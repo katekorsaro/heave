@@ -18,4 +18,11 @@ impl O {
         self.attributes.insert(attribute.id.clone(), attribute);
         self
     }
+    pub fn value_of(&self, id: &str) -> Option<&Value> {
+        let attribute = self.attributes.get(id);
+        match attribute {
+            None => None,
+            Some(attribute) => Some(&attribute.value),
+        }
+    }
 }
