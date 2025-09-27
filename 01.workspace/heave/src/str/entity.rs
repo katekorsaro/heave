@@ -13,7 +13,7 @@ impl O {
             attributes: std::collections::HashMap::new(),
         }
     }
-    pub fn with_attribute(mut self, id: &str, value: Value) -> Self {
+    pub fn with_attribute(mut self, id: &str, value: impl ToValue) -> Self {
         let attribute = Attribute::new(id, value);
         self.attributes.insert(attribute.id.clone(), attribute);
         self
@@ -25,7 +25,7 @@ impl O {
             Some(attribute) => Some(&attribute.value),
         }
     }
-    pub fn set(&mut self, id: &str, value: Value) -> Option<Value> {
+    pub fn set(&mut self, id: &str, value: impl ToValue) -> Option<Value> {
         let attribute = Attribute::new(id, value);
         let previous_attribute = self.attributes.insert(attribute.id.clone(), attribute);
         match previous_attribute {

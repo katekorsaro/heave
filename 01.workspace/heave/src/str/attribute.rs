@@ -7,10 +7,10 @@ pub struct O {
 }
 
 impl O {
-    pub fn new(id: &str, value: Value) -> Self {
+    pub fn new(id: &str, value: impl ToValue) -> Self {
         Self {
             id: String::from(id),
-            value,
+            value: value.to_value(),
         }
     }
 }
