@@ -25,4 +25,19 @@ impl O {
             Some(attribute) => Some(&attribute.value),
         }
     }
+    pub fn set(&mut self, id: &str, value: Value) -> Option<Value> {
+        let attribute = Attribute::new(id, value);
+        let previous_attribute = self.attributes.insert(attribute.id.clone(), attribute);
+        match previous_attribute {
+            None => None,
+            Some(attribute) => Some(attribute.value),
+        }
+    }
+    pub fn unset(&mut self, id: &str) -> Option<Value> {
+        let attribute = self.attributes.remove(id);
+        match attribute {
+            None => None,
+            Some(attribute) => Some(attribute.value),
+        }
+    }
 }
