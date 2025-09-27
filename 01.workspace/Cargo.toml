@@ -1,0 +1,4 @@
+[workspace]
+members = ["heave" ]
+resolver = "3"  # optional, to specify dependency resolver version
+
