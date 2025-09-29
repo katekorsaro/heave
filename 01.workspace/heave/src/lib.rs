@@ -16,4 +16,8 @@ pub use crate::trt::from_eav::T as FromEAV;
 pub use crate::trt::to_eav::T as ToEAV;
 pub use crate::trt::to_value::T as ToValue;
 
-pub mod sqlite {}
+mod sqlite {
+    pub mod init {
+        pub use crate::fun::sqlite_init_db::run as db;
+    }
+}

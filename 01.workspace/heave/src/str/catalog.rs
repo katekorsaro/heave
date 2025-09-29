@@ -13,6 +13,10 @@ impl O {
             ..O::default()
         }
     }
+    pub fn init(&self) {
+        let path = path::Path::new(&self.path);
+        sqlite::init::db(path);
+    }
     pub fn insert(&mut self, object: impl EAV) {
         let entity = object.to_eav();
         self.items.insert(entity.id.clone(), entity);
