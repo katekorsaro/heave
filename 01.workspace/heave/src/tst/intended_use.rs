@@ -130,7 +130,6 @@ mod tests {
             name: "laptop".to_string(),
             price: 200000u64,
         };
-        let mut entity = product.to_eav();
-        catalog.persist(&mut entity);
+        catalog.insert(product);
     }
 }

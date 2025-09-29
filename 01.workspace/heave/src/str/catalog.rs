@@ -13,9 +13,9 @@ impl O {
             ..O::default()
         }
     }
-    pub fn persist(&mut self, entity: &mut Entity) {
-        self.items.insert(entity.id.clone(), entity.clone());
-        entity.persisted = true;
+    pub fn insert(&mut self, object: impl ToEAV) {
+        let entity = object.to_eav();
+        self.items.insert(entity.id.clone(), entity);
     }
 }
 
