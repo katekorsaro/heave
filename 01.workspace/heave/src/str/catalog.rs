@@ -13,11 +13,11 @@ impl O {
             ..O::default()
         }
     }
-    pub fn insert(&mut self, object: impl ToEAV) {
+    pub fn insert(&mut self, object: impl EAV) {
         let entity = object.to_eav();
         self.items.insert(entity.id.clone(), entity);
     }
-    pub fn insert_many(&mut self, objects: Vec<impl ToEAV>) {
+    pub fn insert_many(&mut self, objects: Vec<impl EAV>) {
         for object in objects {
             let entity = object.to_eav();
             self.items.insert(entity.id.clone(), entity);
