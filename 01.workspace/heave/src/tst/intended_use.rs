@@ -7,6 +7,7 @@ mod tests {
         pub name: String,
         pub price: u64,
     }
+    impl EAV for Product {}
     impl ToEAV for Product {
         fn to_eav(self) -> Entity {
             Entity::default()
