@@ -122,4 +122,15 @@ mod tests {
         let converted_product = Product::from_eav(entity);
         assert_eq!(expected_product, converted_product);
     }
+    #[test]
+    fn check_007() {
+        let mut catalog = Catalog::new("");
+        let product = Product {
+            id: short_uuid::short!().to_string(),
+            name: "laptop".to_string(),
+            price: 200000u64,
+        };
+        let mut entity = product.to_eav();
+        catalog.persist(&mut entity);
+    }
 }

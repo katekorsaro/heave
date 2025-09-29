@@ -59,10 +59,4 @@ impl O {
         let value = self.value_of(id).unwrap();
         T::from(value.clone())
     }
-    pub fn persist(&self) {
-        todo!()
-    }
-    pub fn load(_id: &str) -> Self {
-        todo!()
-    }
 }
