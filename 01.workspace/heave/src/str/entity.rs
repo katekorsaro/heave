@@ -42,4 +42,11 @@ impl O {
             Some(attribute) => Some(attribute.value),
         }
     }
+    pub fn unwrap<T>(&self, id: &str) -> T
+    where
+        T: From<Value>,
+    {
+        let value = self.value_of(id).unwrap();
+        T::from(value.clone())
+    }
 }

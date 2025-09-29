@@ -1,6 +1,26 @@
 #[cfg(test)]
 mod tests {
     use crate::*;
+    #[derive(Debug, Clone, PartialEq)]
+    struct Product {
+        pub name: String,
+        pub price: u64,
+    }
+    impl ToEAV for Product {
+        fn to_eav(self) -> Entity {
+            Entity::new("product")
+                .with_attribute("name", self.name)
+                .with_attribute("price", self.price)
+        }
+    }
+    impl FromEAV for Product {
+        fn from_eav(entity: Entity) -> Product {
+            Product {
+                name: entity.unwrap("name"),
+                price: entity.unwrap("price"),
+            }
+        }
+    }
     #[test]
     fn check_001() {
         // Demonstrates the costruction of a new entity instance
@@ -60,5 +80,40 @@ mod tests {
             product_has_category.value_of("category"),
             Some(&Value::Text(category_id))
         );
+    }
+    #[test]
+    fn check_005() {
+        let tag = Entity::new("tag").with_attribute("label", "new");
+        let tag_id = tag.id.clone();
+        let entity = Entity::new("product")
+            .with_attribute("name", "laptop")
+            .with_attribute("price", 200000u64)
+            .with_attribute("delta", -50i64)
+            .with_attribute("in_stock", true)
+            .with_attribute("discount", 5.2f64)
+            .with_attribute("tag", tag);
+        let name: String = entity.unwrap("name");
+        let price: u64 = entity.unwrap("price");
+        let delta: i64 = entity.unwrap("delta");
+        let in_stock: bool = entity.unwrap("in_stock");
+        let discount: f64 = entity.unwrap("discount");
+        let tag: Entity = entity.unwrap("tag");
+        assert_eq!(name, "laptop".to_string());
+        assert_eq!(price, 200000u64);
+        assert_eq!(delta, -50i64);
+        assert!(in_stock);
+        assert_eq!(discount, 5.2f64);
+        assert_eq!(tag.id, tag_id);
+    }
+    #[test]
+    fn check_006() {
+        let product = Product {
+            name: "laptop".to_string(),
+            price: 200000u64,
+        };
+        let expected_product = product.clone();
+        let entity = product.to_eav();
+        let converted_product = Product::from_eav(entity);
+        assert_eq!(expected_product, converted_product);
     }
 }
