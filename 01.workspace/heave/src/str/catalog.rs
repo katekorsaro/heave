@@ -23,6 +23,13 @@ impl O {
             self.items.insert(entity.id.clone(), entity);
         }
     }
+    pub fn get<T>(&self, id: &str) -> Option<T>
+    where
+        T: FromEAV,
+    {
+        let entity = self.items.get(id);
+        entity.map(|e| T::from_eav(e.clone()))
+    }
 }
 
 // impl std::fmt::Display for O {

@@ -148,4 +148,17 @@ mod tests {
         let products = vec![product01, product02];
         catalog.insert_many(products);
     }
+    #[test]
+    fn check_009() {
+        let mut catalog = Catalog::new("");
+        let product = Product {
+            id: short_uuid::short!().to_string(),
+            name: "laptop".to_string(),
+            price: 200000u64,
+        };
+        let expected_product = product.clone();
+        catalog.insert(product);
+        let read_product: Product = catalog.get(&expected_product.id).unwrap();
+        assert_eq!(read_product, expected_product);
+    }
 }
