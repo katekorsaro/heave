@@ -8,13 +8,14 @@ pub fn run(path: &path::Path) {
             class TEXT NOT NULL
         );
         CREATE TABLE IF NOT EXISTS attribute (
-            id TEXT PRIMARY KEY,
+            id TEXT,
+            entity_id TEXT,
             value_int INTEGER,
             value_uint INTEGER,
             value_real REAL,
             value_text TEXT,
             value_bool BOOL,
-            entity_id TEXT,
+            CONSTRAINT pk_id PRIMARY KEY (id, entity_id),
             CONSTRAINT fk_entity_id FOREIGN KEY (entity_id) REFERENCES entity (id) ON DELETE CASCADE ON UPDATE CASCADE
         );
         "#;

@@ -7,6 +7,19 @@ pub struct O {
     pub attributes: std::collections::HashMap<String, Attribute>,
 }
 
+impl EAV for Entity {}
+
+impl ToEAV for Entity {
+    fn to_eav(self) -> Entity {
+        self
+    }
+}
+impl FromEAV for Entity {
+    fn from_eav(entity: Entity) -> Self {
+        entity
+    }
+}
+
 impl O {
     pub fn new(class: &str) -> Self {
         Self {

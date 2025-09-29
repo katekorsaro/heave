@@ -20,4 +20,7 @@ mod sqlite {
     pub mod init {
         pub use crate::fun::sqlite_init_db::run as db;
     }
+    pub mod persist {
+        pub use crate::fun::sqlite_persist_catalog::run as catalog;
+    }
 }

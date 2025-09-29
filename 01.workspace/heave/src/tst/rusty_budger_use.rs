@@ -87,7 +87,12 @@ mod tests {
     }
     #[test]
     pub fn check_001() {
-        let mut catalog = Catalog::new("");
+        let file = "./rustybudger.sqlite3";
+        // clean filesystem
+        if let Ok(true) = std::fs::exists(file) {
+            let _ = std::fs::remove_file(file);
+        }
+        let mut catalog = Catalog::new(file);
         let operation_01 = Operation {
             id: short_uuid::short!().to_string(),
             date: 20250929,
@@ -115,5 +120,6 @@ mod tests {
         catalog.insert_many(operations);
         catalog.insert_many(categories);
         catalog.insert_many(relations);
+        catalog.persist();
     }
 }

@@ -3,11 +3,12 @@ use crate::*;
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct O {
     path: String,
-    items: std::collections::HashMap<String, Entity>,
+    pub(crate) items: std::collections::HashMap<String, Entity>,
 }
 
 impl O {
     pub fn new(path: &str) -> Self {
+        sqlite::init::db(path::Path::new(path));
         Self {
             path: String::from(path),
             ..O::default()
@@ -33,6 +34,10 @@ impl O {
     {
         let entity = self.items.get(id);
         entity.map(|e| T::from_eav(e.clone()))
+    }
+    pub fn persist(&self) {
+        let path = path::Path::new(&self.path);
+        sqlite::persist::catalog(path, self);
     }
 }
 
