@@ -3,12 +3,15 @@ mod tests {
     use crate::*;
     #[derive(Debug, Clone, PartialEq)]
     struct Product {
+        pub id: String,
         pub name: String,
         pub price: u64,
     }
     impl ToEAV for Product {
         fn to_eav(self) -> Entity {
-            Entity::new("product")
+            Entity::default()
+                .with_class("product")
+                .with_id(&self.id)
                 .with_attribute("name", self.name)
                 .with_attribute("price", self.price)
         }
@@ -16,6 +19,7 @@ mod tests {
     impl FromEAV for Product {
         fn from_eav(entity: Entity) -> Product {
             Product {
+                id: entity.id.clone(),
                 name: entity.unwrap("name"),
                 price: entity.unwrap("price"),
             }
@@ -108,6 +112,7 @@ mod tests {
     #[test]
     fn check_006() {
         let product = Product {
+            id: "abcdef".to_string(),
             name: "laptop".to_string(),
             price: 200000u64,
         };

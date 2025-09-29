@@ -12,8 +12,16 @@ impl O {
         Self {
             id: short_uuid::short!().to_string(),
             class: String::from(class),
-            attributes: std::collections::HashMap::new(),
+            ..Entity::default()
         }
+    }
+    pub fn with_id(mut self, id: &str) -> Self {
+        self.id = id.to_string();
+        self
+    }
+    pub fn with_class(mut self, class: &str) -> Self {
+        self.class = class.to_string();
+        self
     }
     pub fn with_attribute(mut self, id: &str, value: impl ToValue) -> Self {
         let attribute = Attribute::new(id, value);
