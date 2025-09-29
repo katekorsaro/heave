@@ -2,6 +2,7 @@ use crate::*;
 
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct O {
+    pub id: String,
     pub class: String,
     pub attributes: std::collections::HashMap<String, Attribute>,
 }
@@ -9,6 +10,7 @@ pub struct O {
 impl O {
     pub fn new(class: &str) -> Self {
         Self {
+            id: short_uuid::short!().to_string(),
             class: String::from(class),
             attributes: std::collections::HashMap::new(),
         }
