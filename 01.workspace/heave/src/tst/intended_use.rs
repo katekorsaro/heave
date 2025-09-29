@@ -132,4 +132,20 @@ mod tests {
         };
         catalog.insert(product);
     }
+    #[test]
+    fn check_008() {
+        let mut catalog = Catalog::new("");
+        let product01 = Product {
+            id: short_uuid::short!().to_string(),
+            name: "laptop".to_string(),
+            price: 200000u64,
+        };
+        let product02 = Product {
+            id: short_uuid::short!().to_string(),
+            name: "desktop".to_string(),
+            price: 150000u64,
+        };
+        let products = vec![product01, product02];
+        catalog.insert_many(products);
+    }
 }

@@ -17,6 +17,12 @@ impl O {
         let entity = object.to_eav();
         self.items.insert(entity.id.clone(), entity);
     }
+    pub fn insert_many(&mut self, objects: Vec<impl ToEAV>) {
+        for object in objects {
+            let entity = object.to_eav();
+            self.items.insert(entity.id.clone(), entity);
+        }
+    }
 }
 
 // impl std::fmt::Display for O {
