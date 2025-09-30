@@ -14,11 +14,6 @@ impl ToEAV for Entity {
         self
     }
 }
-impl FromEAV for Entity {
-    fn from_eav(entity: Entity) -> Self {
-        entity
-    }
-}
 
 impl O {
     pub fn new(class: &str) -> Self {

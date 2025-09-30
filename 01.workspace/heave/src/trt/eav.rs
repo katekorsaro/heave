@@ -2,7 +2,7 @@ use crate::*;
 
 /// TODO: INSERT DOCUMENTATION HERE
 pub trait T where
-    Self: FromEAV,
+    Self: From<Entity>,
     Self: ToEAV,
 {
 }

@@ -17,8 +17,8 @@ mod tests {
                 .with_attribute("price", self.price)
         }
     }
-    impl FromEAV for Product {
-        fn from_eav(entity: Entity) -> Product {
+    impl From<Entity> for Product {
+        fn from(entity: Entity) -> Self {
             Product {
                 id: entity.id.clone(),
                 name: entity.unwrap("name"),
@@ -119,7 +119,7 @@ mod tests {
         };
         let expected_product = product.clone();
         let entity = product.to_eav();
-        let converted_product = Product::from_eav(entity);
+        let converted_product = Product::from(entity);
         assert_eq!(expected_product, converted_product);
     }
     #[test]

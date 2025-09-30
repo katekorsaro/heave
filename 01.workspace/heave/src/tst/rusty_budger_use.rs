@@ -21,8 +21,8 @@ mod tests {
                     .with_attribute("category_id", self.category_id)
             }
         }
-        impl FromEAV for OperationToCategory {
-            fn from_eav(entity: Entity) -> Self {
+        impl From<Entity> for OperationToCategory {
+            fn from(entity: Entity) -> Self {
                 OperationToCategory {
                     id: entity.id.clone(),
                     operation_id: entity.unwrap("operation_id"),
@@ -46,8 +46,8 @@ mod tests {
                     .with_attribute("label", self.label)
             }
         }
-        impl FromEAV for Category {
-            fn from_eav(entity: Entity) -> Self {
+        impl From<Entity> for Category {
+            fn from(entity: Entity) -> Self {
                 Category {
                     id: entity.id.clone(),
                     label: entity.unwrap("label"),
@@ -74,8 +74,8 @@ mod tests {
                     .with_attribute("description", self.description)
             }
         }
-        impl FromEAV for Operation {
-            fn from_eav(entity: Entity) -> Self {
+        impl From<Entity> for Operation {
+            fn from(entity: Entity) -> Self {
                 Operation {
                     id: entity.id.clone(),
                     date: entity.unwrap("date"),

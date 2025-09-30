@@ -30,10 +30,10 @@ impl O {
     }
     pub fn get<T>(&self, id: &str) -> Option<T>
     where
-        T: FromEAV,
+        T: From<Entity>,
     {
         let entity = self.items.get(id);
-        entity.map(|e| T::from_eav(e.clone()))
+        entity.map(|e| T::from(e.clone()))
     }
     pub fn persist(&self) {
         let path = path::Path::new(&self.path);
