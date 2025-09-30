@@ -11,32 +11,44 @@ fn column(value: &Value) -> &'static str {
     }
 }
 
+const DELETE_ENTITY_STATEMENT: &str = r#"
+    DELETE FROM entity
+    WHERE entity.id = ?1;
+"#;
+
+const INSERT_ENTITY_STATEMENT: &str = r#"
+    INSERT INTO entity (id, class)
+    VALUES (?1, ?2);
+"#;
+
+const INSERT_ATTRIBUTE_STATEMENT_TEMPLATE: &str = r#"
+    INSERT INTO attribute (id, entity_id, {column})
+    VALUES (?1, ?2, ?3);
+"#;
+
+fn write_attribute(attribute: &Attribute, entity: &Entity, transaction: &rusqlite::Transaction) {
+    let column = column(&attribute.value);
+    let attribute_values = (&attribute.id, &entity.id, &attribute.value.to_string());
+    let insert_attribute_statement =
+        INSERT_ATTRIBUTE_STATEMENT_TEMPLATE.replace("{column}", column);
+    let _ = transaction.execute(&insert_attribute_statement, attribute_values);
+}
+
+fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) {
+    let entity_id = [&entity.id];
+    let entity_values = (&entity.id, &entity.class);
+    let _ = transaction.execute(DELETE_ENTITY_STATEMENT, entity_id);
+    let _ = transaction.execute(INSERT_ENTITY_STATEMENT, entity_values);
+    for (_key, attribute) in entity.attributes.iter() {
+        write_attribute(attribute, entity, transaction);
+    }
+}
+
 pub fn run(path: &path::Path, catalog: &Catalog) {
     let mut connection = Connection::open(path).unwrap();
-    let delete_entity_statement = r#"
-        DELETE FROM entity
-        WHERE entity.id = ?1;
-        "#;
-    let insert_entity_statement = r#"
-        INSERT INTO entity (id, class)
-        VALUES (?1, ?2);
-        "#;
-    let insert_attribute_statement_template = r#"
-        INSERT INTO attribute (id, entity_id, {column})
-        VALUES (?1, ?2, ?3);
-        "#;
     let transaction = connection.transaction().unwrap();
     for (_key, entity) in catalog.items.iter() {
-        let _ = transaction.execute(delete_entity_statement, [&entity.id]);
-        let _ = transaction.execute(insert_entity_statement, (&entity.id, &entity.class));
-        for (_key, attribute) in entity.attributes.iter() {
-            let insert_attribute_statement =
-                insert_attribute_statement_template.replace("{column}", column(&attribute.value));
-            let _ = transaction.execute(
-                &insert_attribute_statement,
-                (&attribute.id, &entity.id, &attribute.value.to_string()),
-            );
-        }
+        write_entity(entity, &transaction);
     }
     let _ = transaction.commit();
 }
