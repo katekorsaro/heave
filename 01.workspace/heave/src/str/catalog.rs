@@ -38,6 +38,14 @@ impl O {
         let path = path::Path::new(&self.path);
         sqlite::persist::catalog(path, self);
     }
+    pub fn load_by_id(&mut self, id: &str) {
+        let path = path::Path::new(&self.path);
+        let entity = sqlite::load::by_id(path, id);
+        match entity {
+            None => (),
+            Some(entity) => self.insert(entity),
+        }
+    }
 }
 
 // impl std::fmt::Display for O {

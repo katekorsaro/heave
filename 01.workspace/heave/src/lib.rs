@@ -17,6 +17,13 @@ mod sqlite {
     pub mod init {
         pub use crate::fun::sqlite_init_db::run as db;
     }
+    pub mod load {
+        pub use crate::fun::sqlite_load_by_id::run as by_id;
+    }
+    pub mod map {
+        pub use crate::fun::sqlite_map_row_to_attribute::run as row_to_attribute;
+        pub use crate::fun::sqlite_map_row_to_entity::run as row_to_entity;
+    }
     pub mod persist {
         pub use crate::fun::sqlite_persist_catalog::run as catalog;
     }

@@ -161,4 +161,33 @@ mod tests {
         let read_product: Product = catalog.get(&expected_product.id).unwrap();
         assert_eq!(read_product, expected_product);
     }
+    #[test]
+    fn check_010() {
+        // demonstrates load entity by id
+        let tempfile = tempfile::NamedTempFile::new().unwrap();
+        let path = tempfile.path().to_str().unwrap();
+        // insert a new entity
+        let mut catalog = Catalog::new(path);
+        catalog.init();
+        let entity = Entity::new("test")
+            .with_attribute("int", Value::SignedInt(50))
+            .with_attribute("string", Value::Text("text".to_string()));
+        let id = entity.id.clone();
+        catalog.insert(entity);
+        catalog.persist();
+        // read the entity in a new catalog
+        let mut catalog = Catalog::new(path);
+        catalog.load_by_id(&id);
+        let entity: Option<Entity> = catalog.get(&id);
+        assert_eq!(
+            entity,
+            Some(
+                Entity::default()
+                    .with_id(&id)
+                    .with_class("test")
+                    .with_attribute("int", Value::SignedInt(50))
+                    .with_attribute("string", Value::Text("text".to_string()))
+            )
+        );
+    }
 }
