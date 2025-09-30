@@ -1,0 +1,10 @@
+use crate::*;
+
+impl From<u64> for Value {
+    fn from(value: u64) -> Self {
+        Self::UnsignedInt(value)
+    }
+}
+
+// #[cfg(test)]
+// mod unit_tests { use super::*; }
