@@ -18,9 +18,14 @@ pub fn run(path: &path::Path) {
             CONSTRAINT pk_id PRIMARY KEY (id, entity_id),
             CONSTRAINT fk_entity_id FOREIGN KEY (entity_id) REFERENCES entity (id) ON DELETE CASCADE ON UPDATE CASCADE
         );
+        CREATE INDEX IF NOT EXISTS entity_class ON entity (class);
+        CREATE INDEX IF NOT EXISTS attribute_id ON attribute (id);
         "#;
     let connection = Connection::open(path).unwrap();
     let _result = connection.execute_batch(init_statement);
+    if _result.is_err() {
+        panic!();
+    }
 }
 
 #[cfg(test)]
