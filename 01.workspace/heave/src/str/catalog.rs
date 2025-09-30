@@ -73,14 +73,16 @@ impl O {
         let entity = sqlite::load::by_id(path, id);
         match entity {
             None => (),
-            Some(entity) => self.insert(entity),
+            Some(entity) => {
+                self.items.insert(entity.id.clone(), entity);
+            }
         }
     }
     pub fn load_by_class(&mut self, class: &str) {
         let path = path::Path::new(&self.path);
         let entities = sqlite::load::by_class(path, class);
         for entity in entities {
-            self.insert(entity);
+            self.items.insert(entity.id.clone(), entity);
         }
     }
 }
