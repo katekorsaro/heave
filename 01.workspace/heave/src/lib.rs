@@ -12,7 +12,6 @@ pub use crate::str::catalog::O as Catalog;
 pub use crate::str::entity::O as Entity;
 pub use crate::str::value::E as Value;
 pub use crate::trt::eav::T as EAV;
-pub use crate::trt::to_eav::T as ToEAV;
 
 mod sqlite {
     pub mod init {

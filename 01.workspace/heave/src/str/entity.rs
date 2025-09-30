@@ -9,12 +9,6 @@ pub struct O {
 
 impl EAV for Entity {}
 
-impl ToEAV for Entity {
-    fn to_eav(self) -> Entity {
-        self
-    }
-}
-
 impl O {
     pub fn new(class: &str) -> Self {
         Self {

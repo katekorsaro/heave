@@ -12,13 +12,13 @@ mod tests {
             pub category_id: String,
         }
         impl EAV for OperationToCategory {}
-        impl ToEAV for OperationToCategory {
-            fn to_eav(self) -> Entity {
+        impl From<OperationToCategory> for Entity {
+            fn from(value: OperationToCategory) -> Entity {
                 Entity::default()
                     .with_class("operation_has_category")
-                    .with_id(&self.id)
-                    .with_attribute("operation_id", self.operation_id)
-                    .with_attribute("category_id", self.category_id)
+                    .with_id(&value.id)
+                    .with_attribute("operation_id", value.operation_id)
+                    .with_attribute("category_id", value.category_id)
             }
         }
         impl From<Entity> for OperationToCategory {
@@ -38,12 +38,12 @@ mod tests {
             pub label: String,
         }
         impl EAV for Category {}
-        impl ToEAV for Category {
-            fn to_eav(self) -> Entity {
+        impl From<Category> for Entity {
+            fn from(value: Category) -> Entity {
                 Entity::default()
                     .with_class("category")
-                    .with_id(&self.id)
-                    .with_attribute("label", self.label)
+                    .with_id(&value.id)
+                    .with_attribute("label", value.label)
             }
         }
         impl From<Entity> for Category {
@@ -64,14 +64,14 @@ mod tests {
             pub description: String,
         }
         impl EAV for Operation {}
-        impl ToEAV for Operation {
-            fn to_eav(self) -> Entity {
+        impl From<Operation> for Entity {
+            fn from(value: Operation) -> Entity {
                 Entity::default()
                     .with_class("operation")
-                    .with_id(&self.id)
-                    .with_attribute("date", self.date)
-                    .with_attribute("amount", self.amount)
-                    .with_attribute("description", self.description)
+                    .with_id(&value.id)
+                    .with_attribute("date", value.date)
+                    .with_attribute("amount", value.amount)
+                    .with_attribute("description", value.description)
             }
         }
         impl From<Entity> for Operation {

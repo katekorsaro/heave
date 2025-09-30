@@ -3,7 +3,7 @@ use crate::*;
 /// TODO: INSERT DOCUMENTATION HERE
 pub trait T where
     Self: From<Entity>,
-    Self: ToEAV,
+    Self: Into<Entity>,
 {
 }
 

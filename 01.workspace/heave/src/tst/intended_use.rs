@@ -8,13 +8,13 @@ mod tests {
         pub price: u64,
     }
     impl EAV for Product {}
-    impl ToEAV for Product {
-        fn to_eav(self) -> Entity {
+    impl From<Product> for Entity {
+        fn from(value: Product) -> Entity {
             Entity::default()
                 .with_class("product")
-                .with_id(&self.id)
-                .with_attribute("name", self.name)
-                .with_attribute("price", self.price)
+                .with_id(&value.id)
+                .with_attribute("name", value.name)
+                .with_attribute("price", value.price)
         }
     }
     impl From<Entity> for Product {
@@ -118,7 +118,7 @@ mod tests {
             price: 200000u64,
         };
         let expected_product = product.clone();
-        let entity = product.to_eav();
+        let entity: Entity = product.into();
         let converted_product = Product::from(entity);
         assert_eq!(expected_product, converted_product);
     }
