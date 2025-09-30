@@ -8,7 +8,6 @@ pub struct O {
 
 impl O {
     pub fn new(path: &str) -> Self {
-        sqlite::init::db(path::Path::new(path));
         Self {
             path: String::from(path),
             ..O::default()
