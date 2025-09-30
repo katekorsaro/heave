@@ -190,4 +190,32 @@ mod tests {
             )
         );
     }
+    #[test]
+    fn check_011() {
+        // demonstrate load by class
+        let tempfile = tempfile::NamedTempFile::new().unwrap();
+        let path = tempfile.path();
+        let mut catalog = Catalog::new(path.to_str().unwrap());
+        catalog.init();
+        let product_01 = Product {
+            id: short_uuid::short!().to_string(),
+            name: "laptop".to_string(),
+            price: 200000u64,
+        };
+        let product_02 = Product {
+            id: short_uuid::short!().to_string(),
+            name: "desktop".to_string(),
+            price: 300000u64,
+        };
+        let expected_value_01 = product_01.clone();
+        catalog.insert(product_01);
+        catalog.insert(product_02);
+        catalog.persist();
+        // new empty catalog
+        let mut catalog = Catalog::new(path.to_str().unwrap());
+        catalog.load_by_class("product");
+        assert_eq!(catalog.items.len(), 2);
+        let loaded_value_01: Product = catalog.get(&expected_value_01.id).unwrap();
+        assert_eq!(loaded_value_01, expected_value_01);
+    }
 }

@@ -46,15 +46,11 @@ impl O {
             Some(entity) => self.insert(entity),
         }
     }
+    pub fn load_by_class(&mut self, class: &str) {
+        let path = path::Path::new(&self.path);
+        let entities = sqlite::load::by_class(path, class);
+        for entity in entities {
+            self.insert(entity);
+        }
+    }
 }
-
-// impl std::fmt::Display for O {
-// fn fmt(&self, _f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
-// todo!();
-// }
-// }
-
-// #[cfg(test)]
-// mod unit_tests {
-// use super::*;
-// }
