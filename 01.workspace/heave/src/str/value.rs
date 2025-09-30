@@ -12,7 +12,10 @@ pub enum E {
 impl std::fmt::Display for E {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         let string_value = match self {
-            Value::Bool(value) => value.to_string(),
+            Value::Bool(value) => match value{
+                true => 1.to_string(),
+                false => 0.to_string(),
+            },
             Value::Real(value) => value.to_string(),
             Value::SignedInt(value) => value.to_string(),
             Value::UnsignedInt(value) => value.to_string(),
