@@ -52,6 +52,9 @@ impl O {
             Some(attribute) => Some(attribute.value),
         }
     }
+    pub fn has_attribute(&self, id: &str) -> bool {
+        self.attributes.contains_key(id)
+    }
     pub fn unwrap<T>(&self, id: &str) -> T
     where
         T: From<Value>,
