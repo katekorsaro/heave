@@ -59,7 +59,16 @@ impl O {
     where
         T: From<Value>,
     {
-        let value = self.value_of(id).unwrap();
-        T::from(value.clone())
+        self.value_of(id)
+            .map(|value| T::from(value.clone()))
+            .unwrap()
+    }
+    pub fn unwrap_or<T>(&self, id: &str, default: T) -> T
+    where
+        T: From<Value>,
+    {
+        self.value_of(id)
+            .map(|value| T::from(value.clone()))
+            .unwrap_or(default)
     }
 }

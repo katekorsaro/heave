@@ -46,6 +46,24 @@ impl O {
             .collect();
         items
     }
+    pub fn list_by_class_and_attribute<T>(
+        &self,
+        class: &str,
+        attribute: &str,
+        value: impl Into<Value> + Clone,
+    ) -> Vec<T>
+    where
+        T: From<Entity>,
+    {
+        let items: Vec<T> = self
+            .items
+            .values()
+            .filter(|item| item.class == class)
+            .filter(|item| item.value_of(attribute) == Some(&value.clone().into()))
+            .map(|item| T::from(item.clone()))
+            .collect();
+        items
+    }
     pub fn persist(&self) {
         let path = path::Path::new(&self.path);
         sqlite::persist::catalog(path, self);
