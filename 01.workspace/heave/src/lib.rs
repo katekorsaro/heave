@@ -18,6 +18,8 @@ mod sqlite {
         pub use crate::fun::sqlite_init_db::run as db;
     }
     pub mod load {
+        pub use crate::fun::sqlite_load_attributes::run as attributes;
+        pub use crate::fun::sqlite_load_by_class::run as by_class;
         pub use crate::fun::sqlite_load_by_id::run as by_id;
     }
     pub mod map {
