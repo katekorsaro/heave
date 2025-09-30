@@ -37,6 +37,7 @@ fn write_attribute(attribute: &Attribute, entity: &Entity, transaction: &rusqlit
 fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) {
     let entity_id = [&entity.id];
     let entity_values = (&entity.id, &entity.class);
+    println!("Writing: {:?}", entity_values);
     let _ = transaction.execute(DELETE_ENTITY_STATEMENT, entity_id);
     let _ = transaction.execute(INSERT_ENTITY_STATEMENT, entity_values);
     for (_key, attribute) in entity.attributes.iter() {
@@ -47,7 +48,11 @@ fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) {
 pub fn run(path: &path::Path, catalog: &Catalog) {
     let mut connection = Connection::open(path).unwrap();
     let transaction = connection.transaction().unwrap();
-    for (_key, entity) in catalog.items.iter() {
+    for (_key, entity) in catalog
+        .items
+        .iter()
+        .filter(|item| item.1.state == EntityState::New)
+    {
         write_entity(entity, &transaction);
     }
     let _ = transaction.commit();

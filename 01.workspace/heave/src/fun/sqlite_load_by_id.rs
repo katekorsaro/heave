@@ -14,6 +14,7 @@ pub fn run(path: &path::Path, entity_id: &str) -> Option<Entity> {
     let mut entity = result.unwrap();
     if let Some(ref mut entity) = entity {
         sqlite::load::attributes(&connection, entity);
+        entity.state = EntityState::Loaded;
     }
     entity
 }

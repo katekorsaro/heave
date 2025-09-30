@@ -16,6 +16,7 @@ pub fn run(path: &path::Path, entity_class: &str) -> Vec<Entity> {
     for entity in result {
         let mut entity = entity.unwrap();
         sqlite::load::attributes(&connection, &mut entity);
+        entity.state = EntityState::Loaded;
         entities.push(entity);
     }
     entities
