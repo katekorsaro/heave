@@ -173,22 +173,17 @@ mod tests {
             .with_attribute("int", Value::SignedInt(50))
             .with_attribute("string", Value::Text("text".to_string()));
         let id = entity.id.clone();
+        let expected_entity = Entity {
+            state: EntityState::Loaded,
+            ..entity.clone()
+        };
         catalog.insert(entity);
         catalog.persist();
         // read the entity in a new catalog
         let mut catalog = Catalog::new(path);
         catalog.load_by_id(&id);
-        let entity: Option<Entity> = catalog.get(&id);
-        assert_eq!(
-            entity,
-            Some(
-                Entity::default()
-                    .with_id(&id)
-                    .with_class("test")
-                    .with_attribute("int", Value::SignedInt(50))
-                    .with_attribute("string", Value::Text("text".to_string()))
-            )
-        );
+        let entity: Entity = catalog.get(&id).unwrap();
+        assert_eq!(expected_entity, entity,);
     }
     #[test]
     fn check_011() {
