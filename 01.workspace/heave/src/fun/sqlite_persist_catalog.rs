@@ -17,8 +17,8 @@ const DELETE_ENTITY_STATEMENT: &str = r#"
 "#;
 
 const INSERT_ENTITY_STATEMENT: &str = r#"
-    INSERT INTO entity (id, class)
-    VALUES (?1, ?2);
+    INSERT INTO entity (id, class, ref_date)
+    VALUES (?1, ?2, ?3);
 "#;
 
 const INSERT_ATTRIBUTE_STATEMENT_TEMPLATE: &str = r#"
@@ -36,7 +36,7 @@ fn write_attribute(attribute: &Attribute, entity: &Entity, transaction: &rusqlit
 
 fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) {
     let entity_id = [&entity.id];
-    let entity_values = (&entity.id, &entity.class);
+    let entity_values = (&entity.id, &entity.class, entity.ref_date);
     let _ = transaction.execute(DELETE_ENTITY_STATEMENT, entity_id);
     let _ = transaction.execute(INSERT_ENTITY_STATEMENT, entity_values);
     for (_key, attribute) in entity.attributes.iter() {

@@ -5,7 +5,8 @@ pub fn run(path: &path::Path) {
     let init_statement = r#"
         CREATE TABLE IF NOT EXISTS entity (
             id TEXT PRIMARY KEY,
-            class TEXT NOT NULL
+            class TEXT NOT NULL,
+            ref_date INTEGER NOT NULL
         );
         CREATE TABLE IF NOT EXISTS attribute (
             id TEXT,
