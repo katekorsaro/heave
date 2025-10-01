@@ -64,6 +64,12 @@ impl O {
             .map(|value| T::from(value.clone()))
             .unwrap()
     }
+    pub fn unwrap_opt<T>(&self, id: &str) -> Option<T>
+    where
+        T: From<Value>,
+    {
+        self.value_of(id).map(|value| T::from(value.clone()))
+    }
     pub fn unwrap_or<T>(&self, id: &str, default: T) -> T
     where
         T: From<Value>,
