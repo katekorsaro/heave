@@ -54,35 +54,30 @@ impl O {
             .map(|item| T::from(item.clone()));
         items.next()
     }
-    pub fn list_by_class<T>(&self, class: &str) -> Vec<T>
+    pub fn list_by_class<T>(&self, class: &str) -> impl Iterator<Item = T>
     where
         T: From<Entity>,
     {
-        let items: Vec<T> = self
-            .items
+        self.items
             .values()
-            .filter(|item| item.class == class)
+            .filter(move |item| item.class == class)
             .map(|item| T::from(item.clone()))
-            .collect();
-        items
     }
     pub fn list_by_class_and_attribute<T>(
         &self,
         class: &str,
         attribute: &str,
         value: impl Into<Value> + Clone,
-    ) -> Vec<T>
+    ) -> impl Iterator<Item = T>
     where
         T: From<Entity>,
     {
-        let items: Vec<T> = self
-            .items
+        let value: Value = value.into();
+        self.items
             .values()
-            .filter(|item| item.class == class)
-            .filter(|item| item.value_of(attribute) == Some(&value.clone().into()))
+            .filter(move |item| item.class == class)
+            .filter(move |item| item.value_of(attribute) == Some(&value))
             .map(|item| T::from(item.clone()))
-            .collect();
-        items
     }
     pub fn persist(&self) {
         let path = path::Path::new(&self.path);
