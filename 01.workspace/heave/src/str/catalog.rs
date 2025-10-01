@@ -7,21 +7,44 @@ pub struct O {
 }
 
 impl O {
+    /// Creates a new `Catalog` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `path` - The path to the SQLite database file.
+    ///
+    /// # Returns
+    ///
+    /// A new `Catalog` instance.
     pub fn new(path: &str) -> Self {
         Self {
             path: String::from(path),
             ..O::default()
         }
     }
+
+    /// Initializes the database.
     pub fn init(&self) {
         let path = path::Path::new(&self.path);
         sqlite::init::db(path);
     }
+
+    /// Inserts a single object that implements the `EAV` trait into the catalog.
+    ///
+    /// # Arguments
+    ///
+    /// * `object` - The object to insert.
     pub fn insert(&mut self, object: impl EAV) {
         let mut entity = object.into();
         entity.state = EntityState::New;
         self.items.insert(entity.id.clone(), entity);
     }
+
+    /// Inserts multiple objects that implement the `EAV` trait into the catalog.
+    ///
+    /// # Arguments
+    ///
+    /// * `objects` - A vector of objects to insert.
     pub fn insert_many(&mut self, objects: Vec<impl EAV>) {
         for object in objects {
             let mut entity = object.into();
@@ -29,6 +52,16 @@ impl O {
             self.items.insert(entity.id.clone(), entity);
         }
     }
+
+    /// Retrieves an entity by its ID and converts it into a specified type `T`.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the entity to retrieve.
+    ///
+    /// # Returns
+    ///
+    /// An `Option<T>` containing the converted entity if found, otherwise `None`.
     pub fn get<T>(&self, id: &str) -> Option<T>
     where
         T: From<Entity>,
@@ -36,6 +69,18 @@ impl O {
         let entity = self.items.get(id);
         entity.map(|e| T::from(e.clone()))
     }
+
+    /// Retrieves the first entity that matches a given class, attribute, and value.
+    ///
+    /// # Arguments
+    ///
+    /// * `class` - The class of the entity to search for.
+    /// * `attribute` - The attribute of the entity to match.
+    /// * `value` - The value of the attribute to match.
+    ///
+    /// # Returns
+    ///
+    /// An `Option<T>` containing the converted entity if found, otherwise `None`.
     pub fn get_by_class_and_attribute<T>(
         &self,
         class: &str,
@@ -54,6 +99,16 @@ impl O {
             .map(|item| T::from(item.clone()));
         items.next()
     }
+
+    /// Returns an iterator over entities of a specific class.
+    ///
+    /// # Arguments
+    ///
+    /// * `class` - The class of the entities to list.
+    ///
+    /// # Returns
+    ///
+    /// An iterator that yields items of type `T`.
     pub fn list_by_class<T>(&self, class: &str) -> impl Iterator<Item = T>
     where
         T: From<Entity>,
@@ -63,6 +118,18 @@ impl O {
             .filter(move |item| item.class == class)
             .map(|item| T::from(item.clone()))
     }
+
+    /// Returns an iterator over entities that match a given class, attribute, and value.
+    ///
+    /// # Arguments
+    ///
+    /// * `class` - The class of the entities to search for.
+    /// * `attribute` - The attribute of the entities to match.
+    /// * `value` - The value of the attribute to match.
+    ///
+    /// # Returns
+    ///
+    /// An iterator that yields items of type `T`.
     pub fn list_by_class_and_attribute<T>(
         &self,
         class: &str,
@@ -79,10 +146,18 @@ impl O {
             .filter(move |item| item.value_of(attribute) == Some(&value))
             .map(|item| T::from(item.clone()))
     }
+
+    /// Persists the current state of the catalog to the database.
     pub fn persist(&self) {
         let path = path::Path::new(&self.path);
         sqlite::persist::catalog(path, self);
     }
+
+    /// Loads an entity by its ID from the database into the catalog.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the entity to load.
     pub fn load_by_id(&mut self, id: &str) {
         let path = path::Path::new(&self.path);
         let entity = sqlite::load::by_id(path, id);
@@ -93,6 +168,12 @@ impl O {
             }
         }
     }
+
+    /// Loads all entities of a specific class from the database into the catalog.
+    ///
+    /// # Arguments
+    ///
+    /// * `class` - The class of the entities to load.
     pub fn load_by_class(&mut self, class: &str) {
         let path = path::Path::new(&self.path);
         let entities = sqlite::load::by_class(path, class);
