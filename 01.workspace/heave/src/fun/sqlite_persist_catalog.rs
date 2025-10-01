@@ -37,7 +37,6 @@ fn write_attribute(attribute: &Attribute, entity: &Entity, transaction: &rusqlit
 fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) {
     let entity_id = [&entity.id];
     let entity_values = (&entity.id, &entity.class);
-    println!("Writing: {:?}", entity_values);
     let _ = transaction.execute(DELETE_ENTITY_STATEMENT, entity_id);
     let _ = transaction.execute(INSERT_ENTITY_STATEMENT, entity_values);
     for (_key, attribute) in entity.attributes.iter() {
