@@ -6,7 +6,7 @@ pub fn run(path: &path::Path) {
         CREATE TABLE IF NOT EXISTS entity (
             id TEXT PRIMARY KEY,
             class TEXT NOT NULL,
-            ref_date INTEGER NOT NULL
+            ref_date INTEGER
         );
         CREATE TABLE IF NOT EXISTS attribute (
             id TEXT,

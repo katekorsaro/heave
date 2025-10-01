@@ -4,7 +4,7 @@ use crate::*;
 pub struct O {
     pub id: String,
     pub state: EntityState,
-    pub ref_date: u64,
+    pub ref_date: Option<u64>,
     pub class: String,
     pub attributes: std::collections::HashMap<String, Attribute>,
 }
@@ -28,7 +28,7 @@ impl O {
         self
     }
     pub fn with_ref_date(mut self, ref_date: u64) -> Self {
-        self.ref_date = ref_date;
+        self.ref_date = Some(ref_date);
         self
     }
     pub fn with_attribute(mut self, id: &str, value: impl Into<Value>) -> Self {
