@@ -36,6 +36,24 @@ impl O {
         let entity = self.items.get(id);
         entity.map(|e| T::from(e.clone()))
     }
+    pub fn get_by_class_and_attribute<T>(
+        &self,
+        class: &str,
+        attribute: &str,
+        value: impl Into<Value> + Clone,
+    ) -> Option<T>
+    where
+        T: From<Entity>,
+    {
+        let mut items = self
+            .items
+            .values()
+            .filter(|item| item.class == class)
+            .filter(|item| item.value_of(attribute) == Some(&value.clone().into()))
+            .take(1)
+            .map(|item| T::from(item.clone()));
+        items.next()
+    }
     pub fn list_by_class<T>(&self, class: &str) -> Vec<T>
     where
         T: From<Entity>,
