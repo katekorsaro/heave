@@ -5,6 +5,7 @@ pub trait T where
     Self: From<Entity>,
     Self: Into<Entity>,
 {
+    fn class() -> &'static str;
 }
 
 // #[cfg(test)]

@@ -7,7 +7,11 @@ mod tests {
         pub name: String,
         pub price: u64,
     }
-    impl EAV for Product {}
+    impl EAV for Product {
+        fn class() -> &'static str {
+            "product"
+        }
+    }
     impl From<Product> for Entity {
         fn from(value: Product) -> Entity {
             Entity::default()
@@ -208,7 +212,7 @@ mod tests {
         catalog.persist();
         // new empty catalog
         let mut catalog = Catalog::new(path.to_str().unwrap());
-        catalog.load_by_class("product");
+        catalog.load_by_class::<Product>();
         assert_eq!(catalog.items.len(), 2);
         let loaded_value_01: Product = catalog.get(&expected_value_01.id).unwrap();
         assert_eq!(loaded_value_01, expected_value_01);

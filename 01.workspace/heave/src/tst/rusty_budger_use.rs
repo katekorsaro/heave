@@ -11,7 +11,11 @@ mod tests {
             pub operation_id: String,
             pub category_id: String,
         }
-        impl EAV for OperationToCategory {}
+        impl EAV for OperationToCategory {
+            fn class() -> &'static str {
+                "operation_to_category"
+            }
+        }
         impl From<OperationToCategory> for Entity {
             fn from(value: OperationToCategory) -> Entity {
                 Entity::default()
@@ -37,7 +41,11 @@ mod tests {
             pub id: String,
             pub label: String,
         }
-        impl EAV for Category {}
+        impl EAV for Category {
+            fn class() -> &'static str {
+                "category"
+            }
+        }
         impl From<Category> for Entity {
             fn from(value: Category) -> Entity {
                 Entity::default()
@@ -63,7 +71,11 @@ mod tests {
             pub amount: i64,
             pub description: String,
         }
-        impl EAV for Operation {}
+        impl EAV for Operation {
+            fn class() -> &'static str {
+                "operation"
+            }
+        }
         impl From<Operation> for Entity {
             fn from(value: Operation) -> Entity {
                 Entity::default()

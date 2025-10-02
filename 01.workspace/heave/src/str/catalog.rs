@@ -64,17 +64,16 @@ impl O {
     /// An `Option<T>` containing the converted entity if found, otherwise `None`.
     pub fn get<T>(&self, id: &str) -> Option<T>
     where
-        T: From<Entity>,
+        T: EAV,
     {
         let entity = self.items.get(id);
         entity.map(|e| T::from(e.clone()))
     }
 
-    /// Retrieves the first entity that matches a given class, attribute, and value.
+    /// Retrieves the first entity that matches a given attribute and value.
     ///
     /// # Arguments
     ///
-    /// * `class` - The class of the entity to search for.
     /// * `attribute` - The attribute of the entity to match.
     /// * `value` - The value of the attribute to match.
     ///
@@ -83,17 +82,16 @@ impl O {
     /// An `Option<T>` containing the converted entity if found, otherwise `None`.
     pub fn get_by_class_and_attribute<T>(
         &self,
-        class: &str,
         attribute: &str,
         value: impl Into<Value> + Clone,
     ) -> Option<T>
     where
-        T: From<Entity>,
+        T: EAV,
     {
         let mut items = self
             .items
             .values()
-            .filter(|item| item.class == class)
+            .filter(|item| item.class == T::class())
             .filter(|item| item.value_of(attribute) == Some(&value.clone().into()))
             .take(1)
             .map(|item| T::from(item.clone()));
@@ -102,28 +100,23 @@ impl O {
 
     /// Returns an iterator over entities of a specific class.
     ///
-    /// # Arguments
-    ///
-    /// * `class` - The class of the entities to list.
-    ///
     /// # Returns
     ///
     /// An iterator that yields items of type `T`.
-    pub fn list_by_class<T>(&self, class: &str) -> impl Iterator<Item = T>
+    pub fn list_by_class<T>(&self) -> impl Iterator<Item = T>
     where
-        T: From<Entity>,
+        T: EAV,
     {
         self.items
             .values()
-            .filter(move |item| item.class == class)
+            .filter(move |item| item.class == T::class())
             .map(|item| T::from(item.clone()))
     }
 
-    /// Returns an iterator over entities that match a given class, attribute, and value.
+    /// Returns an iterator over entities that match a given attribute and value.
     ///
     /// # Arguments
     ///
-    /// * `class` - The class of the entities to search for.
     /// * `attribute` - The attribute of the entities to match.
     /// * `value` - The value of the attribute to match.
     ///
@@ -132,17 +125,16 @@ impl O {
     /// An iterator that yields items of type `T`.
     pub fn list_by_class_and_attribute<T>(
         &self,
-        class: &str,
         attribute: &str,
         value: impl Into<Value> + Clone,
     ) -> impl Iterator<Item = T>
     where
-        T: From<Entity>,
+        T: EAV,
     {
         let value: Value = value.into();
         self.items
             .values()
-            .filter(move |item| item.class == class)
+            .filter(move |item| item.class == T::class())
             .filter(move |item| item.value_of(attribute) == Some(&value))
             .map(|item| T::from(item.clone()))
     }
@@ -170,11 +162,11 @@ impl O {
     }
 
     /// Loads all entities of a specific class from the database into the catalog.
-    ///
-    /// # Arguments
-    ///
-    /// * `class` - The class of the entities to load.
-    pub fn load_by_class(&mut self, class: &str) {
+    pub fn load_by_class<T>(&mut self)
+    where
+        T: EAV,
+    {
+        let class = T::class();
         let path = path::Path::new(&self.path);
         let entities = sqlite::load::by_class(path, class);
         for entity in entities {
