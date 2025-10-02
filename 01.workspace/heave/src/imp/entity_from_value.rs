@@ -8,7 +8,10 @@ impl From<Value> for Entity {
         };
         Entity {
             id,
-            ..Entity::default()
+            ref_date: None,
+            state: EntityState::Unknown,
+            class: String::new(),
+            attributes: std::collections::HashMap::new(),
         }
     }
 }

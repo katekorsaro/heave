@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug, Default, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct O {
     pub id: String,
     pub state: EntityState,
@@ -16,22 +16,20 @@ impl EAV for Entity {
 }
 
 impl O {
-    pub fn new(class: &str) -> Self {
+    pub fn new<T>() -> Self
+    where
+        T: EAV,
+    {
         Self {
-            id: short_uuid::short!().to_string(),
-            class: String::from(class),
-            ..Entity::default()
+            id: String::new(),
+            state: EntityState::New,
+            ref_date: None,
+            class: T::class().to_string(),
+            attributes: std::collections::HashMap::<String, Attribute>::new(),
         }
     }
     pub fn with_id(mut self, id: &str) -> Self {
         self.id = id.to_string();
-        self
-    }
-    pub fn with_class<T>(mut self) -> Self
-    where
-        T: EAV,
-    {
-        self.class = T::class().to_string();
         self
     }
     pub fn with_ref_date(mut self, ref_date: u64) -> Self {

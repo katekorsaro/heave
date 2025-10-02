@@ -2,5 +2,6 @@
 pub enum E {
     #[default]
     New,
+    Unknown,
     Loaded,
 }

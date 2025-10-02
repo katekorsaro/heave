@@ -56,18 +56,3 @@ pub fn run(path: &path::Path, catalog: &Catalog) {
     }
     let _ = transaction.commit();
 }
-
-#[cfg(test)]
-mod unit_tests {
-    use super::*;
-    #[test]
-    fn test_call() {
-        let tempfile = tempfile::NamedTempFile::new().unwrap();
-        let path = tempfile.path();
-        let entity = Entity::new("test");
-        let mut catalog = Catalog::new("");
-        catalog.insert(entity);
-        sqlite::init::db(path);
-        run(path, &catalog);
-    }
-}

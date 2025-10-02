@@ -6,9 +6,10 @@ pub fn run(row: &rusqlite::Row) -> rusqlite::Result<Entity> {
     let ref_date: Option<u64> = row.get(2)?;
     let entity = Entity {
         id,
+        state: EntityState::Loaded,
         class,
         ref_date,
-        ..Entity::default()
+        attributes: std::collections::HashMap::new(),
     };
     Ok(entity)
 }

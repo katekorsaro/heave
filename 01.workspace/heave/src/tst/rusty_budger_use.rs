@@ -18,8 +18,7 @@ mod tests {
         }
         impl From<OperationToCategory> for Entity {
             fn from(value: OperationToCategory) -> Entity {
-                Entity::default()
-                    .with_class::<OperationToCategory>()
+                Entity::new::<OperationToCategory>()
                     .with_id(&value.id)
                     .with_attribute("operation_id", value.operation_id)
                     .with_attribute("category_id", value.category_id)
@@ -48,8 +47,7 @@ mod tests {
         }
         impl From<Category> for Entity {
             fn from(value: Category) -> Entity {
-                Entity::default()
-                    .with_class::<Category>()
+                Entity::new::<Category>()
                     .with_id(&value.id)
                     .with_attribute("label", value.label)
             }
@@ -78,8 +76,7 @@ mod tests {
         }
         impl From<Operation> for Entity {
             fn from(value: Operation) -> Entity {
-                Entity::default()
-                    .with_class::<Operation>()
+                Entity::new::<Operation>()
                     .with_id(&value.id)
                     .with_attribute("date", value.date)
                     .with_attribute("amount", value.amount)
