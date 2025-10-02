@@ -9,12 +9,6 @@ pub struct O {
     pub attributes: std::collections::HashMap<String, Attribute>,
 }
 
-impl EAV for Entity {
-    fn class() -> &'static str {
-        "entity"
-    }
-}
-
 impl O {
     pub fn new<T>() -> Self
     where
