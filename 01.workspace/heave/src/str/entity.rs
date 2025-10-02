@@ -27,8 +27,11 @@ impl O {
         self.id = id.to_string();
         self
     }
-    pub fn with_class(mut self, class: &str) -> Self {
-        self.class = class.to_string();
+    pub fn with_class<T>(mut self) -> Self
+    where
+        T: EAV,
+    {
+        self.class = T::class().to_string();
         self
     }
     pub fn with_ref_date(mut self, ref_date: u64) -> Self {

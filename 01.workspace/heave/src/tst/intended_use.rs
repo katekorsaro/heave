@@ -15,7 +15,7 @@ mod tests {
     impl From<Product> for Entity {
         fn from(value: Product) -> Entity {
             Entity::default()
-                .with_class("product")
+                .with_class::<Product>()
                 .with_id(&value.id)
                 .with_attribute("name", value.name)
                 .with_attribute("price", value.price)
