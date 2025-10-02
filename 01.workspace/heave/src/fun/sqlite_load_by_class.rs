@@ -8,14 +8,16 @@ const SELECT_ENTITY_BY_CLASS: &str = r#"
 
 pub fn run(path: &path::Path, entity_class: &str) -> Vec<Entity> {
     let mut entities = Vec::<Entity>::new();
-    let connection = Connection::open(path).unwrap();
-    let mut statement = connection.prepare(SELECT_ENTITY_BY_CLASS).unwrap();
+    let mut connection = Connection::open(path).unwrap();
+    let mut transaction = connection.transaction().unwrap();
+    transaction.set_drop_behavior(DropBehavior::Commit);
+    let mut statement = transaction.prepare(SELECT_ENTITY_BY_CLASS).unwrap();
     let result = statement
         .query_map([entity_class], sqlite::map::row_to_entity)
         .unwrap();
     for entity in result {
         let mut entity = entity.unwrap();
-        sqlite::load::attributes(&connection, &mut entity);
+        sqlite::load::attributes(&transaction, &mut entity);
         entity.state = EntityState::Loaded;
         entities.push(entity);
     }
