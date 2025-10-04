@@ -48,9 +48,7 @@ impl O {
     /// * `objects` - A vector of objects to insert.
     pub fn insert_many(&mut self, objects: Vec<impl EAV>) {
         for object in objects {
-            let mut entity = object.into();
-            entity.state = EntityState::New;
-            self.items.insert(entity.id.clone(), entity);
+            self.insert(object);
         }
     }
 
