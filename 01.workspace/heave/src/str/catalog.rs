@@ -150,27 +150,26 @@ impl O {
     /// # Arguments
     ///
     /// * `id` - The ID of the entity to load.
-    pub fn load_by_id(&mut self, id: &str) {
+    pub fn load_by_id(&mut self, id: &str) -> Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
-        let entity = sqlite::load::by_id(path, id);
-        match entity {
-            None => (),
-            Some(entity) => {
-                self.items.insert(entity.id.clone(), entity);
-            }
+        let entity = sqlite::load::by_id(path, id).map_err(|_| FailedTo::LoadFromDB)?;
+        if let Some(entity) = entity {
+            self.items.insert(entity.id.clone(), entity);
         }
+        Ok(())
     }
 
     /// Loads all entities of a specific class from the database into the catalog.
-    pub fn load_by_class<T>(&mut self)
+    pub fn load_by_class<T>(&mut self) -> Result<(), FailedTo>
     where
         T: EAV,
     {
         let class = T::class();
         let path = path::Path::new(&self.path);
-        let entities = sqlite::load::by_class(path, class);
+        let entities = sqlite::load::by_class(path, class)?;
         for entity in entities {
             self.items.insert(entity.id.clone(), entity);
         }
+        Ok(())
     }
 }

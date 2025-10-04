@@ -3,8 +3,13 @@ pub enum E {
     BeginSQLiteTransaction,
     CommitSQLiteTransaction,
     ExecuteSQLiteBatch,
+    ExecuteSQLiteQuery,
     ExecuteSQLiteStatement,
     InitDatabase,
+    LoadFromDB,
+    MapAttribute,
+    MapEntity,
     OpenSQLiteConnection,
     PersistCatalog,
+    PrepareSQLiteStatement,
 }

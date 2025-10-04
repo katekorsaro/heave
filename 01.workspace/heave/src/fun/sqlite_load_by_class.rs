@@ -6,20 +6,24 @@ const SELECT_ENTITY_BY_CLASS: &str = r#"
     WHERE class = ?1;
 "#;
 
-pub fn run(path: &path::Path, entity_class: &str) -> Vec<Entity> {
+pub fn run(path: &path::Path, entity_class: &str) -> Result<Vec<Entity>, FailedTo> {
     let mut entities = Vec::<Entity>::new();
-    let mut connection = Connection::open(path).unwrap();
-    let mut transaction = connection.transaction().unwrap();
+    let mut connection = Connection::open(path).map_err(|_| FailedTo::OpenSQLiteConnection)?;
+    let mut transaction = connection
+        .transaction()
+        .map_err(|_| FailedTo::BeginSQLiteTransaction)?;
     transaction.set_drop_behavior(DropBehavior::Commit);
-    let mut statement = transaction.prepare(SELECT_ENTITY_BY_CLASS).unwrap();
+    let mut statement = transaction
+        .prepare(SELECT_ENTITY_BY_CLASS)
+        .map_err(|_| FailedTo::PrepareSQLiteStatement)?;
     let result = statement
         .query_map([entity_class], sqlite::map::row_to_entity)
-        .unwrap();
+        .map_err(|_| FailedTo::ExecuteSQLiteQuery)?;
     for entity in result {
-        let mut entity = entity.unwrap();
-        sqlite::load::attributes(&transaction, &mut entity);
+        let mut entity = entity.map_err(|_| FailedTo::MapEntity)?;
+        sqlite::load::attributes(&transaction, &mut entity)?;
         entity.state = EntityState::Loaded;
         entities.push(entity);
     }
-    entities
+    Ok(entities)
 }

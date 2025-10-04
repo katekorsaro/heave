@@ -6,17 +6,19 @@ const SELECT_ENTITY_BY_ID: &str = r#"
     WHERE id = ?1;
 "#;
 
-pub fn run(path: &path::Path, entity_id: &str) -> Option<Entity> {
-    let mut connection = Connection::open(path).unwrap();
-    let mut transaction = connection.transaction().unwrap();
+pub fn run(path: &path::Path, entity_id: &str) -> Result<Option<Entity>, FailedTo> {
+    let mut connection = Connection::open(path).map_err(|_| FailedTo::OpenSQLiteConnection)?;
+    let mut transaction = connection
+        .transaction()
+        .map_err(|_| FailedTo::BeginSQLiteTransaction)?;
     transaction.set_drop_behavior(DropBehavior::Commit);
-    let result = transaction
+    let mut entity = transaction
         .query_one(SELECT_ENTITY_BY_ID, [entity_id], sqlite::map::row_to_entity)
-        .optional();
-    let mut entity = result.unwrap();
+        .optional()
+        .map_err(|_| FailedTo::ExecuteSQLiteQuery)?;
     if let Some(ref mut entity) = entity {
-        sqlite::load::attributes(&transaction, entity);
+        sqlite::load::attributes(&transaction, entity)?;
         entity.state = EntityState::Loaded;
     }
-    entity
+    Ok(entity)
 }

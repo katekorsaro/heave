@@ -6,13 +6,16 @@ const SELECT_ATTRIBUTE_BY_FK: &str = r#"
     WHERE entity_id = ?1;
 "#;
 
-pub fn run(transaction: &Transaction, entity: &mut Entity) {
-    let mut select_attributes_statement = transaction.prepare(SELECT_ATTRIBUTE_BY_FK).unwrap();
+pub fn run(transaction: &Transaction, entity: &mut Entity) -> Result<(), FailedTo> {
+    let mut select_attributes_statement = transaction
+        .prepare(SELECT_ATTRIBUTE_BY_FK)
+        .map_err(|_| FailedTo::PrepareSQLiteStatement)?;
     let attributes = select_attributes_statement
         .query_map([&entity.id], sqlite::map::row_to_attribute)
-        .unwrap();
+        .map_err(|_| FailedTo::ExecuteSQLiteQuery)?;
     for attribute in attributes {
-        let attribute = attribute.unwrap();
+        let attribute = attribute.map_err(|_| FailedTo::MapAttribute)?;
         entity.attributes.insert(attribute.id.clone(), attribute);
     }
+    Ok(())
 }
