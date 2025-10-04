@@ -1,7 +1,7 @@
 use crate::*;
 use rusqlite::*;
 
-pub fn run(path: &path::Path) {
+pub fn run(path: &path::Path) -> result::Result<(), FailedTo> {
     let init_statement = r#"
         CREATE TABLE IF NOT EXISTS entity (
             id TEXT PRIMARY KEY,
@@ -22,11 +22,11 @@ pub fn run(path: &path::Path) {
         CREATE INDEX IF NOT EXISTS entity_class ON entity (class);
         CREATE INDEX IF NOT EXISTS attribute_id ON attribute (id);
         "#;
-    let connection = Connection::open(path).unwrap();
-    let _result = connection.execute_batch(init_statement);
-    if _result.is_err() {
-        panic!();
-    }
+    let connection = Connection::open(path).map_err(|_| FailedTo::OpenSQLiteConnection)?;
+    connection
+        .execute_batch(init_statement)
+        .map_err(|_| FailedTo::ExecuteSQLiteBatch)?;
+    Ok(())
 }
 
 #[cfg(test)]
@@ -36,6 +36,7 @@ mod unit_tests {
     fn test_call() {
         let tempfile = tempfile::NamedTempFile::new().unwrap();
         let path = tempfile.path();
-        run(path);
+        let result = run(path);
+        assert!(result.is_ok());
     }
 }

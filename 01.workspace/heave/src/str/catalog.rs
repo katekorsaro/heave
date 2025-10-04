@@ -24,9 +24,10 @@ impl O {
     }
 
     /// Initializes the database.
-    pub fn init(&self) {
+    pub fn init(&self) -> result::Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
-        sqlite::init::db(path);
+        sqlite::init::db(path).map_err(|_| FailedTo::InitDatabase)?;
+        Ok(())
     }
 
     /// Inserts a single object that implements the `EAV` trait into the catalog.
