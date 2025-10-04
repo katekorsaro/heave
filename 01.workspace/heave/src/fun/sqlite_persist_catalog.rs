@@ -26,33 +26,50 @@ const INSERT_ATTRIBUTE_STATEMENT_TEMPLATE: &str = r#"
     VALUES (?1, ?2, ?3);
 "#;
 
-fn write_attribute(attribute: &Attribute, entity: &Entity, transaction: &rusqlite::Transaction) {
+fn write_attribute(
+    attribute: &Attribute,
+    entity: &Entity,
+    transaction: &rusqlite::Transaction,
+) -> result::Result<(), FailedTo> {
     let column = column(&attribute.value);
     let attribute_values = (&attribute.id, &entity.id, &attribute.value.to_string());
     let insert_attribute_statement =
         INSERT_ATTRIBUTE_STATEMENT_TEMPLATE.replace("{column}", column);
-    let _ = transaction.execute(&insert_attribute_statement, attribute_values);
+    transaction
+        .execute(&insert_attribute_statement, attribute_values)
+        .map_err(|_| FailedTo::ExecuteSQLiteStatement)?;
+    Ok(())
 }
 
-fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) {
+fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result<(), FailedTo> {
     let entity_id = [&entity.id];
     let entity_values = (&entity.id, &entity.class, entity.ref_date);
-    let _ = transaction.execute(DELETE_ENTITY_STATEMENT, entity_id);
-    let _ = transaction.execute(INSERT_ENTITY_STATEMENT, entity_values);
-    for (_key, attribute) in entity.attributes.iter() {
-        write_attribute(attribute, entity, transaction);
+    transaction
+        .execute(DELETE_ENTITY_STATEMENT, entity_id)
+        .map_err(|_| FailedTo::ExecuteSQLiteStatement)?;
+    transaction
+        .execute(INSERT_ENTITY_STATEMENT, entity_values)
+        .map_err(|_| FailedTo::ExecuteSQLiteStatement)?;
+    for attribute in entity.attributes.values() {
+        write_attribute(attribute, entity, transaction)?;
     }
+    Ok(())
 }
 
-pub fn run(path: &path::Path, catalog: &Catalog) {
-    let mut connection = Connection::open(path).unwrap();
-    let transaction = connection.transaction().unwrap();
-    for (_key, entity) in catalog
+pub fn run(path: &path::Path, catalog: &Catalog) -> result::Result<(), FailedTo> {
+    let mut connection = Connection::open(path).map_err(|_| FailedTo::OpenSQLiteConnection)?;
+    let transaction = connection
+        .transaction()
+        .map_err(|_| FailedTo::BeginSQLiteTransaction)?;
+    for entity in catalog
         .items
-        .iter()
-        .filter(|item| item.1.state == EntityState::New)
+        .values()
+        .filter(|item| item.state == EntityState::New)
     {
-        write_entity(entity, &transaction);
+        write_entity(entity, &transaction)?;
     }
-    let _ = transaction.commit();
+    transaction
+        .commit()
+        .map_err(|_| FailedTo::CommitSQLiteTransaction)?;
+    Ok(())
 }

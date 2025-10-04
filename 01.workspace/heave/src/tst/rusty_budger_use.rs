@@ -129,6 +129,7 @@ mod tests {
         catalog.insert_many(operations);
         catalog.insert_many(categories);
         catalog.insert_many(relations);
-        catalog.persist();
+        let result = catalog.persist();
+        assert!(result.is_ok());
     }
 }

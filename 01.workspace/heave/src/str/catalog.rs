@@ -139,9 +139,10 @@ impl O {
     }
 
     /// Persists the current state of the catalog to the database.
-    pub fn persist(&self) {
+    pub fn persist(&self) -> result::Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
-        sqlite::persist::catalog(path, self);
+        sqlite::persist::catalog(path, self).map_err(|_| FailedTo::PersistCatalog)?;
+        Ok(())
     }
 
     /// Loads an entity by its ID from the database into the catalog.
