@@ -4,4 +4,5 @@ pub enum E {
     New,
     Unknown,
     Loaded,
+    ToDelete,
 }

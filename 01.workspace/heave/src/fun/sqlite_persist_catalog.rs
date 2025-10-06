@@ -41,6 +41,14 @@ fn write_attribute(
     Ok(())
 }
 
+fn delete_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result<(), FailedTo> {
+    let entity_id = [&entity.id];
+    transaction
+        .execute(DELETE_ENTITY_STATEMENT, entity_id)
+        .map_err(|_| sqlite::FailedTo::ExecuteStatement)?;
+    Ok(())
+}
+
 fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result<(), FailedTo> {
     let entity_id = [&entity.id];
     let entity_values = (&entity.id, &entity.class, entity.ref_date);
@@ -64,9 +72,13 @@ pub fn run(path: &path::Path, catalog: &Catalog) -> result::Result<(), FailedTo>
     for entity in catalog
         .items
         .values()
-        .filter(|item| item.state == EntityState::New)
+        .filter(|item| item.state == EntityState::New || item.state == EntityState::ToDelete)
     {
-        write_entity(entity, &transaction)?;
+        match entity.state {
+            EntityState::New => write_entity(entity, &transaction)?,
+            EntityState::ToDelete => delete_entity(entity, &transaction)?,
+            _ => unreachable!(),
+        }
     }
     transaction
         .commit()

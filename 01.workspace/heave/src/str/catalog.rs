@@ -138,6 +138,13 @@ impl O {
             .map(|item| T::from(item.clone()))
     }
 
+    pub fn delete(&mut self, id: &str) {
+        let entity = self.items.get_mut(id);
+        if let Some(entity) = entity {
+            entity.state = EntityState::ToDelete;
+        }
+    }
+
     /// Persists the current state of the catalog to the database.
     pub fn persist(&self) -> result::Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
