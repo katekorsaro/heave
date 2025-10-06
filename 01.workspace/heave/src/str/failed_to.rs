@@ -1,15 +1,17 @@
+use crate::*;
+
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy, Hash)]
 pub enum E {
-    BeginSQLiteTransaction,
-    CommitSQLiteTransaction,
-    ExecuteSQLiteBatch,
-    ExecuteSQLiteQuery,
-    ExecuteSQLiteStatement,
     InitDatabase,
     LoadFromDB,
     MapAttribute,
     MapEntity,
-    OpenSQLiteConnection,
     PersistCatalog,
-    PrepareSQLiteStatement,
+    SQLite(sqlite::FailedTo),
+}
+
+impl From<sqlite::FailedTo> for E {
+    fn from(value: sqlite::FailedTo) -> Self {
+        Self::SQLite(value)
+    }
 }

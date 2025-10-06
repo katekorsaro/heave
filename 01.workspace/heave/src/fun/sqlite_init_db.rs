@@ -22,10 +22,10 @@ pub fn run(path: &path::Path) -> result::Result<(), FailedTo> {
         CREATE INDEX IF NOT EXISTS entity_class ON entity (class);
         CREATE INDEX IF NOT EXISTS attribute_id ON attribute (id);
         "#;
-    let connection = Connection::open(path).map_err(|_| FailedTo::OpenSQLiteConnection)?;
+    let connection = Connection::open(path).map_err(|_| sqlite::FailedTo::OpenConnection)?;
     connection
         .execute_batch(init_statement)
-        .map_err(|_| FailedTo::ExecuteSQLiteBatch)?;
+        .map_err(|_| sqlite::FailedTo::ExecuteBatch)?;
     Ok(())
 }
 

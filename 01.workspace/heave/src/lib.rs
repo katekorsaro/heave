@@ -16,6 +16,7 @@ pub use crate::str::value::E as Value;
 pub use crate::trt::eav::T as EAV;
 
 mod sqlite {
+    pub use crate::str::sqlite_failed_to::E as FailedTo;
     pub mod init {
         pub use crate::fun::sqlite_init_db::run as db;
     }

@@ -37,7 +37,7 @@ fn write_attribute(
         INSERT_ATTRIBUTE_STATEMENT_TEMPLATE.replace("{column}", column);
     transaction
         .execute(&insert_attribute_statement, attribute_values)
-        .map_err(|_| FailedTo::ExecuteSQLiteStatement)?;
+        .map_err(|_| sqlite::FailedTo::ExecuteStatement)?;
     Ok(())
 }
 
@@ -46,10 +46,10 @@ fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result<
     let entity_values = (&entity.id, &entity.class, entity.ref_date);
     transaction
         .execute(DELETE_ENTITY_STATEMENT, entity_id)
-        .map_err(|_| FailedTo::ExecuteSQLiteStatement)?;
+        .map_err(|_| sqlite::FailedTo::ExecuteStatement)?;
     transaction
         .execute(INSERT_ENTITY_STATEMENT, entity_values)
-        .map_err(|_| FailedTo::ExecuteSQLiteStatement)?;
+        .map_err(|_| sqlite::FailedTo::ExecuteStatement)?;
     for attribute in entity.attributes.values() {
         write_attribute(attribute, entity, transaction)?;
     }
@@ -57,10 +57,10 @@ fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result<
 }
 
 pub fn run(path: &path::Path, catalog: &Catalog) -> result::Result<(), FailedTo> {
-    let mut connection = Connection::open(path).map_err(|_| FailedTo::OpenSQLiteConnection)?;
+    let mut connection = Connection::open(path).map_err(|_| sqlite::FailedTo::OpenConnection)?;
     let transaction = connection
         .transaction()
-        .map_err(|_| FailedTo::BeginSQLiteTransaction)?;
+        .map_err(|_| sqlite::FailedTo::BeginTransaction)?;
     for entity in catalog
         .items
         .values()
@@ -70,6 +70,6 @@ pub fn run(path: &path::Path, catalog: &Catalog) -> result::Result<(), FailedTo>
     }
     transaction
         .commit()
-        .map_err(|_| FailedTo::CommitSQLiteTransaction)?;
+        .map_err(|_| sqlite::FailedTo::CommitTransaction)?;
     Ok(())
 }
