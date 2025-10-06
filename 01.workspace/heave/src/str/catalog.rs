@@ -138,6 +138,11 @@ impl O {
             .map(|item| T::from(item.clone()))
     }
 
+    /// Schedules an entity for deletion. Actual delition will take place when 'persist' is called.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the entity to delete.
     pub fn delete(&mut self, id: &str) {
         let entity = self.items.get_mut(id);
         if let Some(entity) = entity {
@@ -146,6 +151,9 @@ impl O {
     }
 
     /// Persists the current state of the catalog to the database.
+    ///
+    /// - new entities will be written onto DB
+    /// - marked for delition entities will be deleted
     pub fn persist(&self) -> result::Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
         sqlite::persist::catalog(path, self).map_err(|_| FailedTo::PersistCatalog)?;
