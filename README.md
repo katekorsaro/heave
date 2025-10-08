@@ -121,7 +121,7 @@ fn main() {
 Contributions are welcome! If you'd like to contribute to heave, please follow these steps:
 
 1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
+2. Create a new branch for your feature (feature/my_awesome_feature) or bug fix (fix/my_awesome_fix).
 3. Make your changes and commit them with a clear message.
 4. Push your branch to your fork.
 5. Open a pull request to the main repository.
