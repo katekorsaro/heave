@@ -13,8 +13,3 @@ pub fn run(row: &rusqlite::Row) -> rusqlite::Result<Entity> {
     };
     Ok(entity)
 }
-
-// #[cfg(test)]
-// mod unit_tests {
-// use super::*;
-// }

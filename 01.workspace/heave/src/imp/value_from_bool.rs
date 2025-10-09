@@ -5,6 +5,3 @@ impl From<bool> for Value {
         Self::Bool(value)
     }
 }
-
-// #[cfg(test)]
-// mod unit_tests { use super::*; }

@@ -8,6 +8,3 @@ impl From<Value> for bool {
         }
     }
 }
-
-// #[cfg(test)]
-// mod unit_tests { use super::*; }

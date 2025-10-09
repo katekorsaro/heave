@@ -18,8 +18,3 @@ pub fn run(row: &rusqlite::Row) -> rusqlite::Result<Attribute> {
     };
     Ok(Attribute { id, value })
 }
-
-// #[cfg(test)]
-// mod unit_tests {
-// use super::*;
-// }

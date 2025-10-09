@@ -8,6 +8,3 @@ impl From<Value> for f64 {
         }
     }
 }
-
-// #[cfg(test)]
-// mod unit_tests { use super::*; }
