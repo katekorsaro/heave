@@ -31,88 +31,83 @@ Learn more on EAV data model [here](https://en.wikipedia.org/wiki/Entity%E2%80%9
 Here is an example of how to define a typed entity, persist it to a SQLite database, and load it back.
 
 ```rust
-use heave::{Catalog, EAV, Entity};
-use std::fs;
+use heave::*;
 
-// Define a typed entity.
-#[derive(Clone, Debug, PartialEq)]
+// Define a struct named `Product` to represent a product.
 struct Product {
-    id: String,
-    name: String,
-    model: Option<String>,
-    price: u64,
-    in_stock: bool,
+    // `id` is a public field of type `String` to uniquely identify the product.
+    pub id: String,
+    // `name` is a public field of type `String` for the product's name.
+    pub name: String,
+    // `model` is a public optional field of type `String` for the product's model.
+    pub model: Option<String>,
+    // `price` is a public field of type `i64` for the product's price.
+    pub price: i64,
 }
 
-// Implement the EAV trait to define the class of the entity.
+// Implement the `EAV` trait for the `Product` struct.
 impl EAV for Product {
+    // `class` is a function that returns the class name of the entity.
     fn class() -> &'static str {
         "product"
     }
 }
 
-// Implement From<Entity> to map a schemaless entity to a typed one.
-impl From<Entity> for Product {
-    fn from(entity: Entity) -> Self {
-        Product {
-            id: entity.id.clone(),
-            name: entity.unwrap("name"),
-            model: entity.unwrap_opt("model"),
-            price: entity.unwrap_or("price", 0),
-            in_stock: entity.unwrap("in_stock"),
-        }
+// Implement the `From<Product>` trait for the `Entity` struct.
+impl From<Product> for Entity {
+    // `from` is a function that converts a `Product` into an `Entity`.
+    fn from(value: Product) -> Entity {
+        // Create a new `Entity` for the `Product` class.
+        Entity::new::<Product>()
+            // Set the entity's ID from the product's ID.
+            .with_id(&value.id)
+            // Add the "name" attribute with the product's name.
+            .with_attribute("name", value.name)
+            // Add the optional "model" attribute with the product's model.
+            .with_opt_attribute("model", value.model)
+            // Add the "price" attribute with the product's price.
+            .with_attribute("price", value.price)
     }
 }
 
-// Implement From<Product> to map a typed entity to a schemaless one.
-impl From<Product> for Entity {
-    fn from(value: Product) -> Self {
-        let mut entity = Entity::new::<Product>()
-            .with_id(&value.id)
-            .with_attribute("name", value.name)
-            .with_attribute("price", value.price)
-            .with_attribute("in_stock", value.in_stock);
-        if let Some(model) = value.model {
-            entity.set("model", model);
+// Implement the `From<Entity>` trait for the `Product` struct.
+impl From<Entity> for Product {
+    // `from` is a function that converts an `Entity` into a `Product`.
+    fn from(value: Entity) -> Self {
+        // Create a new `Product` from the entity's attributes.
+        Self {
+            // Set the product's ID from the entity's ID.
+            id: value.id.clone(),
+            // Unwrap the "name" attribute to get the product's name.
+            name: value.unwrap("name"),
+            // Unwrap the optional "model" attribute to get the product's model.
+            model: value.unwrap_opt("model"),
+            // Unwrap the "price" attribute to get the product's price.
+            price: value.unwrap("price"),
         }
-        entity
     }
 }
 
 fn main() {
-    let db_path = "example.db";
-
-    // Initialize a new catalog and database.
+    // Define the path for the SQLite database file.
+    let db_path = "./simple_product.sqlite3";
+    // Create a new `Catalog` instance with the specified database path.
     let mut catalog = Catalog::new(db_path);
-    catalog.init();
-
-    // Create a new typed object.
-    let product = Product {
-        id: "prod-123".to_string(),
-        name: String::from("PenguinX Laptop"),
-        model: None,
-        price: 135000,
-        in_stock: true,
+    // Initialize the catalog, which sets up the database.
+    catalog.init().unwrap();
+    // Create a new `Product` instance representing a laptop.
+    let new_laptop = Product {
+        id: "LT001".to_string(),
+        name: "SuperPenguin".to_string(),
+        model: Some("Mark III.2".to_string()),
+        price: 125000,
     };
-    let product_id = product.id.clone();
-
-    // Insert the object and persist it to the database.
-    catalog.insert(product);
-    catalog.persist();
-
-    // Create a new catalog to simulate a different application instance.
-    let mut new_catalog = Catalog::new(db_path);
-
-    // Load the entity from the database.
-    new_catalog.load_by_id(&product_id);
-
-    // Retrieve the typed object from the catalog.
-    let read_product = new_catalog.get::<Product>(&product_id).unwrap();
-
-    println!("Successfully persisted and loaded: {:?}", read_product);
-
-    // Clean up the database file.
-    fs::remove_file(db_path).unwrap();
+    // Insert the new laptop into the catalog. Note that at this time the product is in memory.
+    catalog.insert(new_laptop);
+    // Persist the changes in the catalog to the database.
+    catalog.persist().unwrap();
+    // Remove the SQLite database file.
+    std::fs::remove_file(db_path).unwrap();
 }
 ```
 
