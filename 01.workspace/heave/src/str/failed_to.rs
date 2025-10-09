@@ -2,7 +2,7 @@ use crate::*;
 
 /// Represents the possible failures that can occur in the library.
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy, Hash)]
-pub enum E {
+pub enum FailedTo {
     /// Failed to initialize the database.
     InitDatabase,
     /// Failed to load data from the database.
@@ -17,7 +17,7 @@ pub enum E {
     SQLite(sqlite::FailedTo),
 }
 
-impl From<sqlite::FailedTo> for E {
+impl From<sqlite::FailedTo> for FailedTo {
     fn from(value: sqlite::FailedTo) -> Self {
         Self::SQLite(value)
     }

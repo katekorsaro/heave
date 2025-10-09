@@ -10,13 +10,13 @@ mod tst;
 pub(crate) use crate::str::attribute::O as Attribute;
 pub use crate::str::catalog::O as Catalog;
 pub use crate::str::entity::O as Entity;
-pub use crate::str::entity_state::E as EntityState;
-pub use crate::str::failed_to::E as FailedTo;
-pub(crate) use crate::str::value::E as Value;
+pub use crate::str::entity_state::EntityState;
+pub use crate::str::failed_to::FailedTo;
+pub(crate) use crate::str::value::Value;
 pub use crate::trt::eav::T as EAV;
 
 mod sqlite {
-    pub use crate::str::sqlite_failed_to::E as FailedTo;
+    pub use crate::str::sqlite_failed_to::FailedTo;
     pub mod init {
         pub use crate::fun::sqlite_init_db::run as db;
     }

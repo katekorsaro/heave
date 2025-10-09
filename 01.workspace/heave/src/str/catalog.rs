@@ -9,7 +9,7 @@ pub struct O {
     path: String,
     pub(crate) items: std::collections::HashMap<String, Entity>,
 }
-impl O {
+impl Catalog {
     /// Creates a new `Catalog` instance.
     ///
     /// # Arguments

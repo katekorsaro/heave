@@ -4,8 +4,7 @@ use crate::*;
 ///
 /// This trait provides the necessary conversions to and from the generic `Entity`
 /// representation, and it requires the type to define its own class name.
-pub trait T
-where
+pub trait T where
     Self: From<Entity>,
     Self: Into<Entity>,
 {

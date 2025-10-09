@@ -1,7 +1,7 @@
 use crate::*;
 
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
-pub enum E {
+pub enum Value {
     Bool(bool),
     Real(f64),
     SignedInt(i64),
@@ -9,7 +9,7 @@ pub enum E {
     UnsignedInt(u64),
 }
 
-impl std::fmt::Display for E {
+impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> Result<(), std::fmt::Error> {
         let string_value = match self {
             Value::Bool(value) => match value {

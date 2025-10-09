@@ -6,7 +6,7 @@ pub struct O {
     pub value: Value,
 }
 
-impl O {
+impl Attribute {
     pub fn new(id: &str, value: impl Into<Value>) -> Self {
         Self {
             id: String::from(id),

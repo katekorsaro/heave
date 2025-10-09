@@ -10,7 +10,7 @@ pub struct O {
     pub attributes: std::collections::HashMap<String, Attribute>,
 }
 
-impl O {
+impl Entity {
     /// Creates a new `Entity` instance for a given type `T` that implements `EAV`.
     ///
     /// # Returns
