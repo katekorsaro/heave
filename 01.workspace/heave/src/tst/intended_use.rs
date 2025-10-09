@@ -27,15 +27,12 @@ mod tests {
     }
     impl From<Product> for Entity {
         fn from(value: Product) -> Self {
-            let mut entity = Entity::new::<Product>()
+            Entity::new::<Product>()
                 .with_id(&value.id)
                 .with_attribute("name", value.name)
                 .with_attribute("price", value.price)
-                .with_attribute("in_stock", value.in_stock);
-            if let Some(model) = value.model {
-                entity.set("model", model);
-            }
-            entity
+                .with_attribute("in_stock", value.in_stock)
+                .with_opt_attribute("model", value.model)
         }
     }
     #[test]
