@@ -7,12 +7,12 @@ mod str;
 mod trt;
 mod tst;
 
-pub use crate::str::attribute::O as Attribute;
+pub(crate) use crate::str::attribute::O as Attribute;
 pub use crate::str::catalog::O as Catalog;
 pub use crate::str::entity::O as Entity;
 pub use crate::str::entity_state::E as EntityState;
 pub use crate::str::failed_to::E as FailedTo;
-pub use crate::str::value::E as Value;
+pub(crate) use crate::str::value::E as Value;
 pub use crate::trt::eav::T as EAV;
 
 mod sqlite {
