@@ -191,3 +191,246 @@ impl Catalog {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    // ## 'new()'
+    #[test]
+    fn new_should_create_catalog_with_path_and_empty_items() {
+        // Should create a new Catalog with the given path and an empty 'items' map.
+        todo!();
+    }
+
+    // ## 'init()'
+    #[test]
+    fn init_should_create_db_file_if_not_exists() {
+        // Should create the SQLite database file if it doesn't exist.
+        todo!();
+    }
+
+    #[test]
+    fn init_should_not_fail_if_db_file_exists() {
+        // Should not fail if the database file already exists.
+        todo!();
+    }
+
+    #[test]
+    fn init_should_return_error_for_invalid_path() {
+        // Should return an error for an invalid path or permissions issue.
+        todo!();
+    }
+
+    // ## 'insert()' & 'insert_many()'
+    #[test]
+    fn insert_should_add_single_entity_as_new() {
+        // 'insert()': Should add a single entity to the 'items' map with 'EntityState::New'.
+        todo!();
+    }
+
+    #[test]
+    fn insert_should_overwrite_existing_entity() {
+        // 'insert()': Should overwrite an existing entity with the same ID.
+        todo!();
+    }
+
+    #[test]
+    fn insert_many_should_add_all_entities() {
+        // 'insert_many()': Should add all provided entities to the 'items' map.
+        todo!();
+    }
+
+    // ## 'get()'
+    #[test]
+    fn get_should_retrieve_and_convert_entity_by_id() {
+        // Should retrieve an entity by its ID and correctly convert it to the target type 'T'.
+        todo!();
+    }
+
+    #[test]
+    fn get_should_return_none_for_nonexistent_id() {
+        // Should return 'None' if the ID does not exist.
+        todo!();
+    }
+
+    // ## 'get_by_class_and_attribute()'
+    #[test]
+    fn get_by_class_and_attribute_should_retrieve_correct_entity() {
+        // Should retrieve the first entity matching the class, attribute, and value.
+        todo!();
+    }
+
+    #[test]
+    fn get_by_class_and_attribute_should_work_with_different_value_types() {
+        // Should work with different value types (String, i64, f64, bool).
+        todo!();
+    }
+
+    #[test]
+    fn get_by_class_and_attribute_should_return_none_if_no_match() {
+        // Should return 'None' if no entity matches the criteria.
+        todo!();
+    }
+
+    // ## 'list_by_class()'
+    #[test]
+    fn list_by_class_should_return_all_entities_of_class() {
+        // Should return an iterator with all entities of a specific class.
+        todo!();
+    }
+
+    #[test]
+    fn list_by_class_should_return_empty_iterator_if_no_match() {
+        // Should return an empty iterator if no entities of that class exist.
+        todo!();
+    }
+
+    // ## 'list_by_class_and_attribute()'
+    #[test]
+    fn list_by_class_and_attribute_should_return_all_matching_entities() {
+        // Should return an iterator with all entities matching the class, attribute, and value.
+        todo!();
+    }
+
+    #[test]
+    fn list_by_class_and_attribute_should_return_empty_iterator_if_no_match() {
+        // Should return an empty iterator if no entities match.
+        todo!();
+    }
+
+    // ## 'delete()'
+    #[test]
+    fn delete_should_mark_entity_as_to_delete() {
+        // Should mark an existing entity's state as 'ToDelete'.
+        todo!();
+    }
+
+    #[test]
+    fn delete_should_have_no_effect_for_nonexistent_id() {
+        // Should have no effect if the entity ID does not exist.
+        todo!();
+    }
+
+    // ## 'persist()'
+    #[test]
+    fn persist_should_insert_new_entities() {
+        // Should insert entities with 'EntityState::New' into the database.
+        todo!();
+    }
+
+    #[test]
+    fn persist_should_delete_to_delete_entities() {
+        // Should delete entities with 'EntityState::ToDelete' from the database.
+        todo!();
+    }
+
+    #[test]
+    fn persist_should_update_updated_entities() {
+        // Should update entities with 'EntityState::Updated' in the database (Note: The current implementation doesn't seem to set 'Updated' state, this might be a future enhancement).
+        todo!();
+    }
+
+    #[test]
+    fn persist_should_handle_mixed_entity_states() {
+        // Should handle a mix of new, updated, and deleted entities in one operation.
+        todo!();
+    }
+
+    #[test]
+    fn persist_should_return_error_on_db_failure() {
+        // Should return an error if the database connection fails or a query fails.
+        todo!();
+    }
+
+    #[test]
+    fn persist_should_update_in_memory_state() {
+        // After persisting, the in-memory state of entities should be considered. (e.g., should deleted items be removed from the 'items' map?).
+        todo!();
+    }
+
+    // ## 'load_by_id()'
+    #[test]
+    fn load_by_id_should_load_entity_from_db() {
+        // Should load a single entity from the database into the 'items' map.
+        todo!();
+    }
+
+    #[test]
+    fn load_by_id_should_overwrite_in_memory_entity() {
+        // Should overwrite an existing in-memory entity with the same ID.
+        todo!();
+    }
+
+    #[test]
+    fn load_by_id_should_do_nothing_if_not_found() {
+        // Should do nothing if the entity is not found in the database.
+        todo!();
+    }
+
+    #[test]
+    fn load_by_id_should_return_error_on_db_failure() {
+        // Should return an error if the database operation fails.
+        todo!();
+    }
+
+    // ## 'load_by_class()'
+    #[test]
+    fn load_by_class_should_load_all_entities_of_class() {
+        // Should load all entities of a given class from the database into the 'items' map.
+        todo!();
+    }
+
+    #[test]
+    fn load_by_class_should_overwrite_in_memory_entities() {
+        // Should overwrite any existing in-memory entities with the same IDs.
+        todo!();
+    }
+
+    #[test]
+    fn load_by_class_should_do_nothing_if_none_found() {
+        // Should do nothing if no entities of that class are found.
+        todo!();
+    }
+
+    #[test]
+    fn load_by_class_should_return_error_on_db_failure() {
+        // Should return an error if the database operation fails.
+        todo!();
+    }
+
+    // ## Integration Tests
+    #[test]
+    fn integration_test_init_insert_persist_load_get() {
+        // Scenario: 'init' -> 'insert' -> 'persist' -> create a new catalog instance -> 'load_by_id' -> 'get' -> verify data integrity.
+        todo!();
+    }
+
+    #[test]
+    fn integration_test_init_insert_many_persist_load_list() {
+        // Scenario: 'init' -> 'insert_many' -> 'persist' -> new catalog -> 'load_by_class' -> 'list_by_class' -> verify all items are loaded.
+        todo!();
+    }
+
+    #[test]
+    fn integration_test_insert_persist_load_delete_persist_load() {
+        // Scenario: 'insert' -> 'persist' -> 'load_by_id' -> 'delete' -> 'persist' -> 'load_by_id' should now return nothing for the deleted ID.
+        todo!();
+    }
+
+    #[test]
+    fn integration_test_insert_get_by_class_and_attribute() {
+        // Scenario: 'insert' -> 'get_by_class_and_attribute' should return the correct item.
+        todo!();
+    }
+
+    #[test]
+    fn integration_test_insert_many_list_by_class_and_attribute() {
+        // Scenario: 'insert_many' -> 'list_by_class_and_attribute' should return all matching items.
+        todo!();
+    }
+
+    #[test]
+    fn integration_test_concurrency() {
+        // Scenario: Concurrency - what happens if two 'Catalog' instances point to the same file? (e.g., one reads while the other writes).
+        todo!();
+    }
+}
