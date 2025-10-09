@@ -85,3 +85,33 @@ pub fn run(path: &path::Path, catalog: &Catalog) -> result::Result<(), FailedTo>
         .map_err(|_| sqlite::FailedTo::CommitTransaction)?;
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn persist_should_insert_new_entities_and_attributes() {
+        // Verifies that entities marked as 'New' in the catalog are inserted into the database, along with all their attributes.
+        todo!();
+    }
+    #[test]
+    fn persist_should_delete_entities_marked_for_deletion() {
+        // Ensures that entities marked as 'ToDelete' are correctly removed from the database.
+        todo!();
+    }
+    #[test]
+    fn persist_should_handle_a_mix_of_new_and_deleted_entities() {
+        // Tests the function's ability to handle a batch operation involving both new entities to be inserted and existing ones to be deleted.
+        todo!();
+    }
+    #[test]
+    fn persist_should_not_affect_unmodified_entities() {
+        // Verifies that entities in the catalog that are not marked as 'New' or 'ToDelete' remain untouched in the database.
+        todo!();
+    }
+    #[test]
+    fn persist_should_rollback_transaction_on_failure() {
+        // Ensures that if any part of the persistence process fails, the entire transaction is rolled back, leaving the database state unchanged.
+        todo!();
+    }
+}

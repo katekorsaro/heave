@@ -27,3 +27,28 @@ pub fn run(path: &path::Path, entity_class: &str) -> Result<Vec<Entity>, FailedT
     }
     Ok(entities)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn load_by_class_should_fetch_all_entities_for_a_given_class() {
+        // Verifies that all entities belonging to a specific class are retrieved from the database.
+        todo!();
+    }
+    #[test]
+    fn load_by_class_should_return_empty_vec_for_non_existent_class() {
+        // Ensures that an empty vector is returned when querying for a class that has no entities in the database.
+        todo!();
+    }
+    #[test]
+    fn load_by_class_should_fully_load_entities_with_attributes() {
+        // Checks that the retrieved entities are complete, including all their associated attributes.
+        todo!();
+    }
+    #[test]
+    fn load_by_class_should_fail_gracefully_on_db_connection_error() {
+        // Tests that the function returns an appropriate error if the database connection cannot be established.
+        todo!();
+    }
+}

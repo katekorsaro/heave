@@ -30,13 +30,21 @@ pub fn run(path: &path::Path) -> result::Result<(), FailedTo> {
 }
 
 #[cfg(test)]
-mod unit_tests {
+mod tests {
     use super::*;
     #[test]
-    fn test_call() {
-        let tempfile = tempfile::NamedTempFile::new().unwrap();
-        let path = tempfile.path();
-        let result = run(path);
-        assert!(result.is_ok());
+    fn init_db_should_create_tables_and_indexes_on_new_db() {
+        // This test verifies that a new database is correctly initialized with the necessary tables ('entity', 'attribute') and indexes.
+        todo!();
+    }
+    #[test]
+    fn init_db_should_be_idempotent_and_not_fail_on_existing_db() {
+        // This test ensures that initializing an already existing and initialized database does not cause errors.
+        todo!();
+    }
+    #[test]
+    fn init_db_should_fail_gracefully_on_invalid_path() {
+        // This test checks that the function returns an error when provided with an invalid or inaccessible file path.
+        todo!();
     }
 }

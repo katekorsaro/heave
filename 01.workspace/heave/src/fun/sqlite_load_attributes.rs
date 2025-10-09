@@ -19,3 +19,23 @@ pub fn run(transaction: &Transaction, entity: &mut Entity) -> Result<(), FailedT
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn load_attributes_should_populate_entity_from_db() {
+        // Verifies that attributes for a given entity are correctly loaded from the database and added to the entity's attributes map.
+        todo!();
+    }
+    #[test]
+    fn load_attributes_should_handle_entities_with_no_attributes() {
+        // Ensures that the function completes without error and without adding attributes for an entity that has none in the database.
+        todo!();
+    }
+    #[test]
+    fn load_attributes_should_return_error_on_query_failure() {
+        // Checks that an error is returned if the database query to select attributes fails.
+        todo!();
+    }
+}
