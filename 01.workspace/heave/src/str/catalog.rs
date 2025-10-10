@@ -194,6 +194,46 @@ impl Catalog {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
+    #[derive(Default, PartialEq, Clone)]
+    struct Item {
+        pub id: String,
+        pub name: String,
+        pub price: u64,
+        pub in_stock: bool,
+    }
+    impl Item {
+        pub fn new() -> Self {
+            Self {
+                id: short_uuid::short!().to_string(),
+                ..Self::default()
+            }
+        }
+    }
+    impl EAV for Item {
+        fn class() -> &'static str {
+            "item"
+        }
+    }
+    impl From<Item> for Entity {
+        fn from(value: Item) -> Entity {
+            Entity::new::<Item>()
+                .with_id(&value.id)
+                .with_attribute("name", value.name)
+                .with_attribute("price", value.price)
+                .with_attribute("in_stock", value.in_stock)
+        }
+    }
+    impl From<Entity> for Item {
+        fn from(entity: Entity) -> Self {
+            Self {
+                id: entity.id.clone(),
+                name: entity.unwrap("name"),
+                price: entity.unwrap("price"),
+                in_stock: entity.unwrap("in_stock"),
+            }
+        }
+    }
     // ## 'new()'
     #[test]
     fn new_should_create_catalog_with_path_and_empty_items() {
