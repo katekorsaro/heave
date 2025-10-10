@@ -1,11 +1,15 @@
 pub mod bool_from_value;
 pub mod f64_from_value;
+pub mod i32_from_value;
 pub mod i64_from_value;
 pub mod string_from_value;
+pub mod u32_from_value;
 pub mod u64_from_value;
 pub mod value_from_bool;
 pub mod value_from_f64;
+pub mod value_from_i32;
 pub mod value_from_i64;
 pub mod value_from_str;
 pub mod value_from_string;
+pub mod value_from_u32;
 pub mod value_from_u64;
