@@ -202,14 +202,6 @@ mod tests {
         pub price: u64,
         pub in_stock: bool,
     }
-    impl Item {
-        pub fn new() -> Self {
-            Self {
-                id: short_uuid::short!().to_string(),
-                ..Self::default()
-            }
-        }
-    }
     impl EAV for Item {
         fn class() -> &'static str {
             "item"
@@ -300,19 +292,77 @@ mod tests {
     #[test]
     fn insert_should_add_single_entity_as_new() {
         // 'insert()': Should add a single entity to the 'items' map with 'EntityState::New'.
-        todo!();
+        let mut catalog = Catalog::new("dummy.db");
+        let item = Item {
+            id: "item-123".to_string(),
+            name: "Test Item".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        let item_id = item.id.clone();
+        catalog.insert(item);
+        let entity = catalog.items.get(&item_id).unwrap();
+        assert_eq!(entity.id, item_id);
+        assert_eq!(entity.state, EntityState::New);
+        assert_eq!(entity.class, "item");
+        assert_eq!(entity.value_of("name"), Some(&Value::from("Test Item")));
+        assert_eq!(entity.value_of("price"), Some(&Value::from(100u64)));
+        assert_eq!(entity.value_of("in_stock"), Some(&Value::from(true)));
     }
 
     #[test]
     fn insert_should_overwrite_existing_entity() {
         // 'insert()': Should overwrite an existing entity with the same ID.
-        todo!();
+        let mut catalog = Catalog::new("dummy.db");
+        let item1 = Item {
+            id: "item-123".to_string(),
+            name: "First Item".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        let item_id = item1.id.clone();
+        catalog.insert(item1);
+        let item2 = Item {
+            id: "item-123".to_string(),
+            name: "Second Item".to_string(),
+            price: 200,
+            in_stock: false,
+        };
+        catalog.insert(item2);
+        assert_eq!(catalog.items.len(), 1);
+        let entity = catalog.items.get(&item_id).unwrap();
+        assert_eq!(entity.value_of("name"), Some(&Value::from("Second Item")));
+        assert_eq!(entity.value_of("price"), Some(&Value::from(200u64)));
+        assert_eq!(entity.value_of("in_stock"), Some(&Value::from(false)));
+        assert_eq!(entity.state, EntityState::New);
     }
 
     #[test]
     fn insert_many_should_add_all_entities() {
         // 'insert_many()': Should add all provided entities to the 'items' map.
-        todo!();
+        let mut catalog = Catalog::new("dummy.db");
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                name: "Item 1".to_string(),
+                price: 10,
+                in_stock: true,
+            },
+            Item {
+                id: "item-2".to_string(),
+                name: "Item 2".to_string(),
+                price: 20,
+                in_stock: false,
+            },
+        ];
+        catalog.insert_many(items);
+        assert_eq!(catalog.items.len(), 2);
+        let entity1 = catalog.items.get("item-1").unwrap();
+        assert_eq!(entity1.state, EntityState::New);
+        assert_eq!(entity1.value_of("name"), Some(&Value::from("Item 1")));
+        let entity2 = catalog.items.get("item-2").unwrap();
+        assert_eq!(entity2.state, EntityState::New);
+        assert_eq!(entity2.value_of("name"), Some(&Value::from("Item 2")));
     }
 
     // ## 'get()'
