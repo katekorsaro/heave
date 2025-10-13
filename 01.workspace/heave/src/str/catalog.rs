@@ -195,7 +195,7 @@ impl Catalog {
 #[cfg(test)]
 mod tests {
     use super::*;
-    #[derive(Default, PartialEq, Clone)]
+    #[derive(Debug, Default, PartialEq, Clone)]
     struct Item {
         pub id: String,
         pub name: String,
@@ -369,32 +369,106 @@ mod tests {
     #[test]
     fn get_should_retrieve_and_convert_entity_by_id() {
         // Should retrieve an entity by its ID and correctly convert it to the target type 'T'.
-        todo!();
+        let mut catalog = Catalog::new("dummy.db");
+        let item = Item {
+            id: "item-123".to_string(),
+            name: "Test Item".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        catalog.insert(item.clone());
+        let retrieved_item: Option<Item> = catalog.get("item-123");
+        assert_eq!(retrieved_item, Some(item));
     }
 
     #[test]
     fn get_should_return_none_for_nonexistent_id() {
         // Should return 'None' if the ID does not exist.
-        todo!();
+        let mut catalog = Catalog::new("dummy.db");
+        let item = Item {
+            id: "item-123".to_string(),
+            name: "Test Item".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        catalog.insert(item.clone());
+        let retrieved_item: Option<Item> = catalog.get("nonexistent-id");
+        assert!(retrieved_item.is_none());
     }
 
     // ## 'get_by_class_and_attribute()'
     #[test]
     fn get_by_class_and_attribute_should_retrieve_correct_entity() {
         // Should retrieve the first entity matching the class, attribute, and value.
-        todo!();
+        let mut catalog = Catalog::new("dummy.db");
+        let item1 = Item {
+            id: "item-1".to_string(),
+            name: "Test Item".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        let item2 = Item {
+            id: "item-2".to_string(),
+            name: "Unique Item".to_string(),
+            price: 200,
+            in_stock: false,
+        };
+        catalog.insert(item1.clone());
+        catalog.insert(item2.clone());
+        let retrieved_item: Option<Item> =
+            catalog.get_by_class_and_attribute("name", "Unique Item");
+        assert_eq!(retrieved_item, Some(item2));
     }
 
     #[test]
     fn get_by_class_and_attribute_should_work_with_different_value_types() {
-        // Should work with different value types (String, i64, f64, bool).
-        todo!();
+        // Should work with different value types (String, u64, bool).
+        let mut catalog = Catalog::new("dummy.db");
+        let item1 = Item {
+            id: "item-1".to_string(),
+            name: "Item One".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        let item2 = Item {
+            id: "item-2".to_string(),
+            name: "Item Two".to_string(),
+            price: 250,
+            in_stock: false,
+        };
+        catalog.insert(item1.clone());
+        catalog.insert(item2.clone());
+        // Test with &str for String attribute
+        let retrieved_by_name: Option<Item> =
+            catalog.get_by_class_and_attribute("name", "Item One");
+        assert_eq!(retrieved_by_name, Some(item1.clone()));
+        // Test with u64 for price attribute
+        let retrieved_by_price: Option<Item> = catalog.get_by_class_and_attribute("price", 250u64);
+        assert_eq!(retrieved_by_price, Some(item2.clone()));
+        // Test with bool for in_stock attribute
+        let retrieved_by_stock: Option<Item> = catalog.get_by_class_and_attribute("in_stock", true);
+        assert_eq!(retrieved_by_stock, Some(item1.clone()));
     }
 
     #[test]
     fn get_by_class_and_attribute_should_return_none_if_no_match() {
         // Should return 'None' if no entity matches the criteria.
-        todo!();
+        let mut catalog = Catalog::new("dummy.db");
+        let item = Item {
+            id: "item-1".to_string(),
+            name: "Test Item".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        catalog.insert(item.clone());
+        // Test with a value that doesn't exist
+        let retrieved_item: Option<Item> =
+            catalog.get_by_class_and_attribute("name", "Non-existent Name");
+        assert!(retrieved_item.is_none());
+        // Test with an attribute that doesn't exist
+        let retrieved_item_2: Option<Item> =
+            catalog.get_by_class_and_attribute("non-existent-attribute", "Test Item");
+        assert!(retrieved_item_2.is_none());
     }
 
     // ## 'list_by_class()'
