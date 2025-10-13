@@ -475,13 +475,33 @@ mod tests {
     #[test]
     fn list_by_class_should_return_all_entities_of_class() {
         // Should return an iterator with all entities of a specific class.
-        todo!();
+        let mut catalog = Catalog::new("dummy.db");
+        let item1 = Item {
+            id: "item-1".to_string(),
+            name: "Item One".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        let item2 = Item {
+            id: "item-2".to_string(),
+            name: "Item Two".to_string(),
+            price: 200,
+            in_stock: false,
+        };
+        catalog.insert(item1.clone());
+        catalog.insert(item2.clone());
+        let results: Vec<Item> = catalog.list_by_class::<Item>().collect();
+        assert_eq!(results.len(), 2);
+        assert!(results.contains(&item1));
+        assert!(results.contains(&item2));
     }
 
     #[test]
     fn list_by_class_should_return_empty_iterator_if_no_match() {
         // Should return an empty iterator if no entities of that class exist.
-        todo!();
+        let catalog = Catalog::new("dummy.db");
+        let results: Vec<Item> = catalog.list_by_class::<Item>().collect();
+        assert!(results.is_empty());
     }
 
     // ## 'list_by_class_and_attribute()'
