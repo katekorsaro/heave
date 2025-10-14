@@ -607,13 +607,64 @@ mod tests {
     #[test]
     fn persist_should_insert_new_entities() {
         // Should insert entities with 'EntityState::New' into the database.
-        todo!();
+        let db_path = "target/test_dbs/persist_should_insert_new_entities.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        // 1. Create catalog, insert an item, and persist
+        let mut catalog1 = Catalog::new(db_path);
+        catalog1.init().unwrap();
+        let item1 = Item {
+            id: "item-1".to_string(),
+            name: "Test Item".to_string(),
+            price: 123,
+            in_stock: true,
+        };
+        catalog1.insert(item1.clone());
+        assert!(catalog1.persist().is_ok());
+        // 2. Create a new catalog and load the item to verify it was persisted
+        let mut catalog2 = Catalog::new(db_path);
+        assert!(catalog2.load_by_id("item-1").is_ok());
+        // 3. Get the item and assert it's the same as the one we inserted
+        let loaded_item: Option<Item> = catalog2.get("item-1");
+        assert_eq!(loaded_item, Some(item1));
+        // Clean up
+        std::fs::remove_file(path).unwrap();
     }
 
     #[test]
     fn persist_should_delete_to_delete_entities() {
         // Should delete entities with 'EntityState::ToDelete' from the database.
-        todo!();
+        let db_path = "target/test_dbs/persist_should_delete_to_delete_entities.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        // 1. Create catalog, insert an item, and persist it.
+        let mut catalog1 = Catalog::new(db_path);
+        catalog1.init().unwrap();
+        let item1 = Item {
+            id: "item-to-delete".to_string(),
+            name: "Test Item".to_string(),
+            price: 123,
+            in_stock: true,
+        };
+        catalog1.insert(item1.clone());
+        assert!(catalog1.persist().is_ok());
+        // 2. Mark the item for deletion and persist again.
+        catalog1.delete(&item1.id);
+        assert!(catalog1.persist().is_ok());
+        // 3. Create a new catalog and try to load the deleted item.
+        let mut catalog2 = Catalog::new(db_path);
+        assert!(catalog2.load_by_id(&item1.id).is_ok());
+        // 4. Assert that the item was not found.
+        let loaded_item: Option<Item> = catalog2.get(&item1.id);
+        assert!(loaded_item.is_none());
+        // Clean up
+        std::fs::remove_file(path).unwrap();
     }
 
     #[test]
