@@ -508,13 +508,64 @@ mod tests {
     #[test]
     fn list_by_class_and_attribute_should_return_all_matching_entities() {
         // Should return an iterator with all entities matching the class, attribute, and value.
-        todo!();
+        let mut catalog = Catalog::new("dummy.db");
+        let item1 = Item {
+            id: "item-1".to_string(),
+            name: "Item One".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        let item2 = Item {
+            id: "item-2".to_string(),
+            name: "Item Two".to_string(),
+            price: 200,
+            in_stock: false,
+        };
+        let item3 = Item {
+            id: "item-3".to_string(),
+            name: "Item Three".to_string(),
+            price: 300,
+            in_stock: true,
+        };
+        catalog.insert(item1.clone());
+        catalog.insert(item2.clone());
+        catalog.insert(item3.clone());
+        let results: Vec<Item> = catalog
+            .list_by_class_and_attribute("in_stock", true)
+            .collect();
+        assert_eq!(results.len(), 2);
+        assert!(results.contains(&item1));
+        assert!(results.contains(&item3));
+        assert!(!results.contains(&item2));
     }
 
     #[test]
     fn list_by_class_and_attribute_should_return_empty_iterator_if_no_match() {
         // Should return an empty iterator if no entities match.
-        todo!();
+        let mut catalog = Catalog::new("dummy.db");
+        let item = Item {
+            id: "item-1".to_string(),
+            name: "Test Item".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        catalog.insert(item);
+        // Search for a value that doesn't exist
+        let results: Vec<Item> = catalog
+            .list_by_class_and_attribute("in_stock", false)
+            .collect();
+        assert!(results.is_empty());
+        // Search for an attribute that doesn't exist
+        let results_2: Vec<Item> = catalog
+            .list_by_class_and_attribute("non-existent-attribute", true)
+            .collect();
+        assert!(results_2.is_empty());
+        // Search in a completely empty catalog
+        let empty_catalog = Catalog::new("dummy.db");
+        let results_3: Vec<Item> = empty_catalog
+            .list_by_class_and_attribute("any_attribute", "any_value")
+            .collect();
+        assert!(results_3.is_empty());
     }
 
     // ## 'delete()'
