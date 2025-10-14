@@ -69,13 +69,13 @@ pub fn run(path: &path::Path, catalog: &Catalog) -> result::Result<(), FailedTo>
     let transaction = connection
         .transaction()
         .map_err(|_| sqlite::FailedTo::BeginTransaction)?;
-    for entity in catalog
-        .items
-        .values()
-        .filter(|item| item.state == EntityState::New || item.state == EntityState::ToDelete)
-    {
+    for entity in catalog.items.values().filter(|item| {
+        item.state == EntityState::New
+            || item.state == EntityState::Updated
+            || item.state == EntityState::ToDelete
+    }) {
         match entity.state {
-            EntityState::New => write_entity(entity, &transaction)?,
+            EntityState::New | EntityState::Updated => write_entity(entity, &transaction)?,
             EntityState::ToDelete => delete_entity(entity, &transaction)?,
             _ => unreachable!(),
         }
