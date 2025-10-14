@@ -33,14 +33,18 @@ impl Catalog {
         Ok(())
     }
 
-    /// Inserts a single object that implements the `EAV` trait into the catalog.
+    /// Inserts or updates a single object that implements the `EAV` trait into the catalog.
     ///
     /// # Arguments
     ///
     /// * `object` - The object to insert.
-    pub fn insert(&mut self, object: impl EAV) {
+    pub fn upsert(&mut self, object: impl EAV) {
         let mut entity = object.into();
-        entity.state = EntityState::New;
+        if self.items.contains_key(&entity.id) {
+            entity.state = EntityState::Updated;
+        } else {
+            entity.state = EntityState::New;
+        }
         self.items.insert(entity.id.clone(), entity);
     }
 
@@ -51,7 +55,7 @@ impl Catalog {
     /// * `objects` - A vector of objects to insert.
     pub fn insert_many(&mut self, objects: Vec<impl EAV>) {
         for object in objects {
-            self.insert(object);
+            self.upsert(object);
         }
     }
 
@@ -300,7 +304,7 @@ mod tests {
             in_stock: true,
         };
         let item_id = item.id.clone();
-        catalog.insert(item);
+        catalog.upsert(item);
         let entity = catalog.items.get(&item_id).unwrap();
         assert_eq!(entity.id, item_id);
         assert_eq!(entity.state, EntityState::New);
@@ -321,14 +325,14 @@ mod tests {
             in_stock: true,
         };
         let item_id = item1.id.clone();
-        catalog.insert(item1);
+        catalog.upsert(item1);
         let item2 = Item {
             id: "item-123".to_string(),
             name: "Second Item".to_string(),
             price: 200,
             in_stock: false,
         };
-        catalog.insert(item2);
+        catalog.upsert(item2);
         assert_eq!(catalog.items.len(), 1);
         let entity = catalog.items.get(&item_id).unwrap();
         assert_eq!(entity.value_of("name"), Some(&Value::from("Second Item")));
@@ -376,7 +380,7 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog.insert(item.clone());
+        catalog.upsert(item.clone());
         let retrieved_item: Option<Item> = catalog.get("item-123");
         assert_eq!(retrieved_item, Some(item));
     }
@@ -391,7 +395,7 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog.insert(item.clone());
+        catalog.upsert(item.clone());
         let retrieved_item: Option<Item> = catalog.get("nonexistent-id");
         assert!(retrieved_item.is_none());
     }
@@ -413,8 +417,8 @@ mod tests {
             price: 200,
             in_stock: false,
         };
-        catalog.insert(item1.clone());
-        catalog.insert(item2.clone());
+        catalog.upsert(item1.clone());
+        catalog.upsert(item2.clone());
         let retrieved_item: Option<Item> =
             catalog.get_by_class_and_attribute("name", "Unique Item");
         assert_eq!(retrieved_item, Some(item2));
@@ -436,8 +440,8 @@ mod tests {
             price: 250,
             in_stock: false,
         };
-        catalog.insert(item1.clone());
-        catalog.insert(item2.clone());
+        catalog.upsert(item1.clone());
+        catalog.upsert(item2.clone());
         // Test with &str for String attribute
         let retrieved_by_name: Option<Item> =
             catalog.get_by_class_and_attribute("name", "Item One");
@@ -460,7 +464,7 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog.insert(item.clone());
+        catalog.upsert(item.clone());
         // Test with a value that doesn't exist
         let retrieved_item: Option<Item> =
             catalog.get_by_class_and_attribute("name", "Non-existent Name");
@@ -488,8 +492,8 @@ mod tests {
             price: 200,
             in_stock: false,
         };
-        catalog.insert(item1.clone());
-        catalog.insert(item2.clone());
+        catalog.upsert(item1.clone());
+        catalog.upsert(item2.clone());
         let results: Vec<Item> = catalog.list_by_class::<Item>().collect();
         assert_eq!(results.len(), 2);
         assert!(results.contains(&item1));
@@ -527,9 +531,9 @@ mod tests {
             price: 300,
             in_stock: true,
         };
-        catalog.insert(item1.clone());
-        catalog.insert(item2.clone());
-        catalog.insert(item3.clone());
+        catalog.upsert(item1.clone());
+        catalog.upsert(item2.clone());
+        catalog.upsert(item3.clone());
         let results: Vec<Item> = catalog
             .list_by_class_and_attribute("in_stock", true)
             .collect();
@@ -549,7 +553,7 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog.insert(item);
+        catalog.upsert(item);
         // Search for a value that doesn't exist
         let results: Vec<Item> = catalog
             .list_by_class_and_attribute("in_stock", false)
@@ -580,7 +584,7 @@ mod tests {
             in_stock: true,
         };
         let item_id = item.id.clone();
-        catalog.insert(item);
+        catalog.upsert(item);
         catalog.delete(&item_id);
         let entity = catalog.items.get(&item_id).unwrap();
         assert_eq!(entity.state, EntityState::ToDelete);
@@ -596,7 +600,7 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog.insert(item);
+        catalog.upsert(item);
         let original_items = catalog.items.clone();
         // Attempt to delete a non-existent entity, which should not panic or change anything.
         catalog.delete("nonexistent-id");
@@ -622,7 +626,7 @@ mod tests {
             price: 123,
             in_stock: true,
         };
-        catalog1.insert(item1.clone());
+        catalog1.upsert(item1.clone());
         assert!(catalog1.persist().is_ok());
         // 2. Create a new catalog and load the item to verify it was persisted
         let mut catalog2 = Catalog::new(db_path);
@@ -652,7 +656,7 @@ mod tests {
             price: 123,
             in_stock: true,
         };
-        catalog1.insert(item1.clone());
+        catalog1.upsert(item1.clone());
         assert!(catalog1.persist().is_ok());
         // 2. Mark the item for deletion and persist again.
         catalog1.delete(&item1.id);

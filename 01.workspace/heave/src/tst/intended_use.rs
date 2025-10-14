@@ -59,7 +59,7 @@ mod tests {
         // save some info for late comparison
         let original_product = product.clone();
         // insert the new object into catalog consuming it
-        catalog.insert(product);
+        catalog.upsert(product);
         // read value from catalog using the original key
         let read_product = catalog.get::<Product>(&original_product.id).unwrap();
         // assert equality between original and read

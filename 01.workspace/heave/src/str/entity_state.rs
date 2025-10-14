@@ -4,6 +4,8 @@ pub enum EntityState {
     /// The entity is newly created and has not been persisted.
     #[default]
     New,
+    /// The entity has been updated and changes have not been persisted,
+    Updated,
     /// The state of the entity is unknown.
     Unknown,
     /// The entity has been loaded from the database.
