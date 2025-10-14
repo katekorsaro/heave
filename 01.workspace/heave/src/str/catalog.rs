@@ -673,8 +673,50 @@ mod tests {
 
     #[test]
     fn persist_should_update_updated_entities() {
-        // Should update entities with 'EntityState::Updated' in the database (Note: The current implementation doesn't seem to set 'Updated' state, this might be a future enhancement).
-        todo!();
+        // Should update entities with 'EntityState::Updated' in the database.
+        let db_path = "target/test_dbs/persist_should_update_updated_entities.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        // 1. Insert an entity and persist it.
+        let mut catalog1 = Catalog::new(db_path);
+        catalog1.init().unwrap();
+        let original_item = Item {
+            id: "item-1".to_string(),
+            name: "Original Name".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        catalog1.upsert(original_item.clone());
+        catalog1.persist().unwrap();
+        // 2. Load it into a new catalog to simulate a separate session.
+        let mut catalog2 = Catalog::new(db_path);
+        catalog2.load_by_id("item-1").unwrap();
+        // 3. Upsert updated data for the same item. This should mark it as 'Updated'.
+        let updated_item = Item {
+            id: "item-1".to_string(),
+            name: "Updated Name".to_string(),
+            price: 200,
+            in_stock: false,
+        };
+        catalog2.upsert(updated_item.clone());
+        assert_eq!(
+            catalog2.items.get("item-1").unwrap().state,
+            EntityState::Updated
+        );
+        // 4. Persist the changes.
+        catalog2.persist().unwrap();
+        // 5. Load the data into a third catalog to verify the update was written to the DB.
+        let mut catalog3 = Catalog::new(db_path);
+        catalog3.load_by_id("item-1").unwrap();
+        let loaded_item: Item = catalog3.get("item-1").unwrap();
+        // 6. Assert that the loaded item has the updated values.
+        assert_eq!(loaded_item, updated_item);
+        assert_ne!(loaded_item, original_item);
+        // Clean up
+        std::fs::remove_file(path).unwrap();
     }
 
     #[test]
