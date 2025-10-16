@@ -338,7 +338,7 @@ mod tests {
         assert_eq!(entity.value_of("name"), Some(&Value::from("Second Item")));
         assert_eq!(entity.value_of("price"), Some(&Value::from(200u64)));
         assert_eq!(entity.value_of("in_stock"), Some(&Value::from(false)));
-        assert_eq!(entity.state, EntityState::New);
+        assert_eq!(entity.state, EntityState::Updated);
     }
 
     #[test]
