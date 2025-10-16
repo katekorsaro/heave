@@ -1392,10 +1392,8 @@ mod tests {
         catalog_verify.load_by_id("item-1").unwrap();
         let final_item: Item = catalog_verify.get("item-1").unwrap();
         // The final state depends on which thread persisted last. One update will have been lost.
-        let thread1_won =
-            final_item.name == "Updated by Thread 1" && final_item.price == 100;
-        let thread2_won =
-            final_item.name == "Original" && final_item.price == 200;
+        let thread1_won = final_item.name == "Updated by Thread 1" && final_item.price == 100;
+        let thread2_won = final_item.name == "Original" && final_item.price == 200;
         assert!(
             thread1_won || thread2_won,
             "Final state must be the result of one of the threads winning the race."
