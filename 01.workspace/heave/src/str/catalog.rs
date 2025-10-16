@@ -915,14 +915,8 @@ mod tests {
             loaded_entity.value_of("name"),
             Some(&Value::from("Test Item"))
         );
-        assert_eq!(
-            loaded_entity.value_of("price"),
-            Some(&Value::from(123u64))
-        );
-        assert_eq!(
-            loaded_entity.value_of("in_stock"),
-            Some(&Value::from(true))
-        );
+        assert_eq!(loaded_entity.value_of("price"), Some(&Value::from(123u64)));
+        assert_eq!(loaded_entity.value_of("in_stock"), Some(&Value::from(true)));
         assert_eq!(loaded_entity.state, EntityState::Loaded); // Should be Synced after loading.
         // 6. Also verify by using the public 'get' method.
         let retrieved_item: Option<Item> = catalog2.get("item-1");
@@ -1027,25 +1021,151 @@ mod tests {
     #[test]
     fn load_by_class_should_load_all_entities_of_class() {
         // Should load all entities of a given class from the database into the 'items' map.
-        todo!();
+        let db_path = "target/test_dbs/load_by_class_should_load_all_entities_of_class.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        // 1. Setup DB with a few items of the same class
+        let mut catalog1 = Catalog::new(db_path);
+        catalog1.init().unwrap();
+        let item1 = Item {
+            id: "item-1".to_string(),
+            name: "Item One".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        let item2 = Item {
+            id: "item-2".to_string(),
+            name: "Item Two".to_string(),
+            price: 200,
+            in_stock: false,
+        };
+        catalog1.upsert(item1.clone());
+        catalog1.upsert(item2.clone());
+        catalog1.persist().unwrap();
+        // 2. Create a new catalog and load the items by class
+        let mut catalog2 = Catalog::new(db_path);
+        let result = catalog2.load_by_class::<Item>();
+        assert!(result.is_ok());
+        // 3. Verify that all items of that class were loaded
+        assert_eq!(catalog2.items.len(), 2);
+        let loaded_item1: Item = catalog2.get("item-1").unwrap();
+        let loaded_item2: Item = catalog2.get("item-2").unwrap();
+        assert_eq!(loaded_item1, item1);
+        assert_eq!(loaded_item2, item2);
+        assert_eq!(
+            catalog2.items.get("item-1").unwrap().state,
+            EntityState::Loaded
+        );
+        assert_eq!(
+            catalog2.items.get("item-2").unwrap().state,
+            EntityState::Loaded
+        );
+        // Clean up
+        std::fs::remove_file(path).unwrap();
     }
 
     #[test]
     fn load_by_class_should_overwrite_in_memory_entities() {
         // Should overwrite any existing in-memory entities with the same IDs.
-        todo!();
+        let db_path = "target/test_dbs/load_by_class_should_overwrite_in_memory_entities.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        // 1. Persist an item to the database.
+        let mut catalog1 = Catalog::new(db_path);
+        catalog1.init().unwrap();
+        let item_in_db = Item {
+            id: "item-1".to_string(),
+            name: "DB Version".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        catalog1.upsert(item_in_db.clone());
+        catalog1.persist().unwrap();
+        // 2. Create a new catalog with a different in-memory version of the same item.
+        let mut catalog2 = Catalog::new(db_path);
+        let item_in_memory = Item {
+            id: "item-1".to_string(),
+            name: "Memory Version".to_string(),
+            price: 200,
+            in_stock: false,
+        };
+        catalog2.upsert(item_in_memory);
+        assert_eq!(catalog2.items.len(), 1);
+        assert_eq!(
+            catalog2.get::<Item>("item-1").unwrap().name,
+            "Memory Version"
+        );
+        // 3. Load from the database, which should overwrite the in-memory version.
+        let result = catalog2.load_by_class::<Item>();
+        assert!(result.is_ok());
+        // 4. Verify that the in-memory entity has been replaced with the one from the DB.
+        assert_eq!(catalog2.items.len(), 1);
+        let loaded_item: Item = catalog2.get("item-1").unwrap();
+        assert_eq!(loaded_item, item_in_db);
+        assert_eq!(
+            catalog2.items.get("item-1").unwrap().state,
+            EntityState::Loaded
+        );
+        // Clean up
+        std::fs::remove_file(path).unwrap();
     }
 
     #[test]
     fn load_by_class_should_do_nothing_if_none_found() {
-        // Should do nothing if no entities of that class are found.
-        todo!();
+        // Should do nothing if no entities of that class are found in the database.
+        let db_path = "target/test_dbs/load_by_class_should_do_nothing_if_none_found.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        // 1. Create an empty, initialized database.
+        let mut catalog = Catalog::new(db_path);
+        catalog.init().unwrap();
+        // 2. Attempt to load from the empty DB.
+        let result = catalog.load_by_class::<Item>();
+        assert!(result.is_ok());
+        assert!(catalog.items.is_empty());
+        // 3. Add an item to memory and try loading again from the empty DB.
+        let item_in_memory = Item {
+            id: "item-1".to_string(),
+            name: "In-memory only".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        catalog.upsert(item_in_memory.clone());
+        assert_eq!(catalog.items.len(), 1);
+        let result2 = catalog.load_by_class::<Item>();
+        assert!(result2.is_ok());
+        // 4. Verify the in-memory item is untouched because nothing was loaded from DB.
+        assert_eq!(catalog.items.len(), 1);
+        let retrieved_item: Item = catalog.get("item-1").unwrap();
+        assert_eq!(retrieved_item, item_in_memory);
+        // Clean up
+        std::fs::remove_file(path).unwrap();
     }
 
     #[test]
     fn load_by_class_should_return_error_on_db_failure() {
         // Should return an error if the database operation fails.
-        todo!();
+        // Using a directory as a path should cause a failure.
+        let invalid_path = "target/test_dbs/a_directory_for_load_class_fail";
+        std::fs::create_dir_all(invalid_path).unwrap();
+        let mut catalog = Catalog::new(invalid_path);
+        // Attempt to load from the invalid path.
+        let result = catalog.load_by_class::<Item>();
+        assert!(result.is_err());
+        // Based on `load_by_id`, the error should be `LoadFromDB`.
+        // This assumes `From<SqliteFailedTo>` is implemented to produce `FailedTo::LoadFromDB`.
+        assert_eq!(result.unwrap_err(), FailedTo::LoadFromDB);
+        // Clean up
+        std::fs::remove_dir_all(invalid_path).unwrap();
     }
 
     // ## Integration Tests
