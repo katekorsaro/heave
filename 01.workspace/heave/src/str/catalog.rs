@@ -292,10 +292,10 @@ mod tests {
         std::fs::remove_dir_all(invalid_path).unwrap();
     }
 
-    // ## 'insert()' & 'insert_many()'
+    // ## 'upsert()' & 'insert_many()'
     #[test]
     fn insert_should_add_single_entity_as_new() {
-        // 'insert()': Should add a single entity to the 'items' map with 'EntityState::New'.
+        // 'upsert()': Should add a single entity to the 'items' map with 'EntityState::New'.
         let mut catalog = Catalog::new("dummy.db");
         let item = Item {
             id: "item-123".to_string(),
@@ -316,7 +316,7 @@ mod tests {
 
     #[test]
     fn insert_should_overwrite_existing_entity() {
-        // 'insert()': Should overwrite an existing entity with the same ID.
+        // 'upsert()': Should overwrite an existing entity with the same ID.
         let mut catalog = Catalog::new("dummy.db");
         let item1 = Item {
             id: "item-123".to_string(),
