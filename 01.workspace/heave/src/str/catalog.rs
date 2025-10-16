@@ -188,7 +188,7 @@ impl Catalog {
     {
         let class = T::class();
         let path = path::Path::new(&self.path);
-        let entities = sqlite::load::by_class(path, class)?;
+        let entities = sqlite::load::by_class(path, class).map_err(|_| FailedTo::LoadFromDB)?;
         for entity in entities {
             self.items.insert(entity.id.clone(), entity);
         }
