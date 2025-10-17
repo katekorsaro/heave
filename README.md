@@ -4,6 +4,20 @@ A Rust EAV data model implementation.
 
 Heave is a Rust library that provides a flexible and extensible implementation of the Entity-Attribute-Value (EAV) data model. It allows you to manage data with a dynamic schema, making it suitable for scenarios where attributes of entities are not known at compile time. The library includes support for persisting the EAV data to a SQLite database.
 
+> ## 🚧 A Note From the Developer 🚧
+>
+> Thank you for checking out Heave! I'm so excited you're here and interested in my project at this early stage.
+>
+> I want to be upfront: this is my work-in-progress, and I'm still building and experimenting a lot. This means things are changing constantly. As you dive in, please keep in mind:
+>
+> *   **I'll be making frequent breaking changes.** I'm still shaping the core API, so I'll be refactoring things often. Your code will likely break between updates.
+> *   **You'll find bugs.** I'm working hard, but things might not always work as expected. I'd be incredibly grateful if you reported any issues you find!
+> *   **Features are incomplete.** Many parts of the project are still on my drawing board or only partially implemented.
+>
+> Because of all this, I'm asking you to use Heave for evaluation and feedback only. **I strongly recommend not using it in a production environment just yet.**
+>
+> Your feedback is invaluable in helping me shape the future of Heave. I'd love to hear from you, so please feel free to open an issue!
+
 ## Typed Entities
 
 Typed entities may be used leveraging the `EAV` trait to map to and from schemaless entities.
