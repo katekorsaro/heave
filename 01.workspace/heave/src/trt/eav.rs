@@ -5,8 +5,8 @@ use crate::*;
 /// This trait provides the necessary conversions to and from the generic `Entity`
 /// representation, and it requires the type to define its own class name.
 pub trait T where
-    Self: From<Entity>,
-    Self: Into<Entity>,
+    Self: TryFrom<Entity>,
+    Self: TryInto<Entity>,
 {
     /// Returns the class name of the type.
     ///

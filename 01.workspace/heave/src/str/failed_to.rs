@@ -3,6 +3,10 @@ use crate::*;
 /// Represents the possible failures that can occur in the library.
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy, Hash)]
 pub enum FailedTo {
+    /// Failed to convert from Entity to type.
+    ConvertEntity,
+    /// Failed to convert from type to Entity.
+    ConvertObject,
     /// Failed to convert from Value to type.
     ConvertValue,
     /// Failed to initialize the database.

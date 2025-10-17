@@ -39,14 +39,15 @@ impl Catalog {
     /// # Arguments
     ///
     /// * `object` - The object to insert.
-    pub fn upsert(&mut self, object: impl EAV) {
-        let mut entity = object.into();
+    pub fn upsert(&mut self, object: impl EAV) -> Result<(), FailedTo> {
+        let mut entity = object.try_into().map_err(|_| FailedTo::ConvertObject)?;
         if self.items.contains_key(&entity.id) {
             entity.state = EntityState::Updated;
         } else {
             entity.state = EntityState::New;
         }
         self.items.insert(entity.id.clone(), entity);
+        Ok(())
     }
 
     /// Inserts multiple objects that implement the `EAV` trait into the catalog.
@@ -54,10 +55,11 @@ impl Catalog {
     /// # Arguments
     ///
     /// * `objects` - A vector of objects to insert.
-    pub fn insert_many(&mut self, objects: Vec<impl EAV>) {
+    pub fn insert_many(&mut self, objects: Vec<impl EAV>) -> Result<(), FailedTo> {
         for object in objects {
-            self.upsert(object);
+            self.upsert(object)?;
         }
+        Ok(())
     }
 
     /// Retrieves an entity by its ID and converts it into a specified type `T`.
@@ -69,12 +71,14 @@ impl Catalog {
     /// # Returns
     ///
     /// An `Option<T>` containing the converted entity if found, otherwise `None`.
-    pub fn get<T>(&self, id: &str) -> Option<T>
+    pub fn get<T>(&self, id: &str) -> Result<Option<T>, FailedTo>
     where
         T: EAV,
     {
         let entity = self.items.get(id);
-        entity.map(|e| T::from(e.clone()))
+        entity
+            .map(|e| T::try_from(e.clone()).map_err(|_| FailedTo::ConvertEntity))
+            .transpose()
     }
 
     /// Retrieves the first entity that matches a given attribute and value.
@@ -91,7 +95,7 @@ impl Catalog {
         &self,
         attribute: &str,
         value: impl Into<Value> + Clone,
-    ) -> Option<T>
+    ) -> Result<Option<T>, FailedTo>
     where
         T: EAV,
     {
@@ -101,8 +105,8 @@ impl Catalog {
             .filter(|item| item.class == T::class())
             .filter(|item| item.value_of(attribute) == Some(&value.clone().into()))
             .take(1)
-            .map(|item| T::from(item.clone()));
-        items.next()
+            .map(|item| T::try_from(item.clone()).map_err(|_| FailedTo::ConvertEntity));
+        items.next().transpose()
     }
 
     /// Returns an iterator over entities of a specific class.
@@ -110,14 +114,14 @@ impl Catalog {
     /// # Returns
     ///
     /// An iterator that yields items of type `T`.
-    pub fn list_by_class<T>(&self) -> impl Iterator<Item = T>
+    pub fn list_by_class<T>(&self) -> impl Iterator<Item = Result<T, FailedTo>>
     where
         T: EAV,
     {
         self.items
             .values()
             .filter(move |item| item.class == T::class())
-            .map(|item| T::from(item.clone()))
+            .map(|item| T::try_from(item.clone()).map_err(|_| FailedTo::ConvertEntity))
     }
 
     /// Returns an iterator over entities that match a given attribute and value.
@@ -134,7 +138,7 @@ impl Catalog {
         &self,
         attribute: &str,
         value: impl Into<Value> + Clone,
-    ) -> impl Iterator<Item = T>
+    ) -> impl Iterator<Item = Result<T, FailedTo>>
     where
         T: EAV,
     {
@@ -143,7 +147,7 @@ impl Catalog {
             .values()
             .filter(move |item| item.class == T::class())
             .filter(move |item| item.value_of(attribute) == Some(&value))
-            .map(|item| T::from(item.clone()))
+            .map(|item| T::try_from(item.clone()).map_err(|_| FailedTo::ConvertEntity))
     }
 
     /// Schedules an entity for deletion. Actual delition will take place when 'persist' is called.
@@ -321,7 +325,7 @@ mod tests {
             in_stock: true,
         };
         let item_id = item.id.clone();
-        catalog.upsert(item);
+        let _ = catalog.upsert(item);
         let entity = catalog.items.get(&item_id).unwrap();
         assert_eq!(entity.id, item_id);
         assert_eq!(entity.state, EntityState::New);
@@ -342,14 +346,14 @@ mod tests {
             in_stock: true,
         };
         let item_id = item1.id.clone();
-        catalog.upsert(item1);
+        let _ = catalog.upsert(item1);
         let item2 = Item {
             id: "item-123".to_string(),
             name: "Second Item".to_string(),
             price: 200,
             in_stock: false,
         };
-        catalog.upsert(item2);
+        let _ = catalog.upsert(item2);
         assert_eq!(catalog.items.len(), 1);
         let entity = catalog.items.get(&item_id).unwrap();
         assert_eq!(entity.value_of("name"), Some(&Value::from("Second Item")));
@@ -376,7 +380,7 @@ mod tests {
                 in_stock: false,
             },
         ];
-        catalog.insert_many(items);
+        let _ = catalog.insert_many(items);
         assert_eq!(catalog.items.len(), 2);
         let entity1 = catalog.items.get("item-1").unwrap();
         assert_eq!(entity1.state, EntityState::New);
@@ -397,8 +401,8 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog.upsert(item.clone());
-        let retrieved_item: Option<Item> = catalog.get("item-123");
+        let _ = catalog.upsert(item.clone());
+        let retrieved_item: Option<Item> = catalog.get::<Item>("item-123").unwrap();
         assert_eq!(retrieved_item, Some(item));
     }
 
@@ -412,8 +416,8 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog.upsert(item.clone());
-        let retrieved_item: Option<Item> = catalog.get("nonexistent-id");
+        let _ = catalog.upsert(item.clone());
+        let retrieved_item: Option<Item> = catalog.get("nonexistent-id").unwrap();
         assert!(retrieved_item.is_none());
     }
 
@@ -434,10 +438,11 @@ mod tests {
             price: 200,
             in_stock: false,
         };
-        catalog.upsert(item1.clone());
-        catalog.upsert(item2.clone());
-        let retrieved_item: Option<Item> =
-            catalog.get_by_class_and_attribute("name", "Unique Item");
+        let _ = catalog.upsert(item1.clone());
+        let _ = catalog.upsert(item2.clone());
+        let retrieved_item: Option<Item> = catalog
+            .get_by_class_and_attribute("name", "Unique Item")
+            .unwrap();
         assert_eq!(retrieved_item, Some(item2));
     }
 
@@ -457,17 +462,21 @@ mod tests {
             price: 250,
             in_stock: false,
         };
-        catalog.upsert(item1.clone());
-        catalog.upsert(item2.clone());
+        let _ = catalog.upsert(item1.clone());
+        let _ = catalog.upsert(item2.clone());
         // Test with &str for String attribute
-        let retrieved_by_name: Option<Item> =
-            catalog.get_by_class_and_attribute("name", "Item One");
+        let retrieved_by_name: Option<Item> = catalog
+            .get_by_class_and_attribute("name", "Item One")
+            .unwrap();
         assert_eq!(retrieved_by_name, Some(item1.clone()));
         // Test with u64 for price attribute
-        let retrieved_by_price: Option<Item> = catalog.get_by_class_and_attribute("price", 250u64);
+        let retrieved_by_price: Option<Item> =
+            catalog.get_by_class_and_attribute("price", 250u64).unwrap();
         assert_eq!(retrieved_by_price, Some(item2.clone()));
         // Test with bool for in_stock attribute
-        let retrieved_by_stock: Option<Item> = catalog.get_by_class_and_attribute("in_stock", true);
+        let retrieved_by_stock: Option<Item> = catalog
+            .get_by_class_and_attribute("in_stock", true)
+            .unwrap();
         assert_eq!(retrieved_by_stock, Some(item1.clone()));
     }
 
@@ -481,14 +490,16 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog.upsert(item.clone());
+        let _ = catalog.upsert(item.clone());
         // Test with a value that doesn't exist
-        let retrieved_item: Option<Item> =
-            catalog.get_by_class_and_attribute("name", "Non-existent Name");
+        let retrieved_item: Option<Item> = catalog
+            .get_by_class_and_attribute("name", "Non-existent Name")
+            .unwrap();
         assert!(retrieved_item.is_none());
         // Test with an attribute that doesn't exist
-        let retrieved_item_2: Option<Item> =
-            catalog.get_by_class_and_attribute("non-existent-attribute", "Test Item");
+        let retrieved_item_2: Option<Item> = catalog
+            .get_by_class_and_attribute("non-existent-attribute", "Test Item")
+            .unwrap();
         assert!(retrieved_item_2.is_none());
     }
 
@@ -509,9 +520,12 @@ mod tests {
             price: 200,
             in_stock: false,
         };
-        catalog.upsert(item1.clone());
-        catalog.upsert(item2.clone());
-        let results: Vec<Item> = catalog.list_by_class::<Item>().collect();
+        let _ = catalog.upsert(item1.clone());
+        let _ = catalog.upsert(item2.clone());
+        let results: Vec<Item> = catalog
+            .list_by_class::<Item>()
+            .map(|item| item.unwrap())
+            .collect();
         assert_eq!(results.len(), 2);
         assert!(results.contains(&item1));
         assert!(results.contains(&item2));
@@ -521,7 +535,10 @@ mod tests {
     fn list_by_class_should_return_empty_iterator_if_no_match() {
         // Should return an empty iterator if no entities of that class exist.
         let catalog = Catalog::new("dummy.db");
-        let results: Vec<Item> = catalog.list_by_class::<Item>().collect();
+        let results: Vec<Item> = catalog
+            .list_by_class::<Item>()
+            .map(|item| item.unwrap())
+            .collect();
         assert!(results.is_empty());
     }
 
@@ -548,11 +565,12 @@ mod tests {
             price: 300,
             in_stock: true,
         };
-        catalog.upsert(item1.clone());
-        catalog.upsert(item2.clone());
-        catalog.upsert(item3.clone());
+        let _ = catalog.upsert(item1.clone());
+        let _ = catalog.upsert(item2.clone());
+        let _ = catalog.upsert(item3.clone());
         let results: Vec<Item> = catalog
             .list_by_class_and_attribute("in_stock", true)
+            .map(|item| item.unwrap())
             .collect();
         assert_eq!(results.len(), 2);
         assert!(results.contains(&item1));
@@ -570,21 +588,24 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog.upsert(item);
+        let _ = catalog.upsert(item);
         // Search for a value that doesn't exist
         let results: Vec<Item> = catalog
             .list_by_class_and_attribute("in_stock", false)
+            .map(|item| item.unwrap())
             .collect();
         assert!(results.is_empty());
         // Search for an attribute that doesn't exist
         let results_2: Vec<Item> = catalog
             .list_by_class_and_attribute("non-existent-attribute", true)
+            .map(|item| item.unwrap())
             .collect();
         assert!(results_2.is_empty());
         // Search in a completely empty catalog
         let empty_catalog = Catalog::new("dummy.db");
         let results_3: Vec<Item> = empty_catalog
             .list_by_class_and_attribute("any_attribute", "any_value")
+            .map(|item| item.unwrap())
             .collect();
         assert!(results_3.is_empty());
     }
@@ -601,7 +622,7 @@ mod tests {
             in_stock: true,
         };
         let item_id = item.id.clone();
-        catalog.upsert(item);
+        let _ = catalog.upsert(item);
         catalog.delete(&item_id);
         let entity = catalog.items.get(&item_id).unwrap();
         assert_eq!(entity.state, EntityState::ToDelete);
@@ -617,7 +638,7 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog.upsert(item);
+        let _ = catalog.upsert(item);
         let original_items = catalog.items.clone();
         // Attempt to delete a non-existent entity, which should not panic or change anything.
         catalog.delete("nonexistent-id");
@@ -643,13 +664,13 @@ mod tests {
             price: 123,
             in_stock: true,
         };
-        catalog1.upsert(item1.clone());
+        let _ = catalog1.upsert(item1.clone());
         assert!(catalog1.persist().is_ok());
         // 2. Create a new catalog and load the item to verify it was persisted
         let mut catalog2 = Catalog::new(db_path);
         assert!(catalog2.load_by_id("item-1").is_ok());
         // 3. Get the item and assert it's the same as the one we inserted
-        let loaded_item: Option<Item> = catalog2.get("item-1");
+        let loaded_item: Option<Item> = catalog2.get("item-1").unwrap();
         assert_eq!(loaded_item, Some(item1));
         // Clean up
         std::fs::remove_file(path).unwrap();
@@ -673,7 +694,7 @@ mod tests {
             price: 123,
             in_stock: true,
         };
-        catalog1.upsert(item1.clone());
+        let _ = catalog1.upsert(item1.clone());
         assert!(catalog1.persist().is_ok());
         // 2. Mark the item for deletion and persist again.
         catalog1.delete(&item1.id);
@@ -682,7 +703,7 @@ mod tests {
         let mut catalog2 = Catalog::new(db_path);
         assert!(catalog2.load_by_id(&item1.id).is_ok());
         // 4. Assert that the item was not found.
-        let loaded_item: Option<Item> = catalog2.get(&item1.id);
+        let loaded_item: Option<Item> = catalog2.get(&item1.id).unwrap();
         assert!(loaded_item.is_none());
         // Clean up
         std::fs::remove_file(path).unwrap();
@@ -706,7 +727,7 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog1.upsert(original_item.clone());
+        let _ = catalog1.upsert(original_item.clone());
         catalog1.persist().unwrap();
         // 2. Load it into a new catalog to simulate a separate session.
         let mut catalog2 = Catalog::new(db_path);
@@ -718,7 +739,7 @@ mod tests {
             price: 200,
             in_stock: false,
         };
-        catalog2.upsert(updated_item.clone());
+        let _ = catalog2.upsert(updated_item.clone());
         assert_eq!(
             catalog2.items.get("item-1").unwrap().state,
             EntityState::Updated
@@ -728,7 +749,7 @@ mod tests {
         // 5. Load the data into a third catalog to verify the update was written to the DB.
         let mut catalog3 = Catalog::new(db_path);
         catalog3.load_by_id("item-1").unwrap();
-        let loaded_item: Item = catalog3.get("item-1").unwrap();
+        let loaded_item: Item = catalog3.get("item-1").unwrap().unwrap();
         // 6. Assert that the loaded item has the updated values.
         assert_eq!(loaded_item, updated_item);
         assert_ne!(loaded_item, original_item);
@@ -766,9 +787,9 @@ mod tests {
             price: 30,
             in_stock: true,
         };
-        catalog_setup.upsert(item_to_update_original.clone());
-        catalog_setup.upsert(item_to_delete.clone());
-        catalog_setup.upsert(item_to_keep.clone());
+        let _ = catalog_setup.upsert(item_to_update_original.clone());
+        let _ = catalog_setup.upsert(item_to_delete.clone());
+        let _ = catalog_setup.upsert(item_to_keep.clone());
         catalog_setup.persist().unwrap();
         // 2. Manipulation: Load the data and perform mixed operations.
         let mut catalog_ops = Catalog::new(db_path);
@@ -780,7 +801,7 @@ mod tests {
             price: 40,
             in_stock: false,
         };
-        catalog_ops.upsert(item_to_add.clone()); // State: New
+        let _ = catalog_ops.upsert(item_to_add.clone()); // State: New
         // An updated version of an existing item.
         let item_to_update_new = Item {
             id: "update-me".to_string(),
@@ -788,7 +809,7 @@ mod tests {
             price: 11,
             in_stock: false,
         };
-        catalog_ops.upsert(item_to_update_new.clone()); // State: Updated
+        let _ = catalog_ops.upsert(item_to_update_new.clone()); // State: Updated
         // An item to be deleted.
         catalog_ops.delete("delete-me"); // State: ToDelete
         // item_to_keep is left untouched (State: Synced after load)
@@ -800,16 +821,16 @@ mod tests {
         // Check total count
         assert_eq!(catalog_verify.items.len(), 3);
         // Verify added item
-        let added_item: Item = catalog_verify.get("add-me").unwrap();
+        let added_item: Item = catalog_verify.get("add-me").unwrap().unwrap();
         assert_eq!(added_item, item_to_add);
         // Verify updated item
-        let updated_item: Item = catalog_verify.get("update-me").unwrap();
+        let updated_item: Item = catalog_verify.get("update-me").unwrap().unwrap();
         assert_eq!(updated_item, item_to_update_new);
         // Verify deleted item
-        let deleted_item: Option<Item> = catalog_verify.get("delete-me");
+        let deleted_item: Option<Item> = catalog_verify.get("delete-me").unwrap();
         assert!(deleted_item.is_none());
         // Verify untouched item
-        let kept_item: Item = catalog_verify.get("keep-me").unwrap();
+        let kept_item: Item = catalog_verify.get("keep-me").unwrap().unwrap();
         assert_eq!(kept_item, item_to_keep);
         // Clean up
         std::fs::remove_file(path).unwrap();
@@ -828,7 +849,7 @@ mod tests {
             price: 10,
             in_stock: true,
         };
-        catalog.upsert(item);
+        let _ = catalog.upsert(item);
         let result = catalog.persist();
         assert!(result.is_err());
         assert_eq!(result.unwrap_err(), FailedTo::PersistCatalog);
@@ -864,9 +885,9 @@ mod tests {
             name: "Keep Me".to_string(),
             ..Default::default()
         };
-        catalog.upsert(item_to_update.clone());
-        catalog.upsert(item_to_delete.clone());
-        catalog.upsert(item_untouched.clone());
+        let _ = catalog.upsert(item_to_update.clone());
+        let _ = catalog.upsert(item_to_delete.clone());
+        let _ = catalog.upsert(item_untouched.clone());
         catalog.persist().unwrap();
         // At this point, all items are in the DB and in-memory state is `Loaded`.
         assert_eq!(catalog.items.len(), 3);
@@ -889,14 +910,14 @@ mod tests {
             name: "Add Me".to_string(),
             ..Default::default()
         };
-        catalog.upsert(item_new.clone()); // State: New
+        let _ = catalog.upsert(item_new.clone()); // State: New
         // An updated version of an existing item.
         let item_updated = Item {
             id: "update-me".to_string(),
             name: "Updated".to_string(),
             ..Default::default()
         };
-        catalog.upsert(item_updated.clone()); // State: Updated
+        let _ = catalog.upsert(item_updated.clone()); // State: Updated
         // An item to be deleted.
         catalog.delete("delete-me"); // State: ToDelete
         // 'item_untouched' remains with state `Loaded`.
@@ -963,7 +984,7 @@ mod tests {
             price: 123,
             in_stock: true,
         };
-        catalog1.upsert(item_to_persist.clone());
+        let _ = catalog1.upsert(item_to_persist.clone());
         catalog1.persist().unwrap();
         // 2. Create a new, empty catalog instance for the same DB.
         let mut catalog2 = Catalog::new(db_path);
@@ -985,7 +1006,7 @@ mod tests {
         assert_eq!(loaded_entity.value_of("in_stock"), Some(&Value::from(true)));
         assert_eq!(loaded_entity.state, EntityState::Loaded); // Should be Synced after loading.
         // 6. Also verify by using the public 'get' method.
-        let retrieved_item: Option<Item> = catalog2.get("item-1");
+        let retrieved_item: Option<Item> = catalog2.get("item-1").unwrap();
         assert_eq!(retrieved_item, Some(item_to_persist));
         // Clean up
         std::fs::remove_file(path).unwrap();
@@ -1009,7 +1030,7 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog1.upsert(item_in_db.clone());
+        let _ = catalog1.upsert(item_in_db.clone());
         catalog1.persist().unwrap();
         // 2. Create a new catalog and add a *different* in-memory version of the same item.
         let mut catalog2 = Catalog::new(db_path);
@@ -1019,7 +1040,7 @@ mod tests {
             price: 200,
             in_stock: false,
         };
-        catalog2.upsert(item_in_memory);
+        let _ = catalog2.upsert(item_in_memory);
         let entity_before_load = catalog2.items.get("item-1").unwrap();
         assert_eq!(entity_before_load.state, EntityState::New);
         assert_eq!(
@@ -1041,7 +1062,7 @@ mod tests {
             Some(&Value::from(100u64))
         );
         // 5. Verify using the public 'get' method.
-        let retrieved_item: Item = catalog2.get("item-1").unwrap();
+        let retrieved_item: Item = catalog2.get("item-1").unwrap().unwrap();
         assert_eq!(retrieved_item, item_in_db);
         // Clean up
         std::fs::remove_file(path).unwrap();
@@ -1108,8 +1129,8 @@ mod tests {
             price: 200,
             in_stock: false,
         };
-        catalog1.upsert(item1.clone());
-        catalog1.upsert(item2.clone());
+        let _ = catalog1.upsert(item1.clone());
+        let _ = catalog1.upsert(item2.clone());
         catalog1.persist().unwrap();
         // 2. Create a new catalog and load the items by class
         let mut catalog2 = Catalog::new(db_path);
@@ -1117,8 +1138,8 @@ mod tests {
         assert!(result.is_ok());
         // 3. Verify that all items of that class were loaded
         assert_eq!(catalog2.items.len(), 2);
-        let loaded_item1: Item = catalog2.get("item-1").unwrap();
-        let loaded_item2: Item = catalog2.get("item-2").unwrap();
+        let loaded_item1: Item = catalog2.get("item-1").unwrap().unwrap();
+        let loaded_item2: Item = catalog2.get("item-2").unwrap().unwrap();
         assert_eq!(loaded_item1, item1);
         assert_eq!(loaded_item2, item2);
         assert_eq!(
@@ -1151,7 +1172,7 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog1.upsert(item_in_db.clone());
+        let _ = catalog1.upsert(item_in_db.clone());
         catalog1.persist().unwrap();
         // 2. Create a new catalog with a different in-memory version of the same item.
         let mut catalog2 = Catalog::new(db_path);
@@ -1161,10 +1182,10 @@ mod tests {
             price: 200,
             in_stock: false,
         };
-        catalog2.upsert(item_in_memory);
+        let _ = catalog2.upsert(item_in_memory);
         assert_eq!(catalog2.items.len(), 1);
         assert_eq!(
-            catalog2.get::<Item>("item-1").unwrap().name,
+            catalog2.get::<Item>("item-1").unwrap().unwrap().name,
             "Memory Version"
         );
         // 3. Load from the database, which should overwrite the in-memory version.
@@ -1172,7 +1193,7 @@ mod tests {
         assert!(result.is_ok());
         // 4. Verify that the in-memory entity has been replaced with the one from the DB.
         assert_eq!(catalog2.items.len(), 1);
-        let loaded_item: Item = catalog2.get("item-1").unwrap();
+        let loaded_item: Item = catalog2.get("item-1").unwrap().unwrap();
         assert_eq!(loaded_item, item_in_db);
         assert_eq!(
             catalog2.items.get("item-1").unwrap().state,
@@ -1205,13 +1226,13 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog.upsert(item_in_memory.clone());
+        let _ = catalog.upsert(item_in_memory.clone());
         assert_eq!(catalog.items.len(), 1);
         let result2 = catalog.load_by_class::<Item>();
         assert!(result2.is_ok());
         // 4. Verify the in-memory item is untouched because nothing was loaded from DB.
         assert_eq!(catalog.items.len(), 1);
-        let retrieved_item: Item = catalog.get("item-1").unwrap();
+        let retrieved_item: Item = catalog.get("item-1").unwrap().unwrap();
         assert_eq!(retrieved_item, item_in_memory);
         // Clean up
         std::fs::remove_file(path).unwrap();
@@ -1253,12 +1274,12 @@ mod tests {
             price: 999,
             in_stock: true,
         };
-        catalog1.upsert(item_to_insert.clone());
+        let _ = catalog1.upsert(item_to_insert.clone());
         catalog1.persist().unwrap();
         // 2. create a new catalog instance -> 'load_by_id' -> 'get'
         let mut catalog2 = Catalog::new(db_path);
         catalog2.load_by_id("item-1").unwrap();
-        let loaded_item: Option<Item> = catalog2.get("item-1");
+        let loaded_item: Option<Item> = catalog2.get("item-1").unwrap();
         // 3. verify data integrity
         assert_eq!(loaded_item, Some(item_to_insert));
         // Clean up
@@ -1291,12 +1312,15 @@ mod tests {
                 in_stock: false,
             },
         ];
-        catalog1.insert_many(items_to_insert.clone());
+        let _ = catalog1.insert_many(items_to_insert.clone());
         catalog1.persist().unwrap();
         // 2. new catalog -> 'load_by_class' -> 'list_by_class'
         let mut catalog2 = Catalog::new(db_path);
         catalog2.load_by_class::<Item>().unwrap();
-        let mut loaded_items: Vec<Item> = catalog2.list_by_class::<Item>().collect();
+        let mut loaded_items: Vec<Item> = catalog2
+            .list_by_class::<Item>()
+            .map(|item| item.unwrap())
+            .collect();
         // Sort by ID to ensure consistent order for comparison
         let mut expected_items = items_to_insert;
         loaded_items.sort_by(|a, b| a.id.cmp(&b.id));
@@ -1326,19 +1350,19 @@ mod tests {
             price: 123,
             in_stock: true,
         };
-        catalog1.upsert(item_to_delete.clone());
+        let _ = catalog1.upsert(item_to_delete.clone());
         catalog1.persist().unwrap();
         // 2. 'load_by_id' to confirm it's there
         let mut catalog2 = Catalog::new(db_path);
         catalog2.load_by_id("item-to-delete").unwrap();
-        assert!(catalog2.get::<Item>("item-to-delete").is_some());
+        assert!(catalog2.get::<Item>("item-to-delete").unwrap().is_some());
         // 3. 'delete' -> 'persist'
         catalog2.delete("item-to-delete");
         catalog2.persist().unwrap();
         // 4. 'load_by_id' should now return nothing
         let mut catalog3 = Catalog::new(db_path);
         catalog3.load_by_id("item-to-delete").unwrap();
-        let loaded_item: Option<Item> = catalog3.get("item-to-delete");
+        let loaded_item: Option<Item> = catalog3.get("item-to-delete").unwrap();
         assert!(loaded_item.is_none());
         // Clean up
         std::fs::remove_file(path).unwrap();
@@ -1361,11 +1385,12 @@ mod tests {
             price: 200,
             in_stock: false,
         };
-        catalog.upsert(item1.clone());
-        catalog.upsert(item2.clone());
+        let _ = catalog.upsert(item1.clone());
+        let _ = catalog.upsert(item2.clone());
         // Retrieve by a unique attribute
-        let retrieved_item: Option<Item> =
-            catalog.get_by_class_and_attribute("name", "Second Item");
+        let retrieved_item: Option<Item> = catalog
+            .get_by_class_and_attribute("name", "Second Item")
+            .unwrap();
         // Verify the correct item was retrieved
         assert_eq!(retrieved_item, Some(item2));
     }
@@ -1393,10 +1418,11 @@ mod tests {
             price: 150,
             in_stock: true,
         };
-        catalog.insert_many(vec![item1.clone(), item2.clone(), item3.clone()]);
+        let _ = catalog.insert_many(vec![item1.clone(), item2.clone(), item3.clone()]);
         // List all items that are in stock
         let mut results: Vec<Item> = catalog
             .list_by_class_and_attribute("in_stock", true)
+            .map(|item| item.unwrap())
             .collect();
         // Sort for deterministic comparison
         results.sort_by(|a, b| a.id.cmp(&b.id));
@@ -1428,7 +1454,7 @@ mod tests {
             price: 100,
             in_stock: true,
         };
-        catalog_setup.upsert(initial_item);
+        let _ = catalog_setup.upsert(initial_item);
         catalog_setup.persist().unwrap();
         let db_path_arc = std::sync::Arc::new(String::from(db_path));
         // 2. Thread 1: Loads, updates name, and persists.
@@ -1436,9 +1462,9 @@ mod tests {
         let handle1 = std::thread::spawn(move || {
             let mut catalog1 = Catalog::new(&db_path_arc1);
             catalog1.load_by_id("item-1").unwrap();
-            let mut item = catalog1.get::<Item>("item-1").unwrap();
+            let mut item = catalog1.get::<Item>("item-1").unwrap().unwrap();
             item.name = "Updated by Thread 1".to_string();
-            catalog1.upsert(item);
+            let _ = catalog1.upsert(item);
             catalog1.persist().unwrap();
         });
         // 3. Thread 2: Loads, updates price, and persists.
@@ -1446,9 +1472,9 @@ mod tests {
         let handle2 = std::thread::spawn(move || {
             let mut catalog2 = Catalog::new(&db_path_arc2);
             catalog2.load_by_id("item-1").unwrap();
-            let mut item = catalog2.get::<Item>("item-1").unwrap();
+            let mut item = catalog2.get::<Item>("item-1").unwrap().unwrap();
             item.price = 200;
-            catalog2.upsert(item);
+            let _ = catalog2.upsert(item);
             catalog2.persist().unwrap();
         });
         handle1.join().unwrap();
@@ -1456,7 +1482,7 @@ mod tests {
         // 4. Verification: Load the data and check the final state.
         let mut catalog_verify = Catalog::new(db_path);
         catalog_verify.load_by_id("item-1").unwrap();
-        let final_item: Item = catalog_verify.get("item-1").unwrap();
+        let final_item: Item = catalog_verify.get("item-1").unwrap().unwrap();
         // The final state depends on which thread persisted last. One update will have been lost.
         let thread1_won = final_item.name == "Updated by Thread 1" && final_item.price == 100;
         let thread2_won = final_item.name == "Original" && final_item.price == 200;

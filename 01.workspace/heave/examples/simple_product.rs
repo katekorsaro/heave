@@ -70,7 +70,7 @@ fn main() {
         price: 125000,
     };
     // Insert the new laptop into the catalog. Note that at this time the product is in memory.
-    catalog.upsert(new_laptop);
+    let _ = catalog.upsert(new_laptop);
     // Persist the changes in the catalog to the database.
     catalog.persist().unwrap();
     // Remove the SQLite database file.
