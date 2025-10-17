@@ -1,4 +1,5 @@
 use crate::*;
+use std::collections::HashMap;
 
 /// Represents a catalog of entities that can be persisted to a SQLite database.
 ///
@@ -7,7 +8,7 @@ use crate::*;
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct O {
     path: String,
-    pub(crate) items: std::collections::HashMap<String, Entity>,
+    pub(crate) items: HashMap<String, Entity>,
 }
 impl Catalog {
     /// Creates a new `Catalog` instance.
@@ -161,9 +162,23 @@ impl Catalog {
     ///
     /// - new entities will be written onto DB
     /// - marked for delition entities will be deleted
-    pub fn persist(&self) -> result::Result<(), FailedTo> {
+    pub fn persist(&mut self) -> result::Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
         sqlite::persist::catalog(path, self).map_err(|_| FailedTo::PersistCatalog)?;
+        // cleaning catalog state after db write
+        self.items = self
+            .items
+            .extract_if(|_, item| item.state != EntityState::ToDelete)
+            .map(|(k, item)| {
+                (
+                    k,
+                    Entity {
+                        state: EntityState::Loaded,
+                        ..item
+                    },
+                )
+            })
+            .collect();
         Ok(())
     }
 
@@ -823,60 +838,109 @@ mod tests {
 
     #[test]
     fn persist_should_update_in_memory_state() {
-        // After persisting, the in-memory state of entities should be considered. (e.g., should deleted items be removed from the 'items' map?).
-        // This test verifies the CURRENT behavior: in-memory state is NOT updated by `persist(&self)`.
+        // After persisting, the in-memory state of entities should be considered.
+        // (e.g., should deleted items be removed from the 'items' map, all other items should be marked as Loaded).
         let db_path = "target/test_dbs/persist_should_update_in_memory_state.db";
         let path = std::path::Path::new(db_path);
         std::fs::create_dir_all(path.parent().unwrap()).unwrap();
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
+        // 1. Setup: Create a catalog and pre-populate it with some data.
         let mut catalog = Catalog::new(db_path);
         catalog.init().unwrap();
-        // 1. Add items to get them into New, Updated, and ToDelete states.
-        catalog.upsert(Item {
-            id: "new".to_string(),
+        let item_to_update = Item {
+            id: "update-me".to_string(),
+            name: "Original".to_string(),
             ..Default::default()
-        }); // -> New
-        catalog.upsert(Item {
-            id: "update".to_string(),
+        };
+        let item_to_delete = Item {
+            id: "delete-me".to_string(),
+            name: "Delete Me".to_string(),
             ..Default::default()
-        });
-        catalog.persist().unwrap(); // Persist `update` so it exists in DB for the next step.
-        catalog.upsert(Item {
-            id: "update".to_string(),
+        };
+        let item_untouched = Item {
+            id: "keep-me".to_string(),
+            name: "Keep Me".to_string(),
+            ..Default::default()
+        };
+        catalog.upsert(item_to_update.clone());
+        catalog.upsert(item_to_delete.clone());
+        catalog.upsert(item_untouched.clone());
+        catalog.persist().unwrap();
+        // At this point, all items are in the DB and in-memory state is `Loaded`.
+        assert_eq!(catalog.items.len(), 3);
+        assert_eq!(
+            catalog.items.get("update-me").unwrap().state,
+            EntityState::Loaded
+        );
+        assert_eq!(
+            catalog.items.get("delete-me").unwrap().state,
+            EntityState::Loaded
+        );
+        assert_eq!(
+            catalog.items.get("keep-me").unwrap().state,
+            EntityState::Loaded
+        );
+        // 2. Manipulate the catalog to have entities in various states.
+        // A new item to be inserted.
+        let item_new = Item {
+            id: "add-me".to_string(),
+            name: "Add Me".to_string(),
+            ..Default::default()
+        };
+        catalog.upsert(item_new.clone()); // State: New
+        // An updated version of an existing item.
+        let item_updated = Item {
+            id: "update-me".to_string(),
             name: "Updated".to_string(),
             ..Default::default()
-        }); // -> Updated
-        catalog.upsert(Item {
-            id: "delete".to_string(),
-            ..Default::default()
-        });
-        catalog.delete("delete"); // -> ToDelete
-        // 2. Check initial states before the main persist call.
-        assert_eq!(catalog.items.get("new").unwrap().state, EntityState::New);
+        };
+        catalog.upsert(item_updated.clone()); // State: Updated
+        // An item to be deleted.
+        catalog.delete("delete-me"); // State: ToDelete
+        // 'item_untouched' remains with state `Loaded`.
+        // Check states before final persist
+        assert_eq!(catalog.items.get("add-me").unwrap().state, EntityState::New);
         assert_eq!(
-            catalog.items.get("update").unwrap().state,
+            catalog.items.get("update-me").unwrap().state,
             EntityState::Updated
         );
         assert_eq!(
-            catalog.items.get("delete").unwrap().state,
+            catalog.items.get("delete-me").unwrap().state,
             EntityState::ToDelete
         );
+        assert_eq!(
+            catalog.items.get("keep-me").unwrap().state,
+            EntityState::Loaded
+        );
+        assert_eq!(catalog.items.len(), 4);
         // 3. Persist all changes.
         catalog.persist().unwrap();
-        // 4. Verify that in-memory states have NOT changed, because persist takes &self.
-        assert_eq!(catalog.items.get("new").unwrap().state, EntityState::New);
+        // 4. Verify the in-memory state after persisting.
+        // The item marked for deletion should be gone.
+        assert!(!catalog.items.contains_key("delete-me"));
+        assert_eq!(catalog.items.len(), 3);
+        // All remaining items should have their state as `Loaded`.
+        let new_item_entity = catalog.items.get("add-me").unwrap();
+        assert_eq!(new_item_entity.state, EntityState::Loaded);
         assert_eq!(
-            catalog.items.get("update").unwrap().state,
-            EntityState::Updated
+            new_item_entity.value_of("name"),
+            Some(&Value::from("Add Me"))
         );
+        let updated_item_entity = catalog.items.get("update-me").unwrap();
+        assert_eq!(updated_item_entity.state, EntityState::Loaded);
         assert_eq!(
-            catalog.items.get("delete").unwrap().state,
-            EntityState::ToDelete
+            updated_item_entity.value_of("name"),
+            Some(&Value::from("Updated"))
         );
-        assert!(catalog.items.contains_key("delete")); // Deleted item is still in memory.
-        // Clean up.
+        let untouched_item_entity = catalog.items.get("keep-me").unwrap();
+        assert_eq!(untouched_item_entity.state, EntityState::Loaded);
+        assert_eq!(
+            untouched_item_entity.value_of("name"),
+            Some(&Value::from("Keep Me"))
+        );
+        // Clean up
         std::fs::remove_file(path).unwrap();
     }
 
