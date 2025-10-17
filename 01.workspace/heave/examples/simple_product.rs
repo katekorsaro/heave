@@ -46,11 +46,11 @@ impl From<Entity> for Product {
             // Set the product's ID from the entity's ID.
             id: value.id.clone(),
             // Unwrap the "name" attribute to get the product's name.
-            name: value.unwrap("name"),
+            name: value.unwrap("name").expect("name is always present"),
             // Unwrap the optional "model" attribute to get the product's model.
-            model: value.unwrap_opt("model"),
+            model: value.unwrap_opt("model").expect("model is always present"),
             // Unwrap the "price" attribute to get the product's price.
-            price: value.unwrap("price"),
+            price: value.unwrap("price").expect("price is always present"),
         }
     }
 }

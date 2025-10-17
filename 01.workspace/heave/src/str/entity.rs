@@ -101,9 +101,7 @@ impl Entity {
 
     /// Unwraps an attribute's value into a specified type `T`.
     ///
-    /// # Panics
-    ///
-    /// Panics if the attribute does not exist.
+    /// This function requires `T` to implement `TryFrom<Value>`.
     ///
     /// # Arguments
     ///
@@ -111,48 +109,59 @@ impl Entity {
     ///
     /// # Returns
     ///
-    /// The value of the attribute converted to type `T`.
-    pub fn unwrap<T>(&self, id: &str) -> T
+    /// A `Result<T, FailedTo>` which is `Ok(T)` if the conversion is successful,
+    /// or `Err(FailedTo::ConvertValue)` if it fails.
+    pub fn unwrap<T>(&self, id: &str) -> Result<T, FailedTo>
     where
-        T: From<Value>,
+        T: TryFrom<Value>,
     {
         self.value_of(id)
-            .map(|value| T::from(value.clone()))
+            .map(|value| T::try_from(value.clone()).map_err(|_| FailedTo::ConvertValue))
             .unwrap()
     }
 
     /// Unwraps an attribute's value into an `Option<T>`.
     ///
+    /// This function requires `T` to implement `TryFrom<Value>`.
+    ///
     /// # Arguments
     ///
     /// * `id` - The ID of the attribute to unwrap.
     ///
     /// # Returns
     ///
-    /// An `Option<T>` containing the converted value if the attribute exists, otherwise `None`.
-    pub fn unwrap_opt<T>(&self, id: &str) -> Option<T>
+    /// A `Result<Option<T>, FailedTo>`.
+    /// - `Ok(Some(T))` if the attribute exists and the conversion is successful.
+    /// - `Ok(None)` if the attribute does not exist.
+    /// - `Err(FailedTo::ConvertValue)` if the attribute exists but the conversion fails.
+    pub fn unwrap_opt<T>(&self, id: &str) -> Result<Option<T>, FailedTo>
     where
-        T: From<Value>,
-    {
-        self.value_of(id).map(|value| T::from(value.clone()))
-    }
-
-    /// Unwraps an attribute's value, returning a default if it doesn't exist.
-    ///
-    /// # Arguments
-    ///
-    /// * `id` - The ID of the attribute to unwrap.
-    /// * `default` - The default value to return if the attribute is not found.
-    ///
-    /// # Returns
-    ///
-    /// The converted value of the attribute or the default value.
-    pub fn unwrap_or<T>(&self, id: &str, default: T) -> T
-    where
-        T: From<Value>,
+        T: TryFrom<Value>,
     {
         self.value_of(id)
-            .map(|value| T::from(value.clone()))
-            .unwrap_or(default)
+            .map(|value| T::try_from(value.clone()).map_err(|_| FailedTo::ConvertValue))
+            .transpose()
+    }
+
+    /// Unwraps an attribute's value, returning a default value if it doesn't exist or fails to convert.
+    ///
+    /// This function requires `T` to implement `TryFrom<Value>`.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the attribute to unwrap.
+    /// * `default` - The default value to return if the attribute is not found or conversion fails.
+    ///
+    /// # Returns
+    ///
+    /// The converted value of the attribute, or the default value.
+    pub fn unwrap_or<T>(&self, id: &str, default: T) -> Result<T, FailedTo>
+    where
+        T: TryFrom<Value>,
+    {
+        self.value_of(id)
+            .map(|value| T::try_from(value.clone()).map_err(|_| FailedTo::ConvertValue))
+            .transpose()
+            .map(|value| value.unwrap_or(default))
     }
 }

@@ -224,9 +224,11 @@ mod tests {
         fn from(entity: Entity) -> Self {
             Self {
                 id: entity.id.clone(),
-                name: entity.unwrap("name"),
-                price: entity.unwrap("price"),
-                in_stock: entity.unwrap("in_stock"),
+                name: entity.unwrap("name").expect("name is always present"),
+                price: entity.unwrap("price").expect("price is always present"),
+                in_stock: entity
+                    .unwrap("in_stock")
+                    .expect("in_stock is always present"),
             }
         }
     }
