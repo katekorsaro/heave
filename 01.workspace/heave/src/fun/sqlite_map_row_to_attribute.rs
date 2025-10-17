@@ -14,7 +14,9 @@ pub fn run(row: &rusqlite::Row) -> rusqlite::Result<Attribute> {
         (None, None, Some(value), None, None) => Value::Real(value),
         (None, None, None, Some(value), None) => Value::Text(value),
         (None, None, None, None, Some(value)) => Value::Bool(value),
-        _ => panic!(),
+        _ => {
+            return Err(rusqlite::types::FromSqlError::InvalidType.into());
+        }
     };
     Ok(Attribute { id, value })
 }
