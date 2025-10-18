@@ -473,14 +473,14 @@ mod tests {
             id: "item-1".to_string(),
             name: "Item One".to_string(),
             price: 100,
-            sell_trend: 0,
+            sell_trend: 10,
             in_stock: true,
         };
         let item2 = Item {
             id: "item-2".to_string(),
             name: "Item Two".to_string(),
             price: 250,
-            sell_trend: 0,
+            sell_trend: 20,
             in_stock: false,
         };
         let _ = catalog.upsert(item1.clone());
@@ -501,7 +501,7 @@ mod tests {
         assert_eq!(retrieved_by_stock, Some(item1.clone()));
         // Test with i64 for sell_trend attribute
         let retrieved_by_sell_trend: Option<Item> = catalog
-            .get_by_class_and_attribute("sell_trend", 0i64)
+            .get_by_class_and_attribute("sell_trend", 10i64)
             .unwrap();
         assert_eq!(retrieved_by_sell_trend, Some(item1.clone()));
     }
