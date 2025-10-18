@@ -213,6 +213,15 @@ impl Catalog {
         }
         Ok(())
     }
+
+    pub fn load_by_filter(&mut self, filter: &Filter) -> Result<(), FailedTo> {
+        let path = path::Path::new(&self.path);
+        let entities = sqlite::load::by_filter(path, filter).map_err(|_| FailedTo::LoadFromDB)?;
+        for entity in entities {
+            self.items.insert(entity.id.clone(), entity);
+        }
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -260,7 +269,6 @@ mod tests {
         assert_eq!(catalog.path, path);
         assert!(catalog.items.is_empty());
     }
-
     // ## 'init()'
     #[test]
     fn init_should_create_db_file_if_not_exists() {
@@ -280,7 +288,6 @@ mod tests {
         // Clean up the created file
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn init_should_not_fail_if_db_file_exists() {
         // Should not fail if the database file already exists.
@@ -298,7 +305,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn init_should_return_error_for_invalid_path() {
         // Should return an error for an invalid path or permissions issue.
@@ -312,7 +318,6 @@ mod tests {
         // Clean up
         std::fs::remove_dir_all(invalid_path).unwrap();
     }
-
     // ## 'upsert()' & 'insert_many()'
     #[test]
     fn insert_should_add_single_entity_as_new() {
@@ -334,7 +339,6 @@ mod tests {
         assert_eq!(entity.value_of("price"), Some(&Value::from(100u64)));
         assert_eq!(entity.value_of("in_stock"), Some(&Value::from(true)));
     }
-
     #[test]
     fn insert_should_overwrite_existing_entity() {
         // 'upsert()': Should overwrite an existing entity with the same ID.
@@ -361,7 +365,6 @@ mod tests {
         assert_eq!(entity.value_of("in_stock"), Some(&Value::from(false)));
         assert_eq!(entity.state, EntityState::Updated);
     }
-
     #[test]
     fn insert_many_should_add_all_entities() {
         // 'insert_many()': Should add all provided entities to the 'items' map.
@@ -389,7 +392,6 @@ mod tests {
         assert_eq!(entity2.state, EntityState::New);
         assert_eq!(entity2.value_of("name"), Some(&Value::from("Item 2")));
     }
-
     // ## 'get()'
     #[test]
     fn get_should_retrieve_and_convert_entity_by_id() {
@@ -405,7 +407,6 @@ mod tests {
         let retrieved_item: Option<Item> = catalog.get::<Item>("item-123").unwrap();
         assert_eq!(retrieved_item, Some(item));
     }
-
     #[test]
     fn get_should_return_none_for_nonexistent_id() {
         // Should return 'None' if the ID does not exist.
@@ -420,7 +421,6 @@ mod tests {
         let retrieved_item: Option<Item> = catalog.get("nonexistent-id").unwrap();
         assert!(retrieved_item.is_none());
     }
-
     // ## 'get_by_class_and_attribute()'
     #[test]
     fn get_by_class_and_attribute_should_retrieve_correct_entity() {
@@ -445,7 +445,6 @@ mod tests {
             .unwrap();
         assert_eq!(retrieved_item, Some(item2));
     }
-
     #[test]
     fn get_by_class_and_attribute_should_work_with_different_value_types() {
         // Should work with different value types (String, u64, bool).
@@ -479,7 +478,6 @@ mod tests {
             .unwrap();
         assert_eq!(retrieved_by_stock, Some(item1.clone()));
     }
-
     #[test]
     fn get_by_class_and_attribute_should_return_none_if_no_match() {
         // Should return 'None' if no entity matches the criteria.
@@ -502,7 +500,6 @@ mod tests {
             .unwrap();
         assert!(retrieved_item_2.is_none());
     }
-
     // ## 'list_by_class()'
     #[test]
     fn list_by_class_should_return_all_entities_of_class() {
@@ -530,7 +527,6 @@ mod tests {
         assert!(results.contains(&item1));
         assert!(results.contains(&item2));
     }
-
     #[test]
     fn list_by_class_should_return_empty_iterator_if_no_match() {
         // Should return an empty iterator if no entities of that class exist.
@@ -541,7 +537,6 @@ mod tests {
             .collect();
         assert!(results.is_empty());
     }
-
     // ## 'list_by_class_and_attribute()'
     #[test]
     fn list_by_class_and_attribute_should_return_all_matching_entities() {
@@ -577,7 +572,6 @@ mod tests {
         assert!(results.contains(&item3));
         assert!(!results.contains(&item2));
     }
-
     #[test]
     fn list_by_class_and_attribute_should_return_empty_iterator_if_no_match() {
         // Should return an empty iterator if no entities match.
@@ -609,7 +603,6 @@ mod tests {
             .collect();
         assert!(results_3.is_empty());
     }
-
     // ## 'delete()'
     #[test]
     fn delete_should_mark_entity_as_to_delete() {
@@ -627,7 +620,6 @@ mod tests {
         let entity = catalog.items.get(&item_id).unwrap();
         assert_eq!(entity.state, EntityState::ToDelete);
     }
-
     #[test]
     fn delete_should_have_no_effect_for_nonexistent_id() {
         // Should have no effect if the entity ID does not exist.
@@ -644,7 +636,6 @@ mod tests {
         catalog.delete("nonexistent-id");
         assert_eq!(catalog.items, original_items);
     }
-
     // ## 'persist()'
     #[test]
     fn persist_should_insert_new_entities() {
@@ -675,7 +666,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn persist_should_delete_to_delete_entities() {
         // Should delete entities with 'EntityState::ToDelete' from the database.
@@ -708,7 +698,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn persist_should_update_updated_entities() {
         // Should update entities with 'EntityState::Updated' in the database.
@@ -756,7 +745,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn persist_should_handle_mixed_entity_states() {
         // Should handle a mix of new, updated, and deleted entities in one operation.
@@ -835,7 +823,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn persist_should_return_error_on_db_failure() {
         // Should return an error if the database connection fails or a query fails.
@@ -856,7 +843,6 @@ mod tests {
         // Clean up
         std::fs::remove_dir_all(invalid_path).unwrap();
     }
-
     #[test]
     fn persist_should_update_in_memory_state() {
         // After persisting, the in-memory state of entities should be considered.
@@ -964,7 +950,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     // ## 'load_by_id()'
     #[test]
     fn load_by_id_should_load_entity_from_db() {
@@ -1011,7 +996,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn load_by_id_should_overwrite_in_memory_entity() {
         // Should overwrite an existing in-memory entity with the same ID.
@@ -1067,7 +1051,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn load_by_id_should_do_nothing_if_not_found() {
         // Should do nothing if the entity is not found in the database.
@@ -1088,7 +1071,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn load_by_id_should_return_error_on_db_failure() {
         // Should return an error if the database operation fails.
@@ -1103,7 +1085,6 @@ mod tests {
         // Clean up
         std::fs::remove_dir_all(invalid_path).unwrap();
     }
-
     // ## 'load_by_class()'
     #[test]
     fn load_by_class_should_load_all_entities_of_class() {
@@ -1153,7 +1134,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn load_by_class_should_overwrite_in_memory_entities() {
         // Should overwrite any existing in-memory entities with the same IDs.
@@ -1202,7 +1182,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn load_by_class_should_do_nothing_if_none_found() {
         // Should do nothing if no entities of that class are found in the database.
@@ -1237,7 +1216,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn load_by_class_should_return_error_on_db_failure() {
         // Should return an error if the database operation fails.
@@ -1254,7 +1232,161 @@ mod tests {
         // Clean up
         std::fs::remove_dir_all(invalid_path).unwrap();
     }
-
+    // ## 'load_by_filter()'
+    #[test]
+    fn load_by_filter_should_load_matching_entities() {
+        // Verifies that entities matching a boolean filter are correctly loaded into the catalog.
+        let db_path = "target/test_dbs/lbf_should_load_matching_entities.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                name: "Item One".to_string(),
+                price: 100,
+                in_stock: true,
+            },
+            Item {
+                id: "item-2".to_string(),
+                name: "Item Two".to_string(),
+                price: 200,
+                in_stock: false,
+            },
+            Item {
+                id: "item-3".to_string(),
+                name: "Item Three".to_string(),
+                price: 300,
+                in_stock: true,
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_bool("in_stock", true);
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 2);
+        assert!(catalog.items.contains_key("item-1"));
+        assert!(catalog.items.contains_key("item-3"));
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_not_load_non_matching_entities() {
+        // Ensures that entities that do not match the filter are not loaded.
+        let db_path = "target/test_dbs/lbf_should_not_load_non_matching_entities.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                name: "Item One".to_string(),
+                price: 100,
+                in_stock: true,
+            },
+            Item {
+                id: "item-2".to_string(),
+                name: "Item Two".to_string(),
+                price: 200,
+                in_stock: false,
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_bool("in_stock", false);
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 1);
+        assert!(catalog.items.contains_key("item-2"));
+        assert!(!catalog.items.contains_key("item-1"));
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_with_empty_filter_should_load_all_entities() {
+        // Tests that using an empty filter loads all entities from the database.
+        let db_path = "target/test_dbs/lbf_with_empty_filter_should_load_all_entities.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                name: "Item One".to_string(),
+                price: 100,
+                in_stock: true,
+            },
+            Item {
+                id: "item-2".to_string(),
+                name: "Item Two".to_string(),
+                price: 200,
+                in_stock: false,
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new();
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 2);
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_overwrite_existing_entities() {
+        // Checks that loading from the database overwrites any existing in-memory entities with the same ID.
+        let db_path = "target/test_dbs/lbf_should_overwrite_existing_entities.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let item_in_db = Item {
+            id: "item-1".to_string(),
+            name: "DB Version".to_string(),
+            price: 100,
+            in_stock: true,
+        };
+        catalog_setup.upsert(item_in_db.clone()).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog = Catalog::new(db_path);
+        let item_in_memory = Item {
+            id: "item-1".to_string(),
+            name: "Memory Version".to_string(),
+            price: 200,
+            in_stock: false,
+        };
+        catalog.upsert(item_in_memory).unwrap();
+        let filter = Filter::new().with_bool("in_stock", true);
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        let loaded_item: Item = catalog.get("item-1").unwrap().unwrap();
+        assert_eq!(loaded_item, item_in_db);
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_return_error_on_db_failure() {
+        // Confirms that the function returns an appropriate error if the database operation fails.
+        let invalid_path = "target/test_dbs/a_directory_for_lbf_fail";
+        std::fs::create_dir_all(invalid_path).unwrap();
+        let mut catalog = Catalog::new(invalid_path);
+        let filter = Filter::new();
+        let result = catalog.load_by_filter(&filter);
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), FailedTo::LoadFromDB);
+        std::fs::remove_dir_all(invalid_path).unwrap();
+    }
     // ## Integration Tests
     #[test]
     fn integration_test_init_insert_persist_load_get() {
@@ -1285,7 +1417,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn integration_test_init_insert_many_persist_load_list() {
         // Scenario: 'init' -> 'insert_many' -> 'persist' -> new catalog -> 'load_by_class' -> 'list_by_class' -> verify all items are loaded.
@@ -1331,7 +1462,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn integration_test_insert_persist_load_delete_persist_load() {
         // Scenario: 'insert' -> 'persist' -> 'load_by_id' -> 'delete' -> 'persist' -> 'load_by_id' should now return nothing for the deleted ID.
@@ -1367,7 +1497,6 @@ mod tests {
         // Clean up
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn integration_test_insert_get_by_class_and_attribute() {
         // Scenario: 'insert' -> 'get_by_class_and_attribute' should return the correct item.
@@ -1394,7 +1523,6 @@ mod tests {
         // Verify the correct item was retrieved
         assert_eq!(retrieved_item, Some(item2));
     }
-
     #[test]
     fn integration_test_insert_many_list_by_class_and_attribute() {
         // Scenario: 'insert_many' -> 'list_by_class_and_attribute' should return all matching items.
@@ -1432,7 +1560,6 @@ mod tests {
         assert_eq!(results.len(), 2);
         assert_eq!(results, expected);
     }
-
     #[test]
     #[ignore] // This test can be flaky as it depends on thread scheduling.
     fn integration_test_concurrency() {
