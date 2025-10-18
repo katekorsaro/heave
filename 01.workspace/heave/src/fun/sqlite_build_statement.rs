@@ -2,6 +2,7 @@ use crate::*;
 
 const BASE_SELECT: &str = r#"SELECT * FROM entity WHERE 1=1"#;
 
+// REVIEW: instead of nested queries, switch to an inner join model
 pub fn run(filter: &Filter) -> Result<String, FailedTo> {
     let mut statement = String::from(BASE_SELECT);
     for (i, (name, _comparison, condition)) in filter.conditions().enumerate() {
@@ -23,6 +24,7 @@ pub fn run(filter: &Filter) -> Result<String, FailedTo> {
     Ok(statement)
 }
 
+// REVIEW: evaluate to avoid these tests, do they make sense?
 #[cfg(test)]
 mod tests {
     use super::*;
