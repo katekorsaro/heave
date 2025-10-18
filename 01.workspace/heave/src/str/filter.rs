@@ -2,7 +2,7 @@ use crate::*;
 
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct O {
-    conditions: Vec<(String, Condition)>,
+    conditions: Vec<(String, Comparison, Condition)>,
 }
 
 impl Filter {
@@ -12,11 +12,14 @@ impl Filter {
         }
     }
     pub fn with_bool(mut self, attribute_name: &str, value: bool) -> Self {
-        self.conditions
-            .push((attribute_name.to_string(), Condition::Bool(value)));
+        self.conditions.push((
+            attribute_name.to_string(),
+            Comparison::Equal,
+            Condition::Bool(value),
+        ));
         self
     }
-    pub(crate) fn conditions(&self) -> impl Iterator<Item = &(String, Condition)> {
+    pub(crate) fn conditions(&self) -> impl Iterator<Item = &(String, Comparison, Condition)> {
         self.conditions.iter()
     }
 }

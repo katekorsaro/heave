@@ -9,6 +9,7 @@ mod tst;
 
 pub(crate) use crate::str::attribute::O as Attribute;
 pub use crate::str::catalog::O as Catalog;
+pub use crate::str::comparison::E as Comparison;
 pub use crate::str::condition::E as Condition;
 pub use crate::str::entity::O as Entity;
 pub use crate::str::entity_state::EntityState;

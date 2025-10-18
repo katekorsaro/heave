@@ -1,5 +1,6 @@
 pub mod attribute;
 pub mod catalog;
+pub mod comparison;
 pub mod condition;
 pub mod entity;
 pub mod entity_state;

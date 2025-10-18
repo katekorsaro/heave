@@ -4,7 +4,7 @@ const BASE_SELECT: &str = r#"SELECT * FROM entity WHERE 1=1"#;
 
 pub fn run(filter: &Filter) -> Result<String, FailedTo> {
     let mut statement = String::from(BASE_SELECT);
-    for (i, (name, condition)) in filter.conditions().enumerate() {
+    for (i, (name, _comparison, condition)) in filter.conditions().enumerate() {
         let fragment = match *condition {
             Condition::Bool(_) => format!(
                 " AND id IN (SELECT entity_id FROM attribute WHERE id = '{}' AND value_bool = ?{})",
