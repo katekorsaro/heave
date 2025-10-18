@@ -19,6 +19,19 @@ impl Filter {
         ));
         self
     }
+    pub fn with_signed_int(
+        mut self,
+        attribute_name: &str,
+        comparison: Comparison,
+        value: i64,
+    ) -> Self {
+        self.conditions.push((
+            attribute_name.to_string(),
+            comparison,
+            Condition::SignedInt(value),
+        ));
+        self
+    }
     pub(crate) fn conditions(&self) -> impl Iterator<Item = &(String, Comparison, Condition)> {
         self.conditions.iter()
     }

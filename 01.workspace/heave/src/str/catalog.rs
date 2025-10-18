@@ -232,6 +232,7 @@ mod tests {
         pub id: String,
         pub name: String,
         pub price: u64,
+        pub sell_trend: i64,
         pub in_stock: bool,
     }
     impl EAV for Item {
@@ -245,6 +246,7 @@ mod tests {
                 .with_id(&value.id)
                 .with_attribute("name", value.name)
                 .with_attribute("price", value.price)
+                .with_attribute("sell_trend", value.sell_trend)
                 .with_attribute("in_stock", value.in_stock)
         }
     }
@@ -254,6 +256,9 @@ mod tests {
                 id: entity.id.clone(),
                 name: entity.unwrap("name").expect("name is always present"),
                 price: entity.unwrap("price").expect("price is always present"),
+                sell_trend: entity
+                    .unwrap("sell_trend")
+                    .expect("sell_trend is always present"),
                 in_stock: entity
                     .unwrap("in_stock")
                     .expect("in_stock is always present"),
@@ -327,6 +332,7 @@ mod tests {
             id: "item-123".to_string(),
             name: "Test Item".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let item_id = item.id.clone();
@@ -337,6 +343,7 @@ mod tests {
         assert_eq!(entity.class, "item");
         assert_eq!(entity.value_of("name"), Some(&Value::from("Test Item")));
         assert_eq!(entity.value_of("price"), Some(&Value::from(100u64)));
+        assert_eq!(entity.value_of("sell_trend"), Some(&Value::from(0i64)));
         assert_eq!(entity.value_of("in_stock"), Some(&Value::from(true)));
     }
     #[test]
@@ -347,6 +354,7 @@ mod tests {
             id: "item-123".to_string(),
             name: "First Item".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let item_id = item1.id.clone();
@@ -355,6 +363,7 @@ mod tests {
             id: "item-123".to_string(),
             name: "Second Item".to_string(),
             price: 200,
+            sell_trend: 10,
             in_stock: false,
         };
         let _ = catalog.upsert(item2);
@@ -362,6 +371,7 @@ mod tests {
         let entity = catalog.items.get(&item_id).unwrap();
         assert_eq!(entity.value_of("name"), Some(&Value::from("Second Item")));
         assert_eq!(entity.value_of("price"), Some(&Value::from(200u64)));
+        assert_eq!(entity.value_of("sell_trend"), Some(&Value::from(10i64)));
         assert_eq!(entity.value_of("in_stock"), Some(&Value::from(false)));
         assert_eq!(entity.state, EntityState::Updated);
     }
@@ -374,12 +384,14 @@ mod tests {
                 id: "item-1".to_string(),
                 name: "Item 1".to_string(),
                 price: 10,
+                sell_trend: 0,
                 in_stock: true,
             },
             Item {
                 id: "item-2".to_string(),
                 name: "Item 2".to_string(),
                 price: 20,
+                sell_trend: 0,
                 in_stock: false,
             },
         ];
@@ -388,9 +400,13 @@ mod tests {
         let entity1 = catalog.items.get("item-1").unwrap();
         assert_eq!(entity1.state, EntityState::New);
         assert_eq!(entity1.value_of("name"), Some(&Value::from("Item 1")));
+        assert_eq!(entity1.value_of("price"), Some(&Value::from(10u64)));
+        assert_eq!(entity1.value_of("sell_trend"), Some(&Value::from(0i64)));
         let entity2 = catalog.items.get("item-2").unwrap();
         assert_eq!(entity2.state, EntityState::New);
         assert_eq!(entity2.value_of("name"), Some(&Value::from("Item 2")));
+        assert_eq!(entity2.value_of("price"), Some(&Value::from(20u64)));
+        assert_eq!(entity2.value_of("sell_trend"), Some(&Value::from(0i64)));
     }
     // ## 'get()'
     #[test]
@@ -401,6 +417,7 @@ mod tests {
             id: "item-123".to_string(),
             name: "Test Item".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog.upsert(item.clone());
@@ -415,6 +432,7 @@ mod tests {
             id: "item-123".to_string(),
             name: "Test Item".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog.upsert(item.clone());
@@ -430,12 +448,14 @@ mod tests {
             id: "item-1".to_string(),
             name: "Test Item".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let item2 = Item {
             id: "item-2".to_string(),
             name: "Unique Item".to_string(),
             price: 200,
+            sell_trend: 0,
             in_stock: false,
         };
         let _ = catalog.upsert(item1.clone());
@@ -453,12 +473,14 @@ mod tests {
             id: "item-1".to_string(),
             name: "Item One".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let item2 = Item {
             id: "item-2".to_string(),
             name: "Item Two".to_string(),
             price: 250,
+            sell_trend: 0,
             in_stock: false,
         };
         let _ = catalog.upsert(item1.clone());
@@ -477,6 +499,11 @@ mod tests {
             .get_by_class_and_attribute("in_stock", true)
             .unwrap();
         assert_eq!(retrieved_by_stock, Some(item1.clone()));
+        // Test with i64 for sell_trend attribute
+        let retrieved_by_sell_trend: Option<Item> = catalog
+            .get_by_class_and_attribute("sell_trend", 0i64)
+            .unwrap();
+        assert_eq!(retrieved_by_sell_trend, Some(item1.clone()));
     }
     #[test]
     fn get_by_class_and_attribute_should_return_none_if_no_match() {
@@ -486,6 +513,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Test Item".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog.upsert(item.clone());
@@ -509,12 +537,14 @@ mod tests {
             id: "item-1".to_string(),
             name: "Item One".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let item2 = Item {
             id: "item-2".to_string(),
             name: "Item Two".to_string(),
             price: 200,
+            sell_trend: 0,
             in_stock: false,
         };
         let _ = catalog.upsert(item1.clone());
@@ -546,18 +576,21 @@ mod tests {
             id: "item-1".to_string(),
             name: "Item One".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let item2 = Item {
             id: "item-2".to_string(),
             name: "Item Two".to_string(),
             price: 200,
+            sell_trend: 0,
             in_stock: false,
         };
         let item3 = Item {
             id: "item-3".to_string(),
             name: "Item Three".to_string(),
             price: 300,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog.upsert(item1.clone());
@@ -580,6 +613,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Test Item".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog.upsert(item);
@@ -612,6 +646,7 @@ mod tests {
             id: "item-123".to_string(),
             name: "Test Item".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let item_id = item.id.clone();
@@ -628,6 +663,7 @@ mod tests {
             id: "item-123".to_string(),
             name: "Test Item".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog.upsert(item);
@@ -653,6 +689,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Test Item".to_string(),
             price: 123,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog1.upsert(item1.clone());
@@ -682,6 +719,7 @@ mod tests {
             id: "item-to-delete".to_string(),
             name: "Test Item".to_string(),
             price: 123,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog1.upsert(item1.clone());
@@ -714,6 +752,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Original Name".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog1.upsert(original_item.clone());
@@ -726,6 +765,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Updated Name".to_string(),
             price: 200,
+            sell_trend: 0,
             in_stock: false,
         };
         let _ = catalog2.upsert(updated_item.clone());
@@ -761,18 +801,21 @@ mod tests {
             id: "update-me".to_string(),
             name: "Original".to_string(),
             price: 10,
+            sell_trend: 0,
             in_stock: true,
         };
         let item_to_delete = Item {
             id: "delete-me".to_string(),
             name: "Delete Me".to_string(),
             price: 20,
+            sell_trend: 0,
             in_stock: true,
         };
         let item_to_keep = Item {
             id: "keep-me".to_string(),
             name: "Keep Me".to_string(),
             price: 30,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog_setup.upsert(item_to_update_original.clone());
@@ -787,6 +830,7 @@ mod tests {
             id: "add-me".to_string(),
             name: "Add Me".to_string(),
             price: 40,
+            sell_trend: 0,
             in_stock: false,
         };
         let _ = catalog_ops.upsert(item_to_add.clone()); // State: New
@@ -795,6 +839,7 @@ mod tests {
             id: "update-me".to_string(),
             name: "Updated".to_string(),
             price: 11,
+            sell_trend: 0,
             in_stock: false,
         };
         let _ = catalog_ops.upsert(item_to_update_new.clone()); // State: Updated
@@ -834,6 +879,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Test".to_string(),
             price: 10,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog.upsert(item);
@@ -859,17 +905,23 @@ mod tests {
         let item_to_update = Item {
             id: "update-me".to_string(),
             name: "Original".to_string(),
-            ..Default::default()
+            price: 0,
+            sell_trend: 0,
+            in_stock: false,
         };
         let item_to_delete = Item {
             id: "delete-me".to_string(),
             name: "Delete Me".to_string(),
-            ..Default::default()
+            price: 0,
+            sell_trend: 0,
+            in_stock: false,
         };
         let item_untouched = Item {
             id: "keep-me".to_string(),
             name: "Keep Me".to_string(),
-            ..Default::default()
+            price: 0,
+            sell_trend: 0,
+            in_stock: false,
         };
         let _ = catalog.upsert(item_to_update.clone());
         let _ = catalog.upsert(item_to_delete.clone());
@@ -894,14 +946,18 @@ mod tests {
         let item_new = Item {
             id: "add-me".to_string(),
             name: "Add Me".to_string(),
-            ..Default::default()
+            price: 0,
+            sell_trend: 0,
+            in_stock: false,
         };
         let _ = catalog.upsert(item_new.clone()); // State: New
         // An updated version of an existing item.
         let item_updated = Item {
             id: "update-me".to_string(),
             name: "Updated".to_string(),
-            ..Default::default()
+            price: 0,
+            sell_trend: 10,
+            in_stock: false,
         };
         let _ = catalog.upsert(item_updated.clone()); // State: Updated
         // An item to be deleted.
@@ -941,6 +997,10 @@ mod tests {
             updated_item_entity.value_of("name"),
             Some(&Value::from("Updated"))
         );
+        assert_eq!(
+            updated_item_entity.value_of("sell_trend"),
+            Some(&Value::from(10i64))
+        );
         let untouched_item_entity = catalog.items.get("keep-me").unwrap();
         assert_eq!(untouched_item_entity.state, EntityState::Loaded);
         assert_eq!(
@@ -967,6 +1027,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Test Item".to_string(),
             price: 123,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog1.upsert(item_to_persist.clone());
@@ -988,6 +1049,7 @@ mod tests {
             Some(&Value::from("Test Item"))
         );
         assert_eq!(loaded_entity.value_of("price"), Some(&Value::from(123u64)));
+        assert_eq!(loaded_entity.value_of("sell_trend"), Some(&Value::from(0i64)));
         assert_eq!(loaded_entity.value_of("in_stock"), Some(&Value::from(true)));
         assert_eq!(loaded_entity.state, EntityState::Loaded); // Should be Synced after loading.
         // 6. Also verify by using the public 'get' method.
@@ -1012,6 +1074,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Item from DB".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog1.upsert(item_in_db.clone());
@@ -1022,6 +1085,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "In-memory version".to_string(),
             price: 200,
+            sell_trend: 0,
             in_stock: false,
         };
         let _ = catalog2.upsert(item_in_memory);
@@ -1044,6 +1108,10 @@ mod tests {
         assert_eq!(
             entity_after_load.value_of("price"),
             Some(&Value::from(100u64))
+        );
+        assert_eq!(
+            entity_after_load.value_of("sell_trend"),
+            Some(&Value::from(0i64))
         );
         // 5. Verify using the public 'get' method.
         let retrieved_item: Item = catalog2.get("item-1").unwrap().unwrap();
@@ -1102,12 +1170,14 @@ mod tests {
             id: "item-1".to_string(),
             name: "Item One".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let item2 = Item {
             id: "item-2".to_string(),
             name: "Item Two".to_string(),
             price: 200,
+            sell_trend: 0,
             in_stock: false,
         };
         let _ = catalog1.upsert(item1.clone());
@@ -1150,6 +1220,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "DB Version".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog1.upsert(item_in_db.clone());
@@ -1160,6 +1231,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Memory Version".to_string(),
             price: 200,
+            sell_trend: 0,
             in_stock: false,
         };
         let _ = catalog2.upsert(item_in_memory);
@@ -1203,6 +1275,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "In-memory only".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog.upsert(item_in_memory.clone());
@@ -1249,18 +1322,21 @@ mod tests {
                 id: "item-1".to_string(),
                 name: "Item One".to_string(),
                 price: 100,
+                sell_trend: 0,
                 in_stock: true,
             },
             Item {
                 id: "item-2".to_string(),
                 name: "Item Two".to_string(),
                 price: 200,
+                sell_trend: 0,
                 in_stock: false,
             },
             Item {
                 id: "item-3".to_string(),
                 name: "Item Three".to_string(),
                 price: 300,
+                sell_trend: 0,
                 in_stock: true,
             },
         ];
@@ -1290,12 +1366,14 @@ mod tests {
                 id: "item-1".to_string(),
                 name: "Item One".to_string(),
                 price: 100,
+                sell_trend: 0,
                 in_stock: true,
             },
             Item {
                 id: "item-2".to_string(),
                 name: "Item Two".to_string(),
                 price: 200,
+                sell_trend: 0,
                 in_stock: false,
             },
         ];
@@ -1325,12 +1403,14 @@ mod tests {
                 id: "item-1".to_string(),
                 name: "Item One".to_string(),
                 price: 100,
+                sell_trend: 0,
                 in_stock: true,
             },
             Item {
                 id: "item-2".to_string(),
                 name: "Item Two".to_string(),
                 price: 200,
+                sell_trend: 0,
                 in_stock: false,
             },
         ];
@@ -1357,6 +1437,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "DB Version".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         catalog_setup.upsert(item_in_db.clone()).unwrap();
@@ -1366,6 +1447,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Memory Version".to_string(),
             price: 200,
+            sell_trend: 0,
             in_stock: false,
         };
         catalog.upsert(item_in_memory).unwrap();
@@ -1387,6 +1469,55 @@ mod tests {
         assert_eq!(result.unwrap_err(), FailedTo::LoadFromDB);
         std::fs::remove_dir_all(invalid_path).unwrap();
     }
+
+    #[test]
+    fn load_by_filter_should_load_matching_sell_trend() {
+        let db_path = "target/test_dbs/lbf_matching_sell_trend.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                name: "Item One".to_string(),
+                price: 100,
+                sell_trend: 10,
+                in_stock: true,
+            },
+            Item {
+                id: "item-2".to_string(),
+                name: "Item Two".to_string(),
+                price: 200,
+                sell_trend: -5,
+                in_stock: false,
+            },
+            Item {
+                id: "item-3".to_string(),
+                name: "Item Three".to_string(),
+                price: 300,
+                sell_trend: 10,
+                in_stock: true,
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_signed_int("sell_trend", Comparison::Equal, 10);
+        assert!(catalog.load_by_filter(&filter).is_ok());
+
+        assert_eq!(catalog.items.len(), 2);
+        assert!(catalog.items.contains_key("item-1"));
+        assert!(catalog.items.contains_key("item-3"));
+        assert!(!catalog.items.contains_key("item-2"));
+
+        std::fs::remove_file(path).unwrap();
+    }
     // ## Integration Tests
     #[test]
     fn integration_test_init_insert_persist_load_get() {
@@ -1404,6 +1535,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Integration Test Item".to_string(),
             price: 999,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog1.upsert(item_to_insert.clone());
@@ -1434,12 +1566,14 @@ mod tests {
                 id: "item-1".to_string(),
                 name: "Item One".to_string(),
                 price: 100,
+                sell_trend: 0,
                 in_stock: true,
             },
             Item {
                 id: "item-2".to_string(),
                 name: "Item Two".to_string(),
                 price: 200,
+                sell_trend: 0,
                 in_stock: false,
             },
         ];
@@ -1478,6 +1612,7 @@ mod tests {
             id: "item-to-delete".to_string(),
             name: "Test Item".to_string(),
             price: 123,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog1.upsert(item_to_delete.clone());
@@ -1506,12 +1641,14 @@ mod tests {
             id: "item-1".to_string(),
             name: "First Item".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let item2 = Item {
             id: "item-2".to_string(),
             name: "Second Item".to_string(),
             price: 200,
+            sell_trend: 0,
             in_stock: false,
         };
         let _ = catalog.upsert(item1.clone());
@@ -1532,18 +1669,21 @@ mod tests {
             id: "item-1".to_string(),
             name: "Item One".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let item2 = Item {
             id: "item-2".to_string(),
             name: "Item Two".to_string(),
             price: 200,
+            sell_trend: 0,
             in_stock: false,
         };
         let item3 = Item {
             id: "item-3".to_string(),
             name: "Item Three".to_string(),
             price: 150,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog.insert_many(vec![item1.clone(), item2.clone(), item3.clone()]);
@@ -1579,6 +1719,7 @@ mod tests {
             id: "item-1".to_string(),
             name: "Original".to_string(),
             price: 100,
+            sell_trend: 0,
             in_stock: true,
         };
         let _ = catalog_setup.upsert(initial_item);
@@ -1611,8 +1752,8 @@ mod tests {
         catalog_verify.load_by_id("item-1").unwrap();
         let final_item: Item = catalog_verify.get("item-1").unwrap().unwrap();
         // The final state depends on which thread persisted last. One update will have been lost.
-        let thread1_won = final_item.name == "Updated by Thread 1" && final_item.price == 100;
-        let thread2_won = final_item.name == "Original" && final_item.price == 200;
+        let thread1_won = final_item.name == "Updated by Thread 1" && final_item.price == 100 && final_item.sell_trend == 0;
+        let thread2_won = final_item.name == "Original" && final_item.price == 200 && final_item.sell_trend == 0;
         assert!(
             thread1_won || thread2_won,
             "Final state must be the result of one of the threads winning the race."
