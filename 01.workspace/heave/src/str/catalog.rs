@@ -214,6 +214,8 @@ impl Catalog {
         Ok(())
     }
 
+    /// Loads all entities matching the filter values
+    /// Different entity class with clashing attribute names might be loaded
     pub fn load_by_filter(&mut self, filter: &Filter) -> Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
         let entities = sqlite::load::by_filter(path, filter).map_err(|_| FailedTo::LoadFromDB)?;
