@@ -2,4 +2,5 @@
 pub enum E {
     Bool(bool),
     SignedInt(i64),
+    UnsignedInt(i64),
 }
