@@ -1817,69 +1817,179 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
     
-        #[test]
-        fn load_by_filter_should_load_matching_greater_or_equal_sell_trend_edge_cases() {
-            let db_path = "target/test_dbs/lbf_greater_or_equal_sell_trend_edge_cases.db";
-            let path = std::path::Path::new(db_path);
-            std::fs::create_dir_all(path.parent().unwrap()).unwrap();
-            if path.exists() {
+            #[test]
+            fn load_by_filter_should_load_matching_greater_or_equal_sell_trend_edge_cases() {
+                let db_path = "target/test_dbs/lbf_greater_or_equal_sell_trend_edge_cases.db";
+                let path = std::path::Path::new(db_path);
+                std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+                if path.exists() {
+                    std::fs::remove_file(path).unwrap();
+                }
+        
+                let mut catalog_setup = Catalog::new(db_path);
+                catalog_setup.init().unwrap();
+                let items = vec![
+                    Item {
+                        id: "item-1".to_string(),
+                        name: "Item One".to_string(),
+                        price: 100,
+                        sell_trend: 10,
+                        in_stock: true,
+                    },
+                    Item {
+                        id: "item-2".to_string(),
+                        name: "Item Two".to_string(),
+                        price: 200,
+                        sell_trend: -5,
+                        in_stock: false,
+                    },
+                    Item {
+                        id: "item-3".to_string(),
+                        name: "Item Three".to_string(),
+                        price: 300,
+                        sell_trend: 20,
+                        in_stock: true,
+                    },
+                ];
+                catalog_setup.insert_many(items).unwrap();
+                catalog_setup.persist().unwrap();
+        
+                // Edge Case 1: Value equal to filter value should be included.
+                let mut catalog1 = Catalog::new(db_path);
+                let filter1 = Filter::new().with_signed_int("sell_trend", Comparison::GreaterOrEqual, 20);
+                assert!(catalog1.load_by_filter(&filter1).is_ok());
+                assert_eq!(catalog1.items.len(), 1);
+                assert!(catalog1.items.contains_key("item-3"));
+        
+                // Edge Case 2: No values greater than or equal to filter value.
+                let mut catalog2 = Catalog::new(db_path);
+                let filter2 = Filter::new().with_signed_int("sell_trend", Comparison::GreaterOrEqual, 21);
+                assert!(catalog2.load_by_filter(&filter2).is_ok());
+                assert!(catalog2.items.is_empty());
+        
+                // Edge Case 3: All values greater than or equal to filter value.
+                let mut catalog3 = Catalog::new(db_path);
+                let filter3 = Filter::new().with_signed_int("sell_trend", Comparison::GreaterOrEqual, -5);
+                assert!(catalog3.load_by_filter(&filter3).is_ok());
+                assert_eq!(catalog3.items.len(), 3);
+                assert!(catalog3.items.contains_key("item-1"));
+                assert!(catalog3.items.contains_key("item-2"));
+                assert!(catalog3.items.contains_key("item-3"));
+        
                 std::fs::remove_file(path).unwrap();
             }
-    
-            let mut catalog_setup = Catalog::new(db_path);
-            catalog_setup.init().unwrap();
-            let items = vec![
-                Item {
-                    id: "item-1".to_string(),
-                    name: "Item One".to_string(),
-                    price: 100,
-                    sell_trend: 10,
-                    in_stock: true,
-                },
-                Item {
-                    id: "item-2".to_string(),
-                    name: "Item Two".to_string(),
-                    price: 200,
-                    sell_trend: -5,
-                    in_stock: false,
-                },
-                Item {
-                    id: "item-3".to_string(),
-                    name: "Item Three".to_string(),
-                    price: 300,
-                    sell_trend: 20,
-                    in_stock: true,
-                },
-            ];
-            catalog_setup.insert_many(items).unwrap();
-            catalog_setup.persist().unwrap();
-    
-            // Edge Case 1: Value equal to filter value should be included.
-            let mut catalog1 = Catalog::new(db_path);
-            let filter1 = Filter::new().with_signed_int("sell_trend", Comparison::GreaterOrEqual, 20);
-            assert!(catalog1.load_by_filter(&filter1).is_ok());
-            assert_eq!(catalog1.items.len(), 1);
-            assert!(catalog1.items.contains_key("item-3"));
-    
-            // Edge Case 2: No values greater than or equal to filter value.
-            let mut catalog2 = Catalog::new(db_path);
-            let filter2 = Filter::new().with_signed_int("sell_trend", Comparison::GreaterOrEqual, 21);
-            assert!(catalog2.load_by_filter(&filter2).is_ok());
-            assert!(catalog2.items.is_empty());
-    
-            // Edge Case 3: All values greater than or equal to filter value.
-            let mut catalog3 = Catalog::new(db_path);
-            let filter3 = Filter::new().with_signed_int("sell_trend", Comparison::GreaterOrEqual, -5);
-            assert!(catalog3.load_by_filter(&filter3).is_ok());
-            assert_eq!(catalog3.items.len(), 3);
-            assert!(catalog3.items.contains_key("item-1"));
-            assert!(catalog3.items.contains_key("item-2"));
-            assert!(catalog3.items.contains_key("item-3"));
-    
-            std::fs::remove_file(path).unwrap();
-        }
-    
-    // ## Integration Tests
+        
+            #[test]
+            fn load_by_filter_should_load_matching_lesser_or_equal_sell_trend() {
+                let db_path = "target/test_dbs/lbf_matching_lesser_or_equal_sell_trend.db";
+                let path = std::path::Path::new(db_path);
+                std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+                if path.exists() {
+                    std::fs::remove_file(path).unwrap();
+                }
+        
+                let mut catalog_setup = Catalog::new(db_path);
+                catalog_setup.init().unwrap();
+                let items = vec![
+                    Item {
+                        id: "item-1".to_string(),
+                        name: "Item One".to_string(),
+                        price: 100,
+                        sell_trend: 10,
+                        in_stock: true,
+                    },
+                    Item {
+                        id: "item-2".to_string(),
+                        name: "Item Two".to_string(),
+                        price: 200,
+                        sell_trend: -5,
+                        in_stock: false,
+                    },
+                    Item {
+                        id: "item-3".to_string(),
+                        name: "Item Three".to_string(),
+                        price: 300,
+                        sell_trend: 20,
+                        in_stock: true,
+                    },
+                ];
+                catalog_setup.insert_many(items).unwrap();
+                catalog_setup.persist().unwrap();
+        
+                let mut catalog = Catalog::new(db_path);
+                let filter = Filter::new().with_signed_int("sell_trend", Comparison::LesserOrEqual, 10);
+                assert!(catalog.load_by_filter(&filter).is_ok());
+        
+                assert_eq!(catalog.items.len(), 2);
+                assert!(catalog.items.contains_key("item-1"));
+                assert!(catalog.items.contains_key("item-2"));
+                assert!(!catalog.items.contains_key("item-3"));
+        
+                std::fs::remove_file(path).unwrap();
+            }
+        
+            #[test]
+            fn load_by_filter_should_load_matching_lesser_or_equal_sell_trend_edge_cases() {
+                let db_path = "target/test_dbs/lbf_lesser_or_equal_sell_trend_edge_cases.db";
+                let path = std::path::Path::new(db_path);
+                std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+                if path.exists() {
+                    std::fs::remove_file(path).unwrap();
+                }
+        
+                let mut catalog_setup = Catalog::new(db_path);
+                catalog_setup.init().unwrap();
+                let items = vec![
+                    Item {
+                        id: "item-1".to_string(),
+                        name: "Item One".to_string(),
+                        price: 100,
+                        sell_trend: 10,
+                        in_stock: true,
+                    },
+                    Item {
+                        id: "item-2".to_string(),
+                        name: "Item Two".to_string(),
+                        price: 200,
+                        sell_trend: -5,
+                        in_stock: false,
+                    },
+                    Item {
+                        id: "item-3".to_string(),
+                        name: "Item Three".to_string(),
+                        price: 300,
+                        sell_trend: 20,
+                        in_stock: true,
+                    },
+                ];
+                catalog_setup.insert_many(items).unwrap();
+                catalog_setup.persist().unwrap();
+        
+                // Edge Case 1: Value equal to filter value should be included.
+                let mut catalog1 = Catalog::new(db_path);
+                let filter1 = Filter::new().with_signed_int("sell_trend", Comparison::LesserOrEqual, -5);
+                assert!(catalog1.load_by_filter(&filter1).is_ok());
+                assert_eq!(catalog1.items.len(), 1);
+                assert!(catalog1.items.contains_key("item-2"));
+        
+                // Edge Case 2: No values lesser than or equal to filter value.
+                let mut catalog2 = Catalog::new(db_path);
+                let filter2 = Filter::new().with_signed_int("sell_trend", Comparison::LesserOrEqual, -6);
+                assert!(catalog2.load_by_filter(&filter2).is_ok());
+                assert!(catalog2.items.is_empty());
+        
+                // Edge Case 3: All values lesser than or equal to filter value.
+                let mut catalog3 = Catalog::new(db_path);
+                let filter3 = Filter::new().with_signed_int("sell_trend", Comparison::LesserOrEqual, 20);
+                assert!(catalog3.load_by_filter(&filter3).is_ok());
+                assert_eq!(catalog3.items.len(), 3);
+                assert!(catalog3.items.contains_key("item-1"));
+                assert!(catalog3.items.contains_key("item-2"));
+                assert!(catalog3.items.contains_key("item-3"));
+        
+                std::fs::remove_file(path).unwrap();
+            }
+            // ## Integration Tests
     #[test]
     fn integration_test_init_insert_persist_load_get() {
         // Scenario: 'init' -> 'insert' -> 'persist' -> create a new catalog instance -> 'load_by_id' -> 'get' -> verify data integrity.
