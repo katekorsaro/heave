@@ -1,11 +1,11 @@
 use crate::*;
 
 #[derive(Debug, Default, PartialEq, Clone)]
-pub struct O {
-    conditions: Vec<(String, Comparison, Condition)>,
+pub struct O<'a> {
+    conditions: Vec<(String, Comparison, Condition<'a>)>,
 }
 
-impl Filter {
+impl<'a> Filter<'a> {
     pub fn new() -> Self {
         Self {
             conditions: Vec::new(),
@@ -45,7 +45,20 @@ impl Filter {
         ));
         self
     }
-    pub(crate) fn conditions(&self) -> impl Iterator<Item = &(String, Comparison, Condition)> {
+    pub fn with_text(
+        mut self,
+        attribute_name: &str,
+        comparison: Comparison,
+        value: &'a str,
+    ) -> Self {
+        self.conditions.push((
+            attribute_name.to_string(),
+            comparison,
+            Condition::Text(value),
+        ));
+        self
+    }
+    pub(crate) fn conditions(&self) -> impl Iterator<Item = &(String, Comparison, Condition<'a>)> {
         self.conditions.iter()
     }
 }

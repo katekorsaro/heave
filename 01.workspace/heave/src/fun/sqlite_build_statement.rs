@@ -41,6 +41,7 @@ pub fn run(filter: &Filter) -> Result<String, FailedTo> {
             (Comparison::LesserOrEqual, Condition::SignedInt(_)) => {
                 compose_fragment(name, "value_int", "<=", i + 1)
             }
+            (_, Condition::SignedInt(_)) => return Err(FailedTo::ComposeFilter),
             // UNSIGNED INT
             (Comparison::Equal, Condition::UnsignedInt(_)) => {
                 compose_fragment(name, "value_uint", "=", i + 1)
@@ -56,6 +57,11 @@ pub fn run(filter: &Filter) -> Result<String, FailedTo> {
             }
             (Comparison::LesserOrEqual, Condition::UnsignedInt(_)) => {
                 compose_fragment(name, "value_uint", "<=", i + 1)
+            }
+            (_, Condition::UnsignedInt(_)) => return Err(FailedTo::ComposeFilter),
+            // TEXT
+            (Comparison::IsExactly, Condition::Text(_)) => {
+                compose_fragment(name, "value_text", "=", i + 1)
             }
             _ => todo!(),
         };
