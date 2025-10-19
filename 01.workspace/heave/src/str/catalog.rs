@@ -1051,7 +1051,10 @@ mod tests {
             Some(&Value::from("Test Item"))
         );
         assert_eq!(loaded_entity.value_of("price"), Some(&Value::from(123u64)));
-        assert_eq!(loaded_entity.value_of("sell_trend"), Some(&Value::from(0i64)));
+        assert_eq!(
+            loaded_entity.value_of("sell_trend"),
+            Some(&Value::from(0i64))
+        );
         assert_eq!(loaded_entity.value_of("in_stock"), Some(&Value::from(true)));
         assert_eq!(loaded_entity.state, EntityState::Loaded); // Should be Synced after loading.
         // 6. Also verify by using the public 'get' method.
@@ -1754,8 +1757,11 @@ mod tests {
         catalog_verify.load_by_id("item-1").unwrap();
         let final_item: Item = catalog_verify.get("item-1").unwrap().unwrap();
         // The final state depends on which thread persisted last. One update will have been lost.
-        let thread1_won = final_item.name == "Updated by Thread 1" && final_item.price == 100 && final_item.sell_trend == 0;
-        let thread2_won = final_item.name == "Original" && final_item.price == 200 && final_item.sell_trend == 0;
+        let thread1_won = final_item.name == "Updated by Thread 1"
+            && final_item.price == 100
+            && final_item.sell_trend == 0;
+        let thread2_won =
+            final_item.name == "Original" && final_item.price == 200 && final_item.sell_trend == 0;
         assert!(
             thread1_won || thread2_won,
             "Final state must be the result of one of the threads winning the race."
