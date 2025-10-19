@@ -63,10 +63,11 @@ pub fn run(filter: &Filter) -> Result<String, FailedTo> {
             (Comparison::IsExactly, Condition::Text(_)) => {
                 compose_fragment(name, "value_text", "LIKE", i + 1)
             }
-            (Comparison::StartsWith, Condition::Text(_)) => {
-                compose_fragment(name, "value_text", "LIKE", i + 1)
-            }
-            _ => todo!(),
+            (
+                Comparison::StartsWith | Comparison::EndsWith | Comparison::Contains,
+                Condition::Text(_),
+            ) => compose_fragment(name, "value_text", "LIKE", i + 1),
+            (_, Condition::Text(_)) => return Err(FailedTo::ComposeFilter),
         };
         statement.push_str(&fragment);
     }
