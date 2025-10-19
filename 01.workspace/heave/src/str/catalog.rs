@@ -2321,16 +2321,86 @@ mod tests {
         let filter = Filter::new().with_text("name", Comparison::IsExactly, "Item");
         assert!(catalog.load_by_filter(&filter).is_ok());
         assert!(catalog.items.is_empty());
-        // Case sensitive match
+        // Case insensitive match
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::IsExactly, "item one");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert!(catalog.items.is_empty());
+        assert_eq!(catalog.items.len(), 1);
+        assert!(catalog.items.contains_key("item-1"));
         // No match
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::IsExactly, "Item Four");
         assert!(catalog.load_by_filter(&filter).is_ok());
         assert!(catalog.items.is_empty());
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_load_text_starts_with_comparisons() {
+        let db_path = "target/test_dbs/lbf_text_starts_with_comparisons.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                name: "Item One".to_string(),
+                price: 100,
+                sell_trend: 0,
+                in_stock: true,
+            },
+            Item {
+                id: "item-2".to_string(),
+                name: "Item Two".to_string(),
+                price: 200,
+                sell_trend: 0,
+                in_stock: false,
+            },
+            Item {
+                id: "item-3".to_string(),
+                name: "Another Item".to_string(),
+                price: 300,
+                sell_trend: 0,
+                in_stock: true,
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        // Starts with "Item"
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_text("name", Comparison::StartsWith, "Item");
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 2);
+        assert!(catalog.items.contains_key("item-1"));
+        assert!(catalog.items.contains_key("item-2"));
+        // Starts with "I"
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_text("name", Comparison::StartsWith, "I");
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 2);
+        assert!(catalog.items.contains_key("item-1"));
+        assert!(catalog.items.contains_key("item-2"));
+        // No match
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_text("name", Comparison::StartsWith, "Z");
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert!(catalog.items.is_empty());
+        // Case insensitive
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_text("name", Comparison::StartsWith, "item");
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 2);
+        assert!(catalog.items.contains_key("item-1"));
+        assert!(catalog.items.contains_key("item-2"));
+        // Full string match
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_text("name", Comparison::StartsWith, "Item One");
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 1);
+        assert!(catalog.items.contains_key("item-1"));
         std::fs::remove_file(path).unwrap();
     }
 }

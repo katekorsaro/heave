@@ -61,7 +61,10 @@ pub fn run(filter: &Filter) -> Result<String, FailedTo> {
             (_, Condition::UnsignedInt(_)) => return Err(FailedTo::ComposeFilter),
             // TEXT
             (Comparison::IsExactly, Condition::Text(_)) => {
-                compose_fragment(name, "value_text", "=", i + 1)
+                compose_fragment(name, "value_text", "LIKE", i + 1)
+            }
+            (Comparison::StartsWith, Condition::Text(_)) => {
+                compose_fragment(name, "value_text", "LIKE", i + 1)
             }
             _ => todo!(),
         };
