@@ -3,6 +3,8 @@ use crate::*;
 /// Represents the possible failures that can occur in the library.
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy, Hash)]
 pub enum FailedTo {
+    /// Failed to compose filter statement
+    ComposeFilter,
     /// Failed to convert from Entity to type.
     ConvertEntity,
     /// Failed to convert from type to Entity.

@@ -5,4 +5,8 @@ pub enum E {
     GreaterOrEqual,
     Lesser,
     LesserOrEqual,
+    IsExactly,
+    StartsWith,
+    EndsWith,
+    Contains,
 }

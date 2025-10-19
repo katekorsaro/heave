@@ -24,6 +24,7 @@ pub fn run(filter: &Filter) -> Result<String, FailedTo> {
             (Comparison::Equal, Condition::Bool(_)) => {
                 compose_fragment(name, "value_bool", "=", i + 1)
             }
+            (_, Condition::Bool(_)) => return Err(FailedTo::ComposeFilter),
             // SIGNED INT
             (Comparison::Equal, Condition::SignedInt(_)) => {
                 compose_fragment(name, "value_int", "=", i + 1)
