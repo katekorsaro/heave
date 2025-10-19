@@ -29,6 +29,9 @@ pub fn run(filter: &Filter) -> Result<String, FailedTo> {
             (Comparison::Greater, Condition::SignedInt(_)) => {
                 compose_fragment(name, "value_int", ">", i + 1)
             }
+            (Comparison::Lesser, Condition::SignedInt(_)) => {
+                compose_fragment(name, "value_int", "<", i + 1)
+            }
             _ => todo!(),
         };
         statement.push_str(&fragment);
