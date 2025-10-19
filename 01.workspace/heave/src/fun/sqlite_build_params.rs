@@ -9,25 +9,23 @@ pub fn run<'a>(filter: &'a Filter) -> Result<Vec<Box<dyn ToSql + 'a>>, FailedTo>
             // BOOL
             (Comparison::Equal, Condition::Bool(value)) => params.push(Box::new(value)),
             // SIGNED INT
-            (Comparison::Equal, Condition::SignedInt(value)) => params.push(Box::new(value)),
-            (Comparison::Greater, Condition::SignedInt(value)) => params.push(Box::new(value)),
-            (Comparison::Lesser, Condition::SignedInt(value)) => params.push(Box::new(value)),
-            (Comparison::GreaterOrEqual, Condition::SignedInt(value)) => {
-                params.push(Box::new(value))
-            }
-            (Comparison::LesserOrEqual, Condition::SignedInt(value)) => {
-                params.push(Box::new(value))
-            }
+            (
+                Comparison::Equal
+                | Comparison::Greater
+                | Comparison::Lesser
+                | Comparison::GreaterOrEqual
+                | Comparison::LesserOrEqual,
+                Condition::SignedInt(value),
+            ) => params.push(Box::new(value)),
             // UNSIGNED INT
-            (Comparison::Equal, Condition::UnsignedInt(value)) => params.push(Box::new(value)),
-            (Comparison::Greater, Condition::UnsignedInt(value)) => params.push(Box::new(value)),
-            (Comparison::Lesser, Condition::UnsignedInt(value)) => params.push(Box::new(value)),
-            (Comparison::GreaterOrEqual, Condition::UnsignedInt(value)) => {
-                params.push(Box::new(value))
-            }
-            (Comparison::LesserOrEqual, Condition::UnsignedInt(value)) => {
-                params.push(Box::new(value))
-            }
+            (
+                Comparison::Equal
+                | Comparison::Greater
+                | Comparison::Lesser
+                | Comparison::GreaterOrEqual
+                | Comparison::LesserOrEqual,
+                Condition::UnsignedInt(value),
+            ) => params.push(Box::new(value)),
             // TEXT
             (Comparison::IsExactly, Condition::Text(value)) => params.push(Box::new(value)),
             (Comparison::StartsWith, Condition::Text(value)) => {
