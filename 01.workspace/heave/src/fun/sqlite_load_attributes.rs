@@ -38,6 +38,7 @@ mod tests {
         let mut entity = Entity {
             id: "entity1".to_string(),
             class: "class1".to_string(),
+            subclass: None,
             attributes: HashMap::new(),
             state: Default::default(),
             ref_date: None,
@@ -77,6 +78,7 @@ mod tests {
         let mut entity = Entity {
             id: "entity2".to_string(),
             class: "class1".to_string(),
+            subclass: None,
             attributes: HashMap::new(),
             state: Default::default(),
             ref_date: None,
@@ -101,6 +103,7 @@ mod tests {
         let mut entity = Entity {
             id: "entity3".to_string(),
             class: "class1".to_string(),
+            subclass: None,
             attributes: HashMap::new(),
             state: Default::default(),
             ref_date: None,

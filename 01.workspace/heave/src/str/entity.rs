@@ -14,6 +14,10 @@ pub struct O {
     /// A string identifying the "type" or "class" of the entity (e.g., "product", "user").
     /// This is used to group and query entities of the same kind.
     pub class: String,
+    /// A string identifying the "subtype" or "subclass" of the entity (e.g.,
+    /// "computer", "phone", "customer"). This is used to group and query entities
+    /// of different subtype but of the same kind or inside the same domain (class)
+    pub subclass: Option<String>,
     /// A map of attribute names to `Attribute` values, holding the actual data
     /// of the entity.
     pub attributes: std::collections::HashMap<String, Attribute>,
@@ -34,6 +38,7 @@ impl Entity {
             state: EntityState::New,
             ref_date: None,
             class: T::class().to_string(),
+            subclass: None,
             attributes: std::collections::HashMap::<String, Attribute>::new(),
         }
     }
@@ -49,6 +54,11 @@ impl Entity {
     /// The entity with the updated ID.
     pub fn with_id(mut self, id: &str) -> Self {
         self.id = id.to_string();
+        self
+    }
+
+    pub fn with_subclass(mut self, subclass: &str) -> Self {
+        self.subclass = Some(subclass.to_string());
         self
     }
 

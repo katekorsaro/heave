@@ -6,6 +6,7 @@ pub fn run(path: &path::Path) -> result::Result<(), FailedTo> {
         CREATE TABLE IF NOT EXISTS entity (
             id TEXT PRIMARY KEY,
             class TEXT NOT NULL,
+            subclass TEXT,
             ref_date INTEGER
         );
         CREATE TABLE IF NOT EXISTS attribute (

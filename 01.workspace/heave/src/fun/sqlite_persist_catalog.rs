@@ -113,6 +113,7 @@ mod tests {
         let mut entity = Entity {
             id: "e1".to_string(),
             class: "c1".to_string(),
+            subclass: None,
             attributes: HashMap::new(),
             state: EntityState::New,
             ref_date: None,
@@ -141,6 +142,7 @@ mod tests {
         let entity = Entity {
             id: "e1".to_string(),
             class: "c1".to_string(),
+            subclass: None,
             attributes: HashMap::new(),
             state: EntityState::ToDelete,
             ref_date: None,
@@ -161,6 +163,7 @@ mod tests {
         let to_delete = Entity {
             id: "e1".to_string(),
             class: "c1".to_string(),
+            subclass: None,
             attributes: HashMap::new(),
             state: EntityState::ToDelete,
             ref_date: None,
@@ -168,6 +171,7 @@ mod tests {
         let to_add = Entity {
             id: "e2".to_string(),
             class: "c2".to_string(),
+            subclass: None,
             attributes: HashMap::new(),
             state: EntityState::New,
             ref_date: None,
@@ -190,6 +194,7 @@ mod tests {
         let unmodified = Entity {
             id: "e1".to_string(),
             class: "c1".to_string(),
+            subclass: None,
             attributes: HashMap::new(),
             state: EntityState::Loaded,
             ref_date: None,
@@ -213,6 +218,7 @@ mod tests {
         let mut new_entity = Entity {
             id: "e_new".to_string(),
             class: "c1".to_string(),
+            subclass: None,
             attributes: HashMap::new(),
             state: EntityState::New,
             ref_date: None,

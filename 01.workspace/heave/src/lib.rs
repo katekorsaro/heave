@@ -32,8 +32,9 @@
 //! and the necessary `From` and `TryFrom` conversions.
 //!
 //! ```rust,no_run
-//! use heave::{EAV, Catalog, Entity, Value, FailedTo, Comparison, Filter};
+//! use heave::*;
 //! use std::convert::{From, TryFrom};
+//! use std::result::Result;
 //!
 //! // Define a simple struct representing a product.
 //! #[derive(Debug, Default, PartialEq, Clone)]
@@ -68,10 +69,10 @@
 //!
 //!     fn try_from(entity: Entity) -> Result<Self, Self::Error> {
 //!         Ok(Self {
-//!             id: entity.id,
-//!             name: entity.unwrap("name").ok_or(FailedTo::ConvertEntity)?,
-//!             price: entity.unwrap("price").ok_or(FailedTo::ConvertEntity)?,
-//!             in_stock: entity.unwrap("in_stock").ok_or(FailedTo::ConvertEntity)?,
+//!             id: entity.id.clone(),
+//!             name: entity.unwrap("name").map_err(|_| FailedTo::ConvertEntity)?,
+//!             price: entity.unwrap("price").map_err(|_| FailedTo::ConvertEntity)?,
+//!             in_stock: entity.unwrap("in_stock").map_err(|_| FailedTo::ConvertEntity)?,
 //!         })
 //!     }
 //! }
