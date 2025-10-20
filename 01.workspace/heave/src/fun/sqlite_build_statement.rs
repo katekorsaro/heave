@@ -2,10 +2,10 @@ use crate::*;
 
 const BASE_SELECT: &str = r#"SELECT * FROM entity"#;
 const INNER_JOIN_FRAGMENT: &str = r#"
-    INNER JOIN attribute
-    ON entity.id = attribute.entity_id
-    AND attribute.id = '{attribute_id}'
-    AND {field} {op} ?{index}
+    INNER JOIN attribute as attribute_{index}
+    ON entity.id = attribute_{index}.entity_id
+    AND attribute_{index}.id = '{attribute_id}'
+    AND attribute_{index}.{field} {op} ?{index}
 "#;
 
 fn compose_fragment(name: &str, field: &str, op: &str, index: usize) -> String {

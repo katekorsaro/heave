@@ -2960,4 +2960,56 @@ mod tests {
         assert!(catalog2.items.is_empty());
         std::fs::remove_file(path).unwrap();
     }
+    #[test]
+    fn load_by_filter_with_multiple_conditions() {
+        let db_path = "target/test_dbs/lbf_with_multiple_conditions.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                price: 100,
+                discount: 0.10,
+                in_stock: true,
+                ..Default::default()
+            },
+            Item {
+                id: "item-2".to_string(),
+                price: 200,
+                discount: 0.10,
+                in_stock: true,
+                ..Default::default()
+            },
+            Item {
+                id: "item-3".to_string(),
+                price: 100,
+                discount: 0.20,
+                in_stock: true,
+                ..Default::default()
+            },
+            Item {
+                id: "item-4".to_string(),
+                price: 100,
+                discount: 0.10,
+                in_stock: false,
+                ..Default::default()
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new()
+            .with_unsigned_int("price", Comparison::Equal, 100)
+            .with_real("discount", Comparison::Equal, 0.10)
+            .with_bool("in_stock", true);
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 1);
+        assert!(catalog.items.contains_key("item-1"));
+        std::fs::remove_file(path).unwrap();
+    }
 }
