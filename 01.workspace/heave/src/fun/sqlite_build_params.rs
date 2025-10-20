@@ -26,6 +26,15 @@ pub fn run<'a>(filter: &'a Filter) -> Result<Vec<Box<dyn ToSql + 'a>>, FailedTo>
                 | Comparison::LesserOrEqual,
                 Condition::UnsignedInt(value),
             ) => params.push(Box::new(value)),
+            // REAL
+            (
+                Comparison::Equal
+                | Comparison::Greater
+                | Comparison::Lesser
+                | Comparison::GreaterOrEqual
+                | Comparison::LesserOrEqual,
+                Condition::Real(value),
+            ) => params.push(Box::new(value)),
             // TEXT
             (Comparison::IsExactly, Condition::Text(value)) => params.push(Box::new(value)),
             (Comparison::StartsWith, Condition::Text(value)) => {

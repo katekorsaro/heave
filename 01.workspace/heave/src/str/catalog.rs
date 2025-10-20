@@ -222,6 +222,7 @@ mod tests {
         pub id: String,
         pub name: String,
         pub price: u64,
+        pub discount: f64,
         pub sell_trend: i64,
         pub in_stock: bool,
     }
@@ -236,6 +237,7 @@ mod tests {
                 .with_id(&value.id)
                 .with_attribute("name", value.name)
                 .with_attribute("price", value.price)
+                .with_attribute("discount", value.discount)
                 .with_attribute("sell_trend", value.sell_trend)
                 .with_attribute("in_stock", value.in_stock)
         }
@@ -246,6 +248,9 @@ mod tests {
                 id: entity.id.clone(),
                 name: entity.unwrap("name").expect("name is always present"),
                 price: entity.unwrap("price").expect("price is always present"),
+                discount: entity
+                    .unwrap("discount")
+                    .expect("discount is always present"),
                 sell_trend: entity
                     .unwrap("sell_trend")
                     .expect("sell_trend is always present"),
@@ -324,6 +329,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let item_id = item.id.clone();
         let _ = catalog.upsert(item);
@@ -346,6 +352,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let item_id = item1.id.clone();
         let _ = catalog.upsert(item1);
@@ -355,6 +362,7 @@ mod tests {
             price: 200,
             sell_trend: 10,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog.upsert(item2);
         assert_eq!(catalog.items.len(), 1);
@@ -376,6 +384,7 @@ mod tests {
                 price: 10,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -383,6 +392,7 @@ mod tests {
                 price: 20,
                 sell_trend: 0,
                 in_stock: false,
+                ..Item::default()
             },
         ];
         let _ = catalog.insert_many(items);
@@ -409,6 +419,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog.upsert(item.clone());
         let retrieved_item: Option<Item> = catalog.get::<Item>("item-123").unwrap();
@@ -424,6 +435,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog.upsert(item.clone());
         let retrieved_item: Option<Item> = catalog.get("nonexistent-id").unwrap();
@@ -440,6 +452,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let item2 = Item {
             id: "item-2".to_string(),
@@ -447,6 +460,7 @@ mod tests {
             price: 200,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog.upsert(item1.clone());
         let _ = catalog.upsert(item2.clone());
@@ -465,6 +479,7 @@ mod tests {
             price: 100,
             sell_trend: 10,
             in_stock: true,
+            ..Item::default()
         };
         let item2 = Item {
             id: "item-2".to_string(),
@@ -472,6 +487,7 @@ mod tests {
             price: 250,
             sell_trend: 20,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog.upsert(item1.clone());
         let _ = catalog.upsert(item2.clone());
@@ -505,6 +521,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog.upsert(item.clone());
         // Test with a value that doesn't exist
@@ -529,6 +546,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let item2 = Item {
             id: "item-2".to_string(),
@@ -536,6 +554,7 @@ mod tests {
             price: 200,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog.upsert(item1.clone());
         let _ = catalog.upsert(item2.clone());
@@ -568,6 +587,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let item2 = Item {
             id: "item-2".to_string(),
@@ -575,6 +595,7 @@ mod tests {
             price: 200,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let item3 = Item {
             id: "item-3".to_string(),
@@ -582,6 +603,7 @@ mod tests {
             price: 300,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog.upsert(item1.clone());
         let _ = catalog.upsert(item2.clone());
@@ -605,6 +627,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog.upsert(item);
         // Search for a value that doesn't exist
@@ -638,6 +661,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let item_id = item.id.clone();
         let _ = catalog.upsert(item);
@@ -655,6 +679,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog.upsert(item);
         let original_items = catalog.items.clone();
@@ -681,6 +706,7 @@ mod tests {
             price: 123,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog1.upsert(item1.clone());
         assert!(catalog1.persist().is_ok());
@@ -711,6 +737,7 @@ mod tests {
             price: 123,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog1.upsert(item1.clone());
         assert!(catalog1.persist().is_ok());
@@ -744,6 +771,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog1.upsert(original_item.clone());
         catalog1.persist().unwrap();
@@ -757,6 +785,7 @@ mod tests {
             price: 200,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog2.upsert(updated_item.clone());
         assert_eq!(
@@ -793,6 +822,7 @@ mod tests {
             price: 10,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let item_to_delete = Item {
             id: "delete-me".to_string(),
@@ -800,6 +830,7 @@ mod tests {
             price: 20,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let item_to_keep = Item {
             id: "keep-me".to_string(),
@@ -807,6 +838,7 @@ mod tests {
             price: 30,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog_setup.upsert(item_to_update_original.clone());
         let _ = catalog_setup.upsert(item_to_delete.clone());
@@ -822,6 +854,7 @@ mod tests {
             price: 40,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog_ops.upsert(item_to_add.clone()); // State: New
         // An updated version of an existing item.
@@ -831,6 +864,7 @@ mod tests {
             price: 11,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog_ops.upsert(item_to_update_new.clone()); // State: Updated
         // An item to be deleted.
@@ -871,6 +905,7 @@ mod tests {
             price: 10,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog.upsert(item);
         let result = catalog.persist();
@@ -898,6 +933,7 @@ mod tests {
             price: 0,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let item_to_delete = Item {
             id: "delete-me".to_string(),
@@ -905,6 +941,7 @@ mod tests {
             price: 0,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let item_untouched = Item {
             id: "keep-me".to_string(),
@@ -912,6 +949,7 @@ mod tests {
             price: 0,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog.upsert(item_to_update.clone());
         let _ = catalog.upsert(item_to_delete.clone());
@@ -939,6 +977,7 @@ mod tests {
             price: 0,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog.upsert(item_new.clone()); // State: New
         // An updated version of an existing item.
@@ -948,6 +987,7 @@ mod tests {
             price: 0,
             sell_trend: 10,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog.upsert(item_updated.clone()); // State: Updated
         // An item to be deleted.
@@ -1019,6 +1059,7 @@ mod tests {
             price: 123,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog1.upsert(item_to_persist.clone());
         catalog1.persist().unwrap();
@@ -1069,6 +1110,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog1.upsert(item_in_db.clone());
         catalog1.persist().unwrap();
@@ -1080,6 +1122,7 @@ mod tests {
             price: 200,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog2.upsert(item_in_memory);
         let entity_before_load = catalog2.items.get("item-1").unwrap();
@@ -1165,6 +1208,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let item2 = Item {
             id: "item-2".to_string(),
@@ -1172,6 +1216,7 @@ mod tests {
             price: 200,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog1.upsert(item1.clone());
         let _ = catalog1.upsert(item2.clone());
@@ -1215,6 +1260,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog1.upsert(item_in_db.clone());
         catalog1.persist().unwrap();
@@ -1226,6 +1272,7 @@ mod tests {
             price: 200,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog2.upsert(item_in_memory);
         assert_eq!(catalog2.items.len(), 1);
@@ -1270,6 +1317,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog.upsert(item_in_memory.clone());
         assert_eq!(catalog.items.len(), 1);
@@ -1317,6 +1365,7 @@ mod tests {
                 price: 100,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1324,6 +1373,7 @@ mod tests {
                 price: 200,
                 sell_trend: 0,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -1331,6 +1381,7 @@ mod tests {
                 price: 300,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1361,6 +1412,7 @@ mod tests {
                 price: 100,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1368,6 +1420,7 @@ mod tests {
                 price: 200,
                 sell_trend: 0,
                 in_stock: false,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1398,6 +1451,7 @@ mod tests {
                 price: 100,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1405,6 +1459,7 @@ mod tests {
                 price: 200,
                 sell_trend: 0,
                 in_stock: false,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1432,6 +1487,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         catalog_setup.upsert(item_in_db.clone()).unwrap();
         catalog_setup.persist().unwrap();
@@ -1442,6 +1498,7 @@ mod tests {
             price: 200,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         catalog.upsert(item_in_memory).unwrap();
         let filter = Filter::new().with_bool("in_stock", true);
@@ -1479,6 +1536,7 @@ mod tests {
                 price: 100,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1486,6 +1544,7 @@ mod tests {
                 price: 200,
                 sell_trend: -5,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -1493,6 +1552,7 @@ mod tests {
                 price: 300,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1523,6 +1583,7 @@ mod tests {
                 price: 100,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1530,6 +1591,7 @@ mod tests {
                 price: 200,
                 sell_trend: -5,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -1537,6 +1599,7 @@ mod tests {
                 price: 300,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1567,6 +1630,7 @@ mod tests {
                 price: 100,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1574,6 +1638,7 @@ mod tests {
                 price: 200,
                 sell_trend: -5,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -1581,6 +1646,7 @@ mod tests {
                 price: 300,
                 sell_trend: 20,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1611,6 +1677,7 @@ mod tests {
                 price: 100,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1618,6 +1685,7 @@ mod tests {
                 price: 200,
                 sell_trend: -5,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -1625,6 +1693,7 @@ mod tests {
                 price: 300,
                 sell_trend: 20,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1667,6 +1736,7 @@ mod tests {
                 price: 100,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1674,6 +1744,7 @@ mod tests {
                 price: 200,
                 sell_trend: -5,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -1681,6 +1752,7 @@ mod tests {
                 price: 300,
                 sell_trend: 20,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1711,6 +1783,7 @@ mod tests {
                 price: 100,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1718,6 +1791,7 @@ mod tests {
                 price: 200,
                 sell_trend: -5,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -1725,6 +1799,7 @@ mod tests {
                 price: 300,
                 sell_trend: 20,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1767,6 +1842,7 @@ mod tests {
                 price: 100,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1774,6 +1850,7 @@ mod tests {
                 price: 200,
                 sell_trend: -5,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -1781,6 +1858,7 @@ mod tests {
                 price: 300,
                 sell_trend: 20,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1811,6 +1889,7 @@ mod tests {
                 price: 100,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1818,6 +1897,7 @@ mod tests {
                 price: 200,
                 sell_trend: -5,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -1825,6 +1905,7 @@ mod tests {
                 price: 300,
                 sell_trend: 20,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1867,6 +1948,7 @@ mod tests {
                 price: 100,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1874,6 +1956,7 @@ mod tests {
                 price: 200,
                 sell_trend: -5,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -1881,6 +1964,7 @@ mod tests {
                 price: 300,
                 sell_trend: 20,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1911,6 +1995,7 @@ mod tests {
                 price: 100,
                 sell_trend: 10,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -1918,6 +2003,7 @@ mod tests {
                 price: 200,
                 sell_trend: -5,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -1925,6 +2011,7 @@ mod tests {
                 price: 300,
                 sell_trend: 20,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -1969,6 +2056,7 @@ mod tests {
             price: 999,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog1.upsert(item_to_insert.clone());
         catalog1.persist().unwrap();
@@ -2000,6 +2088,7 @@ mod tests {
                 price: 100,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -2007,6 +2096,7 @@ mod tests {
                 price: 200,
                 sell_trend: 0,
                 in_stock: false,
+                ..Item::default()
             },
         ];
         let _ = catalog1.insert_many(items_to_insert.clone());
@@ -2046,6 +2136,7 @@ mod tests {
             price: 123,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog1.upsert(item_to_delete.clone());
         catalog1.persist().unwrap();
@@ -2075,6 +2166,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let item2 = Item {
             id: "item-2".to_string(),
@@ -2082,6 +2174,7 @@ mod tests {
             price: 200,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let _ = catalog.upsert(item1.clone());
         let _ = catalog.upsert(item2.clone());
@@ -2103,6 +2196,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let item2 = Item {
             id: "item-2".to_string(),
@@ -2110,6 +2204,7 @@ mod tests {
             price: 200,
             sell_trend: 0,
             in_stock: false,
+            ..Item::default()
         };
         let item3 = Item {
             id: "item-3".to_string(),
@@ -2117,6 +2212,7 @@ mod tests {
             price: 150,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog.insert_many(vec![item1.clone(), item2.clone(), item3.clone()]);
         // List all items that are in stock
@@ -2153,6 +2249,7 @@ mod tests {
             price: 100,
             sell_trend: 0,
             in_stock: true,
+            ..Item::default()
         };
         let _ = catalog_setup.upsert(initial_item);
         catalog_setup.persist().unwrap();
@@ -2213,6 +2310,7 @@ mod tests {
                 price: 100,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -2220,6 +2318,7 @@ mod tests {
                 price: 200,
                 sell_trend: 0,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -2227,6 +2326,7 @@ mod tests {
                 price: 300,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -2292,6 +2392,7 @@ mod tests {
                 price: 100,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -2299,6 +2400,7 @@ mod tests {
                 price: 200,
                 sell_trend: 0,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -2306,6 +2408,7 @@ mod tests {
                 price: 300,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -2351,6 +2454,7 @@ mod tests {
                 price: 100,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -2358,6 +2462,7 @@ mod tests {
                 price: 200,
                 sell_trend: 0,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -2365,6 +2470,7 @@ mod tests {
                 price: 300,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -2420,6 +2526,7 @@ mod tests {
                 price: 100,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -2427,6 +2534,7 @@ mod tests {
                 price: 200,
                 sell_trend: 0,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -2434,6 +2542,7 @@ mod tests {
                 price: 300,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -2480,6 +2589,7 @@ mod tests {
                 price: 100,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
             Item {
                 id: "item-2".to_string(),
@@ -2487,6 +2597,7 @@ mod tests {
                 price: 200,
                 sell_trend: 0,
                 in_stock: false,
+                ..Item::default()
             },
             Item {
                 id: "item-3".to_string(),
@@ -2494,6 +2605,7 @@ mod tests {
                 price: 300,
                 sell_trend: 0,
                 in_stock: true,
+                ..Item::default()
             },
         ];
         catalog_setup.insert_many(items).unwrap();
@@ -2520,6 +2632,332 @@ mod tests {
         assert!(catalog.load_by_filter(&filter).is_ok());
         assert_eq!(catalog.items.len(), 1);
         assert!(catalog.items.contains_key("item-1"));
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_load_matching_discount_equal() {
+        let db_path = "target/test_dbs/lbf_matching_discount_equal.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                discount: 0.10,
+                ..Item::default()
+            },
+            Item {
+                id: "item-2".to_string(),
+                discount: 0.20,
+                ..Item::default()
+            },
+            Item {
+                id: "item-3".to_string(),
+                discount: 0.10,
+                ..Item::default()
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_real("discount", Comparison::Equal, 0.10);
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 2);
+        assert!(catalog.items.contains_key("item-1"));
+        assert!(catalog.items.contains_key("item-3"));
+        assert!(!catalog.items.contains_key("item-2"));
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_load_matching_discount_greater() {
+        let db_path = "target/test_dbs/lbf_matching_discount_greater.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                discount: 0.10,
+                ..Item::default()
+            },
+            Item {
+                id: "item-2".to_string(),
+                discount: 0.20,
+                ..Item::default()
+            },
+            Item {
+                id: "item-3".to_string(),
+                discount: 0.30,
+                ..Item::default()
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_real("discount", Comparison::Greater, 0.15);
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 2);
+        assert!(catalog.items.contains_key("item-2"));
+        assert!(catalog.items.contains_key("item-3"));
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_load_matching_discount_greater_edge_cases() {
+        let db_path = "target/test_dbs/lbf_discount_greater_edge_cases.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                discount: 0.10,
+                ..Item::default()
+            },
+            Item {
+                id: "item-2".to_string(),
+                discount: 0.20,
+                ..Item::default()
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog1 = Catalog::new(db_path);
+        let filter1 = Filter::new().with_real("discount", Comparison::Greater, 0.10);
+        assert!(catalog1.load_by_filter(&filter1).is_ok());
+        assert_eq!(catalog1.items.len(), 1);
+        assert!(catalog1.items.contains_key("item-2"));
+        let mut catalog2 = Catalog::new(db_path);
+        let filter2 = Filter::new().with_real("discount", Comparison::Greater, 0.20);
+        assert!(catalog2.load_by_filter(&filter2).is_ok());
+        assert!(catalog2.items.is_empty());
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_load_matching_discount_lesser() {
+        let db_path = "target/test_dbs/lbf_matching_discount_lesser.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                discount: 0.10,
+                ..Item::default()
+            },
+            Item {
+                id: "item-2".to_string(),
+                discount: 0.20,
+                ..Item::default()
+            },
+            Item {
+                id: "item-3".to_string(),
+                discount: 0.05,
+                ..Item::default()
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_real("discount", Comparison::Lesser, 0.15);
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 2);
+        assert!(catalog.items.contains_key("item-1"));
+        assert!(catalog.items.contains_key("item-3"));
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_load_matching_discount_lesser_edge_cases() {
+        let db_path = "target/test_dbs/lbf_discount_lesser_edge_cases.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                discount: 0.10,
+                ..Item::default()
+            },
+            Item {
+                id: "item-2".to_string(),
+                discount: 0.20,
+                ..Item::default()
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog1 = Catalog::new(db_path);
+        let filter1 = Filter::new().with_real("discount", Comparison::Lesser, 0.20);
+        assert!(catalog1.load_by_filter(&filter1).is_ok());
+        assert_eq!(catalog1.items.len(), 1);
+        assert!(catalog1.items.contains_key("item-1"));
+        let mut catalog2 = Catalog::new(db_path);
+        let filter2 = Filter::new().with_real("discount", Comparison::Lesser, 0.10);
+        assert!(catalog2.load_by_filter(&filter2).is_ok());
+        assert!(catalog2.items.is_empty());
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_load_matching_discount_greater_or_equal() {
+        let db_path = "target/test_dbs/lbf_matching_discount_greater_or_equal.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                discount: 0.10,
+                ..Item::default()
+            },
+            Item {
+                id: "item-2".to_string(),
+                discount: 0.20,
+                ..Item::default()
+            },
+            Item {
+                id: "item-3".to_string(),
+                discount: 0.15,
+                ..Item::default()
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_real("discount", Comparison::GreaterOrEqual, 0.15);
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 2);
+        assert!(catalog.items.contains_key("item-2"));
+        assert!(catalog.items.contains_key("item-3"));
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_load_matching_discount_greater_or_equal_edge_cases() {
+        let db_path = "target/test_dbs/lbf_discount_greater_or_equal_edge_cases.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                discount: 0.10,
+                ..Item::default()
+            },
+            Item {
+                id: "item-2".to_string(),
+                discount: 0.20,
+                ..Item::default()
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog1 = Catalog::new(db_path);
+        let filter1 = Filter::new().with_real("discount", Comparison::GreaterOrEqual, 0.20);
+        assert!(catalog1.load_by_filter(&filter1).is_ok());
+        assert_eq!(catalog1.items.len(), 1);
+        assert!(catalog1.items.contains_key("item-2"));
+        let mut catalog2 = Catalog::new(db_path);
+        let filter2 = Filter::new().with_real("discount", Comparison::GreaterOrEqual, 0.21);
+        assert!(catalog2.load_by_filter(&filter2).is_ok());
+        assert!(catalog2.items.is_empty());
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_load_matching_discount_lesser_or_equal() {
+        let db_path = "target/test_dbs/lbf_matching_discount_lesser_or_equal.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                discount: 0.10,
+                ..Item::default()
+            },
+            Item {
+                id: "item-2".to_string(),
+                discount: 0.20,
+                ..Item::default()
+            },
+            Item {
+                id: "item-3".to_string(),
+                discount: 0.15,
+                ..Item::default()
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog = Catalog::new(db_path);
+        let filter = Filter::new().with_real("discount", Comparison::LesserOrEqual, 0.15);
+        assert!(catalog.load_by_filter(&filter).is_ok());
+        assert_eq!(catalog.items.len(), 2);
+        assert!(catalog.items.contains_key("item-1"));
+        assert!(catalog.items.contains_key("item-3"));
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
+    fn load_by_filter_should_load_matching_discount_lesser_or_equal_edge_cases() {
+        let db_path = "target/test_dbs/lbf_discount_lesser_or_equal_edge_cases.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        let items = vec![
+            Item {
+                id: "item-1".to_string(),
+                discount: 0.10,
+                ..Item::default()
+            },
+            Item {
+                id: "item-2".to_string(),
+                discount: 0.20,
+                ..Item::default()
+            },
+        ];
+        catalog_setup.insert_many(items).unwrap();
+        catalog_setup.persist().unwrap();
+        let mut catalog1 = Catalog::new(db_path);
+        let filter1 = Filter::new().with_real("discount", Comparison::LesserOrEqual, 0.10);
+        assert!(catalog1.load_by_filter(&filter1).is_ok());
+        assert_eq!(catalog1.items.len(), 1);
+        assert!(catalog1.items.contains_key("item-1"));
+        let mut catalog2 = Catalog::new(db_path);
+        let filter2 = Filter::new().with_real("discount", Comparison::LesserOrEqual, 0.09);
+        assert!(catalog2.load_by_filter(&filter2).is_ok());
+        assert!(catalog2.items.is_empty());
         std::fs::remove_file(path).unwrap();
     }
 }

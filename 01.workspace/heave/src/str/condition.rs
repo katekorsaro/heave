@@ -1,7 +1,8 @@
-#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy, Hash)]
+#[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 pub enum E<'a> {
     Bool(bool),
+    Real(f64),
     SignedInt(i64),
-    UnsignedInt(i64),
     Text(&'a str),
+    UnsignedInt(i64),
 }

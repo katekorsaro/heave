@@ -59,6 +59,23 @@ pub fn run(filter: &Filter) -> Result<String, FailedTo> {
                 compose_fragment(name, "value_uint", "<=", i + 1)
             }
             (_, Condition::UnsignedInt(_)) => return Err(FailedTo::ComposeFilter),
+            // REAL
+            (Comparison::Equal, Condition::Real(_)) => {
+                compose_fragment(name, "value_real", "=", i + 1)
+            }
+            (Comparison::Greater, Condition::Real(_)) => {
+                compose_fragment(name, "value_real", ">", i + 1)
+            }
+            (Comparison::Lesser, Condition::Real(_)) => {
+                compose_fragment(name, "value_real", "<", i + 1)
+            }
+            (Comparison::GreaterOrEqual, Condition::Real(_)) => {
+                compose_fragment(name, "value_real", ">=", i + 1)
+            }
+            (Comparison::LesserOrEqual, Condition::Real(_)) => {
+                compose_fragment(name, "value_real", "<=", i + 1)
+            }
+            (_, Condition::Real(_)) => return Err(FailedTo::ComposeFilter),
             // TEXT
             (Comparison::IsExactly, Condition::Text(_)) => {
                 compose_fragment(name, "value_text", "LIKE", i + 1)

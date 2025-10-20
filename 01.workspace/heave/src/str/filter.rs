@@ -58,6 +58,14 @@ impl<'a> Filter<'a> {
         ));
         self
     }
+    pub fn with_real(mut self, attribute_name: &str, comparison: Comparison, value: f64) -> Self {
+        self.conditions.push((
+            attribute_name.to_string(),
+            comparison,
+            Condition::Real(value),
+        ));
+        self
+    }
     pub(crate) fn conditions(&self) -> impl Iterator<Item = &(String, Comparison, Condition<'a>)> {
         self.conditions.iter()
     }
