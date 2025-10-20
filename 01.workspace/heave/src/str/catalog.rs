@@ -169,7 +169,10 @@ impl Catalog {
     /// # Returns
     ///
     /// An iterator that yields items of type `T` from the in-memory cache.
-    pub fn list_by_class_and_subclass<T>(&self, subclass: &str) -> impl Iterator<Item = Result<T, FailedTo>>
+    pub fn list_by_class_and_subclass<T>(
+        &self,
+        subclass: &str,
+    ) -> impl Iterator<Item = Result<T, FailedTo>>
     where
         T: EAV,
     {
@@ -355,6 +358,7 @@ mod tests {
         pub discount: f64,
         pub sell_trend: i64,
         pub in_stock: bool,
+        pub subclass: Option<String>,
     }
     impl EAV for Item {
         fn class() -> &'static str {
@@ -363,13 +367,17 @@ mod tests {
     }
     impl From<Item> for Entity {
         fn from(value: Item) -> Entity {
-            Entity::new::<Item>()
+            let mut entity = Entity::new::<Item>()
                 .with_id(&value.id)
                 .with_attribute("name", value.name)
                 .with_attribute("price", value.price)
                 .with_attribute("discount", value.discount)
                 .with_attribute("sell_trend", value.sell_trend)
-                .with_attribute("in_stock", value.in_stock)
+                .with_attribute("in_stock", value.in_stock);
+            if let Some(subclass) = value.subclass {
+                entity = entity.with_subclass(&subclass);
+            }
+            entity
         }
     }
     impl From<Entity> for Item {
@@ -387,6 +395,7 @@ mod tests {
                 in_stock: entity
                     .unwrap("in_stock")
                     .expect("in_stock is always present"),
+                subclass: entity.subclass,
             }
         }
     }
@@ -3140,6 +3149,58 @@ mod tests {
         assert!(catalog.load_by_filter(&filter).is_ok());
         assert_eq!(catalog.items.len(), 1);
         assert!(catalog.items.contains_key("item-1"));
+
         std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn list_by_class_and_subclass_should_return_matching_entities() {
+        let mut catalog = Catalog::new("dummy.db");
+        let item1 = Item {
+            id: "item-1".to_string(),
+            subclass: Some("electronics".to_string()),
+            ..Default::default()
+        };
+        let item2 = Item {
+            id: "item-2".to_string(),
+            subclass: Some("books".to_string()),
+            ..Default::default()
+        };
+        let item3 = Item {
+            id: "item-3".to_string(),
+            subclass: Some("electronics".to_string()),
+            ..Default::default()
+        };
+        let _ = catalog.upsert(item1.clone());
+        let _ = catalog.upsert(item2.clone());
+        let _ = catalog.upsert(item3.clone());
+
+        let results: Vec<Item> = catalog
+            .list_by_class_and_subclass("electronics")
+            .map(|item| item.unwrap())
+            .collect();
+
+        assert_eq!(results.len(), 2);
+        assert!(results.contains(&item1));
+        assert!(results.contains(&item3));
+        assert!(!results.contains(&item2));
+    }
+
+    #[test]
+    fn list_by_class_and_subclass_should_return_empty_if_no_match() {
+        let mut catalog = Catalog::new("dummy.db");
+        let item1 = Item {
+            id: "item-1".to_string(),
+            subclass: Some("electronics".to_string()),
+            ..Default::default()
+        };
+        let _ = catalog.upsert(item1.clone());
+
+        let results: Vec<Item> = catalog
+            .list_by_class_and_subclass("books")
+            .map(|item| item.unwrap())
+            .collect();
+
+        assert!(results.is_empty());
     }
 }
