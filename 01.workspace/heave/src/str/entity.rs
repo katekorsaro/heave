@@ -3,10 +3,19 @@ use crate::*;
 /// Represents a generic entity with an ID, class, and a set of attributes.
 #[derive(Debug, PartialEq, Clone)]
 pub struct O {
+    /// The unique identifier for this entity.
     pub id: String,
+    /// The current state of the entity within the `Catalog`'s in-memory cache.
+    /// This tracks whether the entity is new, modified, or marked for deletion.
     pub state: EntityState,
+    /// An optional timestamp or version number, typically used for optimistic
+    /// locking or tracking when the entity was last referenced or modified.
     pub ref_date: Option<u64>,
+    /// A string identifying the "type" or "class" of the entity (e.g., "product", "user").
+    /// This is used to group and query entities of the same kind.
     pub class: String,
+    /// A map of attribute names to `Attribute` values, holding the actual data
+    /// of the entity.
     pub attributes: std::collections::HashMap<String, Attribute>,
 }
 

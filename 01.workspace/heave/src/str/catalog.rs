@@ -11,32 +11,58 @@ pub struct O {
     pub(crate) items: HashMap<String, Entity>,
 }
 impl Catalog {
-    /// Creates a new `Catalog` instance.
+    /// Creates a new, empty in-memory `Catalog` for the database at the given path.
+    ///
+    /// This method does not create the database file or connect to it. It only
+    /// initializes an empty catalog in memory. The database file will be accessed
+    /// when `init()`, `persist()`, or `load_*` methods are called.
     ///
     /// # Arguments
     ///
-    /// * `path` - The path to the SQLite database file.
+    /// * `path` - The path to the SQLite database file that this catalog will manage.
     ///
     /// # Returns
     ///
-    /// A new `Catalog` instance.
+    /// A new `Catalog` instance with an empty in-memory item cache.
     pub fn new(path: &str) -> Self {
         Self {
             path: String::from(path),
             ..O::default()
         }
     }
-    /// Initializes the database.
+    /// Initializes the database by creating the file and schema if they don't exist.
+    ///
+    /// This method interacts with the filesystem to ensure the database file and its
+    /// underlying tables are ready. It has no effect on the in-memory state of the
+    /// catalog.
+    ///
+    /// # Effects
+    ///
+    /// - **Database State:** Creates the SQLite file and required tables if they are not
+    ///   present. If the file already exists, it does nothing.
+    /// - **In-Memory State:** This method does not alter the in-memory entity cache.
     pub fn init(&self) -> result::Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
         sqlite::init::db(path).map_err(|_| FailedTo::InitDatabase)?;
         Ok(())
     }
-    /// Inserts or updates a single object that implements the `EAV` trait into the catalog.
+    /// Inserts or updates an object in the in-memory catalog.
+    ///
+    /// This is a purely in-memory operation. The change will not be written to the
+    /// database until `persist()` is called.
+    ///
+    /// # Effects
+    ///
+    /// - **In-Memory State:**
+    ///   - If the entity does not exist in the catalog, it is added with the state
+    ///     `EntityState::New`.
+    ///   - If the entity already exists, it is overwritten and its state is set to
+    ///     `EntityState::Updated`.
+    /// - **Database State:** Unchanged. Call `persist()` to save the changes.
     ///
     /// # Arguments
     ///
-    /// * `object` - The object to insert.
+    /// * `object` - The object to insert or update, which must implement the `EAV` trait.
     pub fn upsert(&mut self, object: impl EAV) -> Result<(), FailedTo> {
         let mut entity = object.try_into().map_err(|_| FailedTo::ConvertObject)?;
         if self.items.contains_key(&entity.id) {
@@ -47,18 +73,29 @@ impl Catalog {
         self.items.insert(entity.id.clone(), entity);
         Ok(())
     }
-    /// Inserts multiple objects that implement the `EAV` trait into the catalog.
+    /// Inserts or updates multiple objects in the in-memory catalog.
+    ///
+    /// This method calls `upsert()` for each object in the provided vector. Like
+    /// `upsert()`, this is a purely in-memory operation.
+    ///
+    /// # Effects
+    ///
+    /// - **In-Memory State:** Adds or updates multiple entities in the cache.
+    /// - **Database State:** Unchanged. Call `persist()` to save the changes.
     ///
     /// # Arguments
     ///
-    /// * `objects` - A vector of objects to insert.
+    /// * `objects` - A vector of objects to insert or update.
     pub fn insert_many(&mut self, objects: Vec<impl EAV>) -> Result<(), FailedTo> {
         for object in objects {
             self.upsert(object)?;
         }
         Ok(())
     }
-    /// Retrieves an entity by its ID and converts it into a specified type `T`.
+    /// Retrieves an entity by its ID from the in-memory catalog.
+    ///
+    /// This is a purely in-memory operation and does not interact with the database.
+    /// It will only find entities that have been loaded into or created in the catalog.
     ///
     /// # Arguments
     ///
@@ -66,7 +103,8 @@ impl Catalog {
     ///
     /// # Returns
     ///
-    /// An `Option<T>` containing the converted entity if found, otherwise `None`.
+    /// An `Option<T>` containing the converted entity if found in the in-memory
+    /// cache, otherwise `None`.
     pub fn get<T>(&self, id: &str) -> Result<Option<T>, FailedTo>
     where
         T: EAV,
@@ -76,7 +114,10 @@ impl Catalog {
             .map(|e| T::try_from(e.clone()).map_err(|_| FailedTo::ConvertEntity))
             .transpose()
     }
-    /// Retrieves the first entity that matches a given attribute and value.
+    /// Retrieves the first entity from the in-memory catalog that matches a given
+    /// class, attribute, and value.
+    ///
+    /// This is a purely in-memory operation and does not interact with the database.
     ///
     /// # Arguments
     ///
@@ -85,7 +126,8 @@ impl Catalog {
     ///
     /// # Returns
     ///
-    /// An `Option<T>` containing the converted entity if found, otherwise `None`.
+    /// An `Option<T>` containing the first matching converted entity if found,
+    /// otherwise `None`.
     pub fn get_by_class_and_attribute<T>(
         &self,
         attribute: &str,
@@ -103,11 +145,13 @@ impl Catalog {
             .map(|item| T::try_from(item.clone()).map_err(|_| FailedTo::ConvertEntity));
         items.next().transpose()
     }
-    /// Returns an iterator over entities of a specific class.
+    /// Returns an iterator over all entities of a specific class in the in-memory catalog.
+    ///
+    /// This is a purely in-memory operation and does not interact with the database.
     ///
     /// # Returns
     ///
-    /// An iterator that yields items of type `T`.
+    /// An iterator that yields items of type `T` from the in-memory cache.
     pub fn list_by_class<T>(&self) -> impl Iterator<Item = Result<T, FailedTo>>
     where
         T: EAV,
@@ -117,7 +161,10 @@ impl Catalog {
             .filter(move |item| item.class == T::class())
             .map(|item| T::try_from(item.clone()).map_err(|_| FailedTo::ConvertEntity))
     }
-    /// Returns an iterator over entities that match a given attribute and value.
+    /// Returns an iterator over entities in the in-memory catalog that match a given
+    /// class, attribute, and value.
+    ///
+    /// This is a purely in-memory operation and does not interact with the database.
     ///
     /// # Arguments
     ///
@@ -126,7 +173,7 @@ impl Catalog {
     ///
     /// # Returns
     ///
-    /// An iterator that yields items of type `T`.
+    /// An iterator that yields matching items of type `T` from the in-memory cache.
     pub fn list_by_class_and_attribute<T>(
         &self,
         attribute: &str,
@@ -142,21 +189,44 @@ impl Catalog {
             .filter(move |item| item.value_of(attribute) == Some(&value))
             .map(|item| T::try_from(item.clone()).map_err(|_| FailedTo::ConvertEntity))
     }
-    /// Schedules an entity for deletion. Actual delition will take place when 'persist' is called.
+    /// Marks an entity for deletion from the in-memory catalog.
+    ///
+    /// This is a purely in-memory operation. The entity will not be removed from the
+    /// database until `persist()` is called.
+    ///
+    /// # Effects
+    ///
+    /// - **In-Memory State:** If the entity exists, its state is set to
+    ///   `EntityState::ToDelete`. If it was in a `New` state, it will simply be
+    ///   forgotten upon the next `persist()` call without ever touching the database.
+    /// - **Database State:** Unchanged. Call `persist()` to apply the deletion.
     ///
     /// # Arguments
     ///
-    /// * `id` - The ID of the entity to delete.
+    /// * `id` - The ID of the entity to mark for deletion.
     pub fn delete(&mut self, id: &str) {
         let entity = self.items.get_mut(id);
         if let Some(entity) = entity {
             entity.state = EntityState::ToDelete;
         }
     }
-    /// Persists the current state of the catalog to the database.
+    /// Persists all in-memory changes to the database and updates the in-memory state.
     ///
-    /// - new entities will be written onto DB
-    /// - marked for delition entities will be deleted
+    /// This method synchronizes the state of the in-memory catalog with the database
+    /// by writing all pending changes (new, updated, and deleted entities).
+    ///
+    /// # Effects
+    ///
+    /// - **Database State:**
+    ///   - Entities marked as `EntityState::New` are inserted into the database.
+    ///   - Entities marked as `EntityState::Updated` are updated in the database.
+    ///   - Entities marked as `EntityState::ToDelete` are deleted from the database.
+    ///
+    /// - **In-Memory State:**
+    ///   - After a successful database write, entities marked `ToDelete` are permanently
+    ///     removed from the in-memory catalog.
+    ///   - All other entities that were successfully persisted (new or updated) have
+    ///     their state changed to `EntityState::Loaded`.
     pub fn persist(&mut self) -> result::Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
         sqlite::persist::catalog(path, self).map_err(|_| FailedTo::PersistCatalog)?;
@@ -176,7 +246,21 @@ impl Catalog {
             .collect();
         Ok(())
     }
-    /// Loads an entity by its ID from the database into the catalog.
+    /// Loads a single entity by its ID from the database into the in-memory catalog.
+    ///
+    /// This method fetches the entity from the database and updates the in-memory
+    /// catalog. If an entity with the same ID already exists in memory, it will be
+    /// **overwritten** with the version from the database.
+    ///
+    /// # Effects
+    ///
+    /// - **In-Memory State:**
+    ///   - If an entity is found in the database, it is inserted or updated in the
+    ///     in-memory cache with the state `EntityState::Loaded`.
+    ///   - Any existing in-memory entity with the same ID, regardless of its state
+    ///     (`New`, `Updated`), will be replaced.
+    ///   - If no entity is found in the database, the in-memory cache is not modified.
+    /// - **Database State:** Unchanged.
     ///
     /// # Arguments
     ///
@@ -189,7 +273,19 @@ impl Catalog {
         }
         Ok(())
     }
-    /// Loads all entities of a specific class from the database into the catalog.
+    /// Loads all entities of a specific class from the database into the in-memory catalog.
+    ///
+    /// This method fetches all entities matching the given class from the database.
+    /// If any of the loaded entities have IDs that match entities already in the
+    /// in-memory catalog, the in-memory versions will be **overwritten**.
+    ///
+    /// # Effects
+    ///
+    /// - **In-Memory State:**
+    ///   - All found entities are inserted or updated in the in-memory cache with the
+    ///     state `EntityState::Loaded`.
+    ///   - Any existing in-memory entities with matching IDs are replaced.
+    /// - **Database State:** Unchanged.
     pub fn load_by_class<T>(&mut self) -> Result<(), FailedTo>
     where
         T: EAV,
@@ -202,8 +298,24 @@ impl Catalog {
         }
         Ok(())
     }
-    /// Loads all entities matching the filter values
-    /// Different entity class with clashing attribute names might be loaded
+    /// Loads entities from the database that match a given `Filter`.
+    ///
+    /// This method queries the database for all entities that satisfy the conditions
+    /// specified in the filter. If any of the loaded entities have IDs that match
+    /// entities already in the in-memory catalog, the in-memory versions will be
+    /// **overwritten**.
+    ///
+    /// **Warning:** The filter is applied at the attribute level. If different entity
+    /// classes share attribute names, this method may load entities of multiple
+    /// classes.
+    ///
+    /// # Effects
+    ///
+    /// - **In-Memory State:**
+    ///   - All found entities are inserted or updated in the in-memory cache with the
+    ///     state `EntityState::Loaded`.
+    ///   - Any existing in-memory entities with matching IDs are replaced.
+    /// - **Database State:** Unchanged.
     pub fn load_by_filter(&mut self, filter: &Filter) -> Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
         let entities = sqlite::load::by_filter(path, filter).map_err(|_| FailedTo::LoadFromDB)?;
