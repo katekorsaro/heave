@@ -17,8 +17,8 @@ const DELETE_ENTITY_STATEMENT: &str = r#"
 "#;
 
 const INSERT_ENTITY_STATEMENT: &str = r#"
-    INSERT INTO entity (id, class, ref_date)
-    VALUES (?1, ?2, ?3);
+    INSERT INTO entity (id, class, subclass, ref_date)
+    VALUES (?1, ?2, ?3, ?4);
 "#;
 
 const INSERT_ATTRIBUTE_STATEMENT_TEMPLATE: &str = r#"
@@ -51,7 +51,7 @@ fn delete_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result
 
 fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result<(), FailedTo> {
     let entity_id = [&entity.id];
-    let entity_values = (&entity.id, &entity.class, entity.ref_date);
+    let entity_values = (&entity.id, &entity.class, &entity.subclass, entity.ref_date);
     transaction
         .execute(DELETE_ENTITY_STATEMENT, entity_id)
         .map_err(|_| sqlite::FailedTo::ExecuteStatement)?;

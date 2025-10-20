@@ -369,6 +369,7 @@ mod tests {
         fn from(value: Item) -> Entity {
             let mut entity = Entity::new::<Item>()
                 .with_id(&value.id)
+                .with_subclass("subitem")
                 .with_attribute("name", value.name)
                 .with_attribute("price", value.price)
                 .with_attribute("discount", value.discount)
@@ -554,6 +555,7 @@ mod tests {
         let mut catalog = Catalog::new("dummy.db");
         let item = Item {
             id: "item-123".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Test Item".to_string(),
             price: 100,
             sell_trend: 0,
@@ -595,6 +597,7 @@ mod tests {
         };
         let item2 = Item {
             id: "item-2".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Unique Item".to_string(),
             price: 200,
             sell_trend: 0,
@@ -614,6 +617,7 @@ mod tests {
         let mut catalog = Catalog::new("dummy.db");
         let item1 = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item One".to_string(),
             price: 100,
             sell_trend: 10,
@@ -622,6 +626,7 @@ mod tests {
         };
         let item2 = Item {
             id: "item-2".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item Two".to_string(),
             price: 250,
             sell_trend: 20,
@@ -681,6 +686,7 @@ mod tests {
         let mut catalog = Catalog::new("dummy.db");
         let item1 = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item One".to_string(),
             price: 100,
             sell_trend: 0,
@@ -689,6 +695,7 @@ mod tests {
         };
         let item2 = Item {
             id: "item-2".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item Two".to_string(),
             price: 200,
             sell_trend: 0,
@@ -722,6 +729,7 @@ mod tests {
         let mut catalog = Catalog::new("dummy.db");
         let item1 = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item One".to_string(),
             price: 100,
             sell_trend: 0,
@@ -730,6 +738,7 @@ mod tests {
         };
         let item2 = Item {
             id: "item-2".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item Two".to_string(),
             price: 200,
             sell_trend: 0,
@@ -738,6 +747,7 @@ mod tests {
         };
         let item3 = Item {
             id: "item-3".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item Three".to_string(),
             price: 300,
             sell_trend: 0,
@@ -841,6 +851,7 @@ mod tests {
         catalog1.init().unwrap();
         let item1 = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Test Item".to_string(),
             price: 123,
             sell_trend: 0,
@@ -906,6 +917,7 @@ mod tests {
         catalog1.init().unwrap();
         let original_item = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Original Name".to_string(),
             price: 100,
             sell_trend: 0,
@@ -920,6 +932,7 @@ mod tests {
         // 3. Upsert updated data for the same item. This should mark it as 'Updated'.
         let updated_item = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Updated Name".to_string(),
             price: 200,
             sell_trend: 0,
@@ -957,6 +970,7 @@ mod tests {
         catalog_setup.init().unwrap();
         let item_to_update_original = Item {
             id: "update-me".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Original".to_string(),
             price: 10,
             sell_trend: 0,
@@ -965,6 +979,7 @@ mod tests {
         };
         let item_to_delete = Item {
             id: "delete-me".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Delete Me".to_string(),
             price: 20,
             sell_trend: 0,
@@ -973,6 +988,7 @@ mod tests {
         };
         let item_to_keep = Item {
             id: "keep-me".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Keep Me".to_string(),
             price: 30,
             sell_trend: 0,
@@ -989,6 +1005,7 @@ mod tests {
         // A new item to be inserted.
         let item_to_add = Item {
             id: "add-me".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Add Me".to_string(),
             price: 40,
             sell_trend: 0,
@@ -999,6 +1016,7 @@ mod tests {
         // An updated version of an existing item.
         let item_to_update_new = Item {
             id: "update-me".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Updated".to_string(),
             price: 11,
             sell_trend: 0,
@@ -1194,6 +1212,7 @@ mod tests {
         catalog1.init().unwrap();
         let item_to_persist = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Test Item".to_string(),
             price: 123,
             sell_trend: 0,
@@ -1245,6 +1264,7 @@ mod tests {
         catalog1.init().unwrap();
         let item_in_db = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item from DB".to_string(),
             price: 100,
             sell_trend: 0,
@@ -1257,6 +1277,7 @@ mod tests {
         let mut catalog2 = Catalog::new(db_path);
         let item_in_memory = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "In-memory version".to_string(),
             price: 200,
             sell_trend: 0,
@@ -1343,6 +1364,7 @@ mod tests {
         catalog1.init().unwrap();
         let item1 = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item One".to_string(),
             price: 100,
             sell_trend: 0,
@@ -1351,6 +1373,7 @@ mod tests {
         };
         let item2 = Item {
             id: "item-2".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item Two".to_string(),
             price: 200,
             sell_trend: 0,
@@ -1395,6 +1418,7 @@ mod tests {
         catalog1.init().unwrap();
         let item_in_db = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "DB Version".to_string(),
             price: 100,
             sell_trend: 0,
@@ -1407,6 +1431,7 @@ mod tests {
         let mut catalog2 = Catalog::new(db_path);
         let item_in_memory = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Memory Version".to_string(),
             price: 200,
             sell_trend: 0,
@@ -1452,6 +1477,7 @@ mod tests {
         // 3. Add an item to memory and try loading again from the empty DB.
         let item_in_memory = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "In-memory only".to_string(),
             price: 100,
             sell_trend: 0,
@@ -1622,6 +1648,7 @@ mod tests {
         catalog_setup.init().unwrap();
         let item_in_db = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "DB Version".to_string(),
             price: 100,
             sell_trend: 0,
@@ -1633,6 +1660,7 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let item_in_memory = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Memory Version".to_string(),
             price: 200,
             sell_trend: 0,
@@ -2191,6 +2219,7 @@ mod tests {
         catalog1.init().unwrap();
         let item_to_insert = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Integration Test Item".to_string(),
             price: 999,
             sell_trend: 0,
@@ -2223,6 +2252,7 @@ mod tests {
         let items_to_insert = vec![
             Item {
                 id: "item-1".to_string(),
+                subclass: Some("subitem".to_string()),
                 name: "Item One".to_string(),
                 price: 100,
                 sell_trend: 0,
@@ -2231,6 +2261,7 @@ mod tests {
             },
             Item {
                 id: "item-2".to_string(),
+                subclass: Some("subitem".to_string()),
                 name: "Item Two".to_string(),
                 price: 200,
                 sell_trend: 0,
@@ -2309,6 +2340,7 @@ mod tests {
         };
         let item2 = Item {
             id: "item-2".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Second Item".to_string(),
             price: 200,
             sell_trend: 0,
@@ -2331,6 +2363,7 @@ mod tests {
         let mut catalog = Catalog::new("dummy.db");
         let item1 = Item {
             id: "item-1".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item One".to_string(),
             price: 100,
             sell_trend: 0,
@@ -2339,6 +2372,7 @@ mod tests {
         };
         let item2 = Item {
             id: "item-2".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item Two".to_string(),
             price: 200,
             sell_trend: 0,
@@ -2347,6 +2381,7 @@ mod tests {
         };
         let item3 = Item {
             id: "item-3".to_string(),
+            subclass: Some("subitem".to_string()),
             name: "Item Three".to_string(),
             price: 150,
             sell_trend: 0,
@@ -3149,10 +3184,8 @@ mod tests {
         assert!(catalog.load_by_filter(&filter).is_ok());
         assert_eq!(catalog.items.len(), 1);
         assert!(catalog.items.contains_key("item-1"));
-
         std::fs::remove_file(path).unwrap();
     }
-
     #[test]
     fn list_by_class_and_subclass_should_return_matching_entities() {
         let mut catalog = Catalog::new("dummy.db");
@@ -3174,18 +3207,15 @@ mod tests {
         let _ = catalog.upsert(item1.clone());
         let _ = catalog.upsert(item2.clone());
         let _ = catalog.upsert(item3.clone());
-
         let results: Vec<Item> = catalog
             .list_by_class_and_subclass("electronics")
             .map(|item| item.unwrap())
             .collect();
-
         assert_eq!(results.len(), 2);
         assert!(results.contains(&item1));
         assert!(results.contains(&item3));
         assert!(!results.contains(&item2));
     }
-
     #[test]
     fn list_by_class_and_subclass_should_return_empty_if_no_match() {
         let mut catalog = Catalog::new("dummy.db");
@@ -3195,12 +3225,102 @@ mod tests {
             ..Default::default()
         };
         let _ = catalog.upsert(item1.clone());
-
         let results: Vec<Item> = catalog
             .list_by_class_and_subclass("books")
             .map(|item| item.unwrap())
             .collect();
-
         assert!(results.is_empty());
+    }
+    #[test]
+    fn load_by_filter_with_class_and_subclass_clauses() {
+        // Verifies that class and subclass clauses in a filter correctly load entities.
+        let db_path = "target/test_dbs/lbf_with_class_subclass_clauses.db";
+        let path = std::path::Path::new(db_path);
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        if path.exists() {
+            std::fs::remove_file(path).unwrap();
+        }
+        let mut catalog_setup = Catalog::new(db_path);
+        catalog_setup.init().unwrap();
+        // Define a second struct with a different class
+        #[derive(Debug, Default, PartialEq, Clone)]
+        struct AnotherItem {
+            pub id: String,
+        }
+        impl EAV for AnotherItem {
+            fn class() -> &'static str {
+                "another_item"
+            }
+        }
+        impl From<AnotherItem> for Entity {
+            fn from(value: AnotherItem) -> Entity {
+                Entity::new::<AnotherItem>().with_id(&value.id)
+            }
+        }
+        impl From<Entity> for AnotherItem {
+            fn from(entity: Entity) -> Self {
+                Self {
+                    id: entity.id.clone(),
+                }
+            }
+        }
+        let item1 = Item {
+            id: "item-1".to_string(),
+            subclass: Some("sub-a".to_string()),
+            ..Default::default()
+        };
+        let item2 = Item {
+            id: "item-2".to_string(),
+            subclass: Some("sub-b".to_string()),
+            ..Default::default()
+        };
+        let item3 = Item {
+            id: "item-3".to_string(),
+            subclass: Some("sub-a".to_string()),
+            ..Default::default()
+        };
+        let item4 = Item {
+            id: "item-4".to_string(),
+            subclass: None, // -> "subitem"
+            ..Default::default()
+        };
+        let another_item = AnotherItem {
+            id: "another-1".to_string(),
+        };
+        catalog_setup.upsert(item1).unwrap();
+        catalog_setup.upsert(item2).unwrap();
+        catalog_setup.upsert(item3).unwrap();
+        catalog_setup.upsert(item4).unwrap();
+        catalog_setup.upsert(another_item).unwrap();
+        catalog_setup.persist().unwrap();
+        // Test 1: Filter by class "item"
+        let mut catalog1 = Catalog::new(db_path);
+        let filter1 = Filter::new().with_class("item");
+        assert!(catalog1.load_by_filter(&filter1).is_ok());
+        assert_eq!(catalog1.items.len(), 4);
+        assert!(catalog1.items.contains_key("item-1"));
+        assert!(catalog1.items.contains_key("item-2"));
+        assert!(catalog1.items.contains_key("item-3"));
+        assert!(catalog1.items.contains_key("item-4"));
+        // Test 2: Filter by class "another_item"
+        let mut catalog2 = Catalog::new(db_path);
+        let filter2 = Filter::new().with_class("another_item");
+        assert!(catalog2.load_by_filter(&filter2).is_ok());
+        assert_eq!(catalog2.items.len(), 1);
+        assert!(catalog2.items.contains_key("another-1"));
+        // Test 3: Filter by class "item" and subclass "sub-a"
+        let mut catalog3 = Catalog::new(db_path);
+        let filter3 = Filter::new().with_class("item").with_subclass("sub-a");
+        assert!(catalog3.load_by_filter(&filter3).is_ok());
+        assert_eq!(catalog3.items.len(), 2);
+        assert!(catalog3.items.contains_key("item-1"));
+        assert!(catalog3.items.contains_key("item-3"));
+        // Test 4: Filter by class "item" and subclass "subitem" (the default)
+        let mut catalog4 = Catalog::new(db_path);
+        let filter4 = Filter::new().with_class("item").with_subclass("subitem");
+        assert!(catalog4.load_by_filter(&filter4).is_ok());
+        assert_eq!(catalog4.items.len(), 1);
+        assert!(catalog4.items.contains_key("item-4"));
+        std::fs::remove_file(path).unwrap();
     }
 }

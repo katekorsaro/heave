@@ -7,6 +7,8 @@ use crate::*;
 /// all specified criteria.
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct O<'a> {
+    class: Option<String>,
+    subclass: Option<String>,
     conditions: Vec<(String, Comparison, Condition<'a>)>,
 }
 
@@ -14,8 +16,20 @@ impl<'a> Filter<'a> {
     /// Creates a new, empty `Filter`.
     pub fn new() -> Self {
         Self {
+            class: None,
+            subclass: None,
             conditions: Vec::new(),
         }
+    }
+    /// Adds a class condition to the filter.
+    pub fn with_class(mut self, value: &str) -> Self {
+        self.class = Some(value.to_string());
+        self
+    }
+    /// Adds a subclass condition to the filter.
+    pub fn with_subclass(mut self, value: &str) -> Self {
+        self.subclass = Some(value.to_string());
+        self
     }
     /// Adds a boolean condition to the filter.
     ///
@@ -84,5 +98,11 @@ impl<'a> Filter<'a> {
     /// This is used internally by the persistence engine.
     pub(crate) fn conditions(&self) -> impl Iterator<Item = &(String, Comparison, Condition<'a>)> {
         self.conditions.iter()
+    }
+    pub(crate) fn class(&self) -> &Option<String> {
+        &self.class
+    }
+    pub(crate) fn subclass(&self) -> &Option<String> {
+        &self.subclass
     }
 }

@@ -50,5 +50,11 @@ pub fn run<'a>(filter: &'a Filter) -> Result<Vec<Box<dyn ToSql + 'a>>, FailedTo>
             _ => return Err(FailedTo::ComposeFilter),
         }
     }
+    if let Some(value) = filter.class() {
+        params.push(Box::new(value));
+    }
+    if let Some(value) = filter.subclass() {
+        params.push(Box::new(value));
+    }
     Ok(params)
 }
