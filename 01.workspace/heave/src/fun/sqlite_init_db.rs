@@ -21,6 +21,7 @@ pub fn run(path: &path::Path) -> result::Result<(), FailedTo> {
             CONSTRAINT fk_entity_id FOREIGN KEY (entity_id) REFERENCES entity (id) ON DELETE CASCADE ON UPDATE CASCADE
         );
         CREATE INDEX IF NOT EXISTS entity_class ON entity (class);
+        CREATE INDEX IF NOT EXISTS entity_subclass ON entity (subclass);
         CREATE INDEX IF NOT EXISTS attribute_id ON attribute (id);
         "#;
     let connection = Connection::open(path).map_err(|_| sqlite::FailedTo::OpenConnection)?;
