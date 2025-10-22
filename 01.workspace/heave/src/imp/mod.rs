@@ -1,4 +1,16 @@
 pub mod bool_try_from_value;
+pub mod catalog_delete;
+pub mod catalog_get;
+pub mod catalog_init;
+pub mod catalog_insert_many;
+pub mod catalog_list_by_class;
+pub mod catalog_list_by_class_and_subclass;
+pub mod catalog_load_by_class;
+pub mod catalog_load_by_filter;
+pub mod catalog_load_by_id;
+pub mod catalog_new;
+pub mod catalog_persist;
+pub mod catalog_upsert;
 pub mod f64_try_from_value;
 pub mod i32_try_from_value;
 pub mod i64_try_from_value;
