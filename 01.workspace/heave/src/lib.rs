@@ -193,6 +193,9 @@ pub use crate::str::filter::O as Filter;
 pub(crate) use crate::str::value::Value;
 pub use crate::trt::eav::T as EAV;
 
+#[cfg(test)]
+pub(crate) use crate::str::item::O as Item;
+
 mod sqlite {
     pub use crate::str::sqlite_failed_to::FailedTo;
     pub mod build {
