@@ -1,3 +1,4 @@
+#![warn(missing_docs)]
 //! A lightweight and intuitive Entity-Attribute-Value (EAV) database library for Rust.
 //!
 //! This library provides a simple and thread safe way to persist and query semi-structured data using an EAV model on top of a SQLite database. It is designed to be easy to use, with a focus on simplicity and developer experience.
