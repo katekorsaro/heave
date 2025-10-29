@@ -22,8 +22,10 @@ mod tests {
         let _ = catalog.upsert(item1.clone());
         let _ = catalog.upsert(item2.clone());
         let _ = catalog.upsert(item3.clone());
-        let results: Vec<Item> = catalog
-            .list_by_class_and_subclass("electronics")
+        let results: Vec<_> = catalog
+            .list_by_class_and_subclass::<Item>("electronics")
+            .unwrap()
+            .into_iter()
             .map(|item| item.unwrap())
             .collect();
         assert_eq!(results.len(), 2);
@@ -40,8 +42,10 @@ mod tests {
             ..Default::default()
         };
         let _ = catalog.upsert(item1.clone());
-        let results: Vec<Item> = catalog
-            .list_by_class_and_subclass("books")
+        let results: Vec<_> = catalog
+            .list_by_class_and_subclass::<Item>("books")
+            .unwrap()
+            .into_iter()
             .map(|item| item.unwrap())
             .collect();
         assert!(results.is_empty());

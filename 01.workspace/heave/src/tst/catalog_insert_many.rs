@@ -24,13 +24,24 @@ mod tests {
             },
         ];
         let _ = catalog.insert_many(items);
-        assert_eq!(catalog.items.len(), 2);
-        let entity1 = catalog.items.get("item-1").unwrap();
+        let len = catalog.len().unwrap();
+        assert_eq!(len, 2);
+        let entity1 = catalog
+            .with_items(|items| {
+                let entity = items.get("item-1").unwrap();
+                Ok(entity.clone())
+            })
+            .unwrap();
         assert_eq!(entity1.state, EntityState::New);
         assert_eq!(entity1.value_of("name"), Some(&Value::from("Item 1")));
         assert_eq!(entity1.value_of("price"), Some(&Value::from(10u64)));
         assert_eq!(entity1.value_of("sell_trend"), Some(&Value::from(0i64)));
-        let entity2 = catalog.items.get("item-2").unwrap();
+        let entity2 = catalog
+            .with_items(|items| {
+                let entity = items.get("item-2").unwrap();
+                Ok(entity.clone())
+            })
+            .unwrap();
         assert_eq!(entity2.state, EntityState::New);
         assert_eq!(entity2.value_of("name"), Some(&Value::from("Item 2")));
         assert_eq!(entity2.value_of("price"), Some(&Value::from(20u64)));

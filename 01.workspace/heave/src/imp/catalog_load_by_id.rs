@@ -22,13 +22,12 @@ impl Catalog {
     /// * `id` - The ID of the entity to load.
     pub fn load_by_id(&mut self, id: &str) -> Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
-        let entity = sqlite::load::by_id(path, id).map_err(|_| FailedTo::LoadFromDB)?;
-        if let Some(entity) = entity {
-            self.items.insert(entity.id.clone(), entity);
-        }
-        Ok(())
+        self.on_items(|items| {
+            let entity = sqlite::load::by_id(path, id).map_err(|_| FailedTo::LoadFromDB)?;
+            if let Some(entity) = entity {
+                items.insert(entity.id.clone(), entity);
+            }
+            Ok(())
+        })
     }
 }
-
-// #[cfg(test)]
-// mod unit_tests { use super::*; }

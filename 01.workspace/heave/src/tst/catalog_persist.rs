@@ -105,7 +105,9 @@ mod tests {
         };
         let _ = catalog2.upsert(updated_item.clone());
         assert_eq!(
-            catalog2.items.get("item-1").unwrap().state,
+            catalog2
+                .with_items(|items| { Ok(items.get("item-1").unwrap().state) })
+                .unwrap(),
             EntityState::Updated
         );
         // 4. Persist the changes.
@@ -197,7 +199,7 @@ mod tests {
         let mut catalog_verify = Catalog::new(db_path);
         catalog_verify.load_by_class::<Item>().unwrap();
         // Check total count
-        assert_eq!(catalog_verify.items.len(), 3);
+        assert_eq!(catalog_verify.len().unwrap(), 3);
         // Verify added item
         let added_item: Item = catalog_verify.get("add-me").unwrap().unwrap();
         assert_eq!(added_item, item_to_add);
@@ -277,17 +279,23 @@ mod tests {
         let _ = catalog.upsert(item_untouched.clone());
         catalog.persist().unwrap();
         // At this point, all items are in the DB and in-memory state is `Loaded`.
-        assert_eq!(catalog.items.len(), 3);
+        assert_eq!(catalog.len().unwrap(), 3);
         assert_eq!(
-            catalog.items.get("update-me").unwrap().state,
+            catalog
+                .with_items(|items| { Ok(items.get("update-me").unwrap().state) })
+                .unwrap(),
             EntityState::Loaded
         );
         assert_eq!(
-            catalog.items.get("delete-me").unwrap().state,
+            catalog
+                .with_items(|items| { Ok(items.get("delete-me").unwrap().state) })
+                .unwrap(),
             EntityState::Loaded
         );
         assert_eq!(
-            catalog.items.get("keep-me").unwrap().state,
+            catalog
+                .with_items(|items| { Ok(items.get("keep-me").unwrap().state) })
+                .unwrap(),
             EntityState::Loaded
         );
         // 2. Manipulate the catalog to have entities in various states.
@@ -315,34 +323,49 @@ mod tests {
         catalog.delete("delete-me"); // State: ToDelete
         // 'item_untouched' remains with state `Loaded`.
         // Check states before final persist
-        assert_eq!(catalog.items.get("add-me").unwrap().state, EntityState::New);
         assert_eq!(
-            catalog.items.get("update-me").unwrap().state,
+            catalog
+                .with_items(|items| { Ok(items.get("add-me").unwrap().state) })
+                .unwrap(),
+            EntityState::New
+        );
+        assert_eq!(
+            catalog
+                .with_items(|items| { Ok(items.get("update-me").unwrap().state) })
+                .unwrap(),
             EntityState::Updated
         );
         assert_eq!(
-            catalog.items.get("delete-me").unwrap().state,
+            catalog
+                .with_items(|items| { Ok(items.get("delete-me").unwrap().state) })
+                .unwrap(),
             EntityState::ToDelete
         );
         assert_eq!(
-            catalog.items.get("keep-me").unwrap().state,
+            catalog
+                .with_items(|items| { Ok(items.get("keep-me").unwrap().state) })
+                .unwrap(),
             EntityState::Loaded
         );
-        assert_eq!(catalog.items.len(), 4);
+        assert_eq!(catalog.len().unwrap(), 4);
         // 3. Persist all changes.
         catalog.persist().unwrap();
         // 4. Verify the in-memory state after persisting.
         // The item marked for deletion should be gone.
-        assert!(!catalog.items.contains_key("delete-me"));
-        assert_eq!(catalog.items.len(), 3);
+        assert!(!catalog.contains_key("delete-me").unwrap());
+        assert_eq!(catalog.len().unwrap(), 3);
         // All remaining items should have their state as `Loaded`.
-        let new_item_entity = catalog.items.get("add-me").unwrap();
+        let new_item_entity = catalog
+            .with_items(|items| Ok(items.get("add-me").unwrap().clone()))
+            .unwrap();
         assert_eq!(new_item_entity.state, EntityState::Loaded);
         assert_eq!(
             new_item_entity.value_of("name"),
             Some(&Value::from("Add Me"))
         );
-        let updated_item_entity = catalog.items.get("update-me").unwrap();
+        let updated_item_entity = catalog
+            .with_items(|items| Ok(items.get("update-me").unwrap().clone()))
+            .unwrap();
         assert_eq!(updated_item_entity.state, EntityState::Loaded);
         assert_eq!(
             updated_item_entity.value_of("name"),
@@ -352,7 +375,9 @@ mod tests {
             updated_item_entity.value_of("sell_trend"),
             Some(&Value::from(10i64))
         );
-        let untouched_item_entity = catalog.items.get("keep-me").unwrap();
+        let untouched_item_entity = catalog
+            .with_items(|items| Ok(items.get("keep-me").unwrap().clone()))
+            .unwrap();
         assert_eq!(untouched_item_entity.state, EntityState::Loaded);
         assert_eq!(
             untouched_item_entity.value_of("name"),

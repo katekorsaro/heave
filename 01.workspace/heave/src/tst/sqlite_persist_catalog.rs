@@ -22,7 +22,7 @@ mod tests {
         // Verifies that entities marked as 'New' in the catalog are inserted into the database, along with all their attributes.
         let db_path = Path::new("test_insert.db");
         let conn = setup_db(db_path);
-        let mut catalog = Catalog::new(db_path.to_str().unwrap());
+        let catalog = Catalog::new(db_path.to_str().unwrap());
         let mut entity = Entity {
             id: "e1".to_string(),
             class: "c1".to_string(),
@@ -38,8 +38,14 @@ mod tests {
                 value: Value::Text("v1".to_string()),
             },
         );
-        catalog.items.insert("e1".to_string(), entity);
-        assert!(sqlite::persist::catalog(db_path, &catalog).is_ok());
+        let _ = catalog.on_items(|items| {
+            items.insert("e1".to_string(), entity);
+            Ok(())
+        });
+        let is_ok = catalog
+            .with_items(|items| Ok(sqlite::persist::catalog(db_path, items).is_ok()))
+            .unwrap();
+        assert!(is_ok);
         assert_eq!(count_rows(&conn, "entity", "id = 'e1'"), 1);
         assert_eq!(count_rows(&conn, "attribute", "entity_id = 'e1'"), 1);
         fs::remove_file(db_path).unwrap();
@@ -51,7 +57,7 @@ mod tests {
         let conn = setup_db(db_path);
         conn.execute("INSERT INTO entity (id, class) VALUES ('e1', 'c1')", [])
             .unwrap();
-        let mut catalog = Catalog::new(db_path.to_str().unwrap());
+        let catalog = Catalog::new(db_path.to_str().unwrap());
         let entity = Entity {
             id: "e1".to_string(),
             class: "c1".to_string(),
@@ -60,8 +66,14 @@ mod tests {
             state: EntityState::ToDelete,
             ref_date: None,
         };
-        catalog.items.insert("e1".to_string(), entity);
-        assert!(sqlite::persist::catalog(db_path, &catalog).is_ok());
+        let _ = catalog.on_items(|items| {
+            items.insert("e1".to_string(), entity);
+            Ok(())
+        });
+        let is_ok = catalog
+            .with_items(|items| Ok(sqlite::persist::catalog(db_path, items).is_ok()))
+            .unwrap();
+        assert!(is_ok);
         assert_eq!(count_rows(&conn, "entity", "id = 'e1'"), 0);
         fs::remove_file(db_path).unwrap();
     }
@@ -72,7 +84,7 @@ mod tests {
         let conn = setup_db(db_path);
         conn.execute("INSERT INTO entity (id, class) VALUES ('e1', 'c1')", [])
             .unwrap();
-        let mut catalog = Catalog::new(db_path.to_str().unwrap());
+        let catalog = Catalog::new(db_path.to_str().unwrap());
         let to_delete = Entity {
             id: "e1".to_string(),
             class: "c1".to_string(),
@@ -89,9 +101,18 @@ mod tests {
             state: EntityState::New,
             ref_date: None,
         };
-        catalog.items.insert("e1".to_string(), to_delete);
-        catalog.items.insert("e2".to_string(), to_add);
-        assert!(sqlite::persist::catalog(db_path, &catalog).is_ok());
+        let _ = catalog.on_items(|items| {
+            items.insert("e1".to_string(), to_delete);
+            Ok(())
+        });
+        let _ = catalog.on_items(|items| {
+            items.insert("e2".to_string(), to_add);
+            Ok(())
+        });
+        let is_ok = catalog
+            .with_items(|items| Ok(sqlite::persist::catalog(db_path, items).is_ok()))
+            .unwrap();
+        assert!(is_ok);
         assert_eq!(count_rows(&conn, "entity", "id = 'e1'"), 0);
         assert_eq!(count_rows(&conn, "entity", "id = 'e2'"), 1);
         fs::remove_file(db_path).unwrap();
@@ -103,7 +124,7 @@ mod tests {
         let conn = setup_db(db_path);
         conn.execute("INSERT INTO entity (id, class) VALUES ('e1', 'c1')", [])
             .unwrap();
-        let mut catalog = Catalog::new(db_path.to_str().unwrap());
+        let catalog = Catalog::new(db_path.to_str().unwrap());
         let unmodified = Entity {
             id: "e1".to_string(),
             class: "c1".to_string(),
@@ -112,8 +133,14 @@ mod tests {
             state: EntityState::Loaded,
             ref_date: None,
         };
-        catalog.items.insert("e1".to_string(), unmodified);
-        assert!(sqlite::persist::catalog(db_path, &catalog).is_ok());
+        let _ = catalog.on_items(|items| {
+            items.insert("e1".to_string(), unmodified);
+            Ok(())
+        });
+        let is_ok = catalog
+            .with_items(|items| Ok(sqlite::persist::catalog(db_path, items).is_ok()))
+            .unwrap();
+        assert!(is_ok);
         assert_eq!(count_rows(&conn, "entity", "id = 'e1'"), 1);
         fs::remove_file(db_path).unwrap();
     }
@@ -127,7 +154,7 @@ mod tests {
             [],
         )
         .unwrap();
-        let mut catalog = Catalog::new(db_path.to_str().unwrap());
+        let catalog = Catalog::new(db_path.to_str().unwrap());
         let mut new_entity = Entity {
             id: "e_new".to_string(),
             class: "c1".to_string(),
@@ -143,12 +170,17 @@ mod tests {
                 value: Value::Text("v1".to_string()),
             },
         );
-        catalog.items.insert("e_new".to_string(), new_entity);
+        let _ = catalog.on_items(|items| {
+            items.insert("e_new".to_string(), new_entity);
+            Ok(())
+        });
         // Corrupt the DB to cause a failure during the transaction
         conn.execute("DROP TABLE attribute", []).unwrap();
         drop(conn);
-        let result = sqlite::persist::catalog(db_path, &catalog);
-        assert!(result.is_err());
+        let is_err = catalog
+            .with_items(|items| Ok(sqlite::persist::catalog(db_path, items).is_err()))
+            .unwrap();
+        assert!(is_err);
         // Re-open connection to check state
         let conn = Connection::open(db_path).unwrap();
         // The new entity should not have been inserted due to rollback

@@ -43,9 +43,9 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_bool("in_stock", true);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(catalog.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -82,9 +82,9 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_bool("in_stock", false);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-2"));
-        assert!(!catalog.items.contains_key("item-1"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-2").unwrap());
+        assert!(!catalog.contains_key("item-1").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -121,7 +121,7 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new();
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
+        assert_eq!(catalog.len().unwrap(), 2);
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -216,10 +216,10 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_signed_int("sell_trend", Comparison::Equal, 10);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(catalog.items.contains_key("item-3"));
-        assert!(!catalog.items.contains_key("item-2"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(catalog.contains_key("item-3").unwrap());
+        assert!(!catalog.contains_key("item-2").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -263,10 +263,10 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_signed_int("sell_trend", Comparison::Equal, -5);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-2"));
-        assert!(!catalog.items.contains_key("item-1"));
-        assert!(!catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-2").unwrap());
+        assert!(!catalog.contains_key("item-1").unwrap());
+        assert!(!catalog.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -310,10 +310,10 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_signed_int("sell_trend", Comparison::Greater, 5);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(!catalog.items.contains_key("item-2"));
-        assert!(catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(!catalog.contains_key("item-2").unwrap());
+        assert!(catalog.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -358,21 +358,21 @@ mod tests {
         let mut catalog1 = Catalog::new(db_path);
         let filter1 = Filter::new().with_signed_int("sell_trend", Comparison::Greater, 10);
         assert!(catalog1.load_by_filter(&filter1).is_ok());
-        assert_eq!(catalog1.items.len(), 1);
-        assert!(catalog1.items.contains_key("item-3"));
+        assert_eq!(catalog1.len().unwrap(), 1);
+        assert!(catalog1.contains_key("item-3").unwrap());
         // Edge Case 2: No values greater than filter value.
         let mut catalog2 = Catalog::new(db_path);
         let filter2 = Filter::new().with_signed_int("sell_trend", Comparison::Greater, 20);
         assert!(catalog2.load_by_filter(&filter2).is_ok());
-        assert!(catalog2.items.is_empty());
+        assert!(catalog2.is_empty().unwrap());
         // Edge Case 3: All values greater than filter value.
         let mut catalog3 = Catalog::new(db_path);
         let filter3 = Filter::new().with_signed_int("sell_trend", Comparison::Greater, -10);
         assert!(catalog3.load_by_filter(&filter3).is_ok());
-        assert_eq!(catalog3.items.len(), 3);
-        assert!(catalog3.items.contains_key("item-1"));
-        assert!(catalog3.items.contains_key("item-2"));
-        assert!(catalog3.items.contains_key("item-3"));
+        assert_eq!(catalog3.len().unwrap(), 3);
+        assert!(catalog3.contains_key("item-1").unwrap());
+        assert!(catalog3.contains_key("item-2").unwrap());
+        assert!(catalog3.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -416,10 +416,10 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_signed_int("sell_trend", Comparison::Lesser, 15);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(catalog.items.contains_key("item-2"));
-        assert!(!catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(catalog.contains_key("item-2").unwrap());
+        assert!(!catalog.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -464,21 +464,21 @@ mod tests {
         let mut catalog1 = Catalog::new(db_path);
         let filter1 = Filter::new().with_signed_int("sell_trend", Comparison::Lesser, 10);
         assert!(catalog1.load_by_filter(&filter1).is_ok());
-        assert_eq!(catalog1.items.len(), 1);
-        assert!(catalog1.items.contains_key("item-2"));
+        assert_eq!(catalog1.len().unwrap(), 1);
+        assert!(catalog1.contains_key("item-2").unwrap());
         // Edge Case 2: No values lesser than filter value.
         let mut catalog2 = Catalog::new(db_path);
         let filter2 = Filter::new().with_signed_int("sell_trend", Comparison::Lesser, -5);
         assert!(catalog2.load_by_filter(&filter2).is_ok());
-        assert!(catalog2.items.is_empty());
+        assert!(catalog2.is_empty().unwrap());
         // Edge Case 3: All values lesser than filter value.
         let mut catalog3 = Catalog::new(db_path);
         let filter3 = Filter::new().with_signed_int("sell_trend", Comparison::Lesser, 25);
         assert!(catalog3.load_by_filter(&filter3).is_ok());
-        assert_eq!(catalog3.items.len(), 3);
-        assert!(catalog3.items.contains_key("item-1"));
-        assert!(catalog3.items.contains_key("item-2"));
-        assert!(catalog3.items.contains_key("item-3"));
+        assert_eq!(catalog3.len().unwrap(), 3);
+        assert!(catalog3.contains_key("item-1").unwrap());
+        assert!(catalog3.contains_key("item-2").unwrap());
+        assert!(catalog3.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -522,10 +522,10 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_signed_int("sell_trend", Comparison::GreaterOrEqual, 10);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(!catalog.items.contains_key("item-2"));
-        assert!(catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(!catalog.contains_key("item-2").unwrap());
+        assert!(catalog.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -570,21 +570,21 @@ mod tests {
         let mut catalog1 = Catalog::new(db_path);
         let filter1 = Filter::new().with_signed_int("sell_trend", Comparison::GreaterOrEqual, 20);
         assert!(catalog1.load_by_filter(&filter1).is_ok());
-        assert_eq!(catalog1.items.len(), 1);
-        assert!(catalog1.items.contains_key("item-3"));
+        assert_eq!(catalog1.len().unwrap(), 1);
+        assert!(catalog1.contains_key("item-3").unwrap());
         // Edge Case 2: No values greater than or equal to filter value.
         let mut catalog2 = Catalog::new(db_path);
         let filter2 = Filter::new().with_signed_int("sell_trend", Comparison::GreaterOrEqual, 21);
         assert!(catalog2.load_by_filter(&filter2).is_ok());
-        assert!(catalog2.items.is_empty());
+        assert!(catalog2.is_empty().unwrap());
         // Edge Case 3: All values greater than or equal to filter value.
         let mut catalog3 = Catalog::new(db_path);
         let filter3 = Filter::new().with_signed_int("sell_trend", Comparison::GreaterOrEqual, -5);
         assert!(catalog3.load_by_filter(&filter3).is_ok());
-        assert_eq!(catalog3.items.len(), 3);
-        assert!(catalog3.items.contains_key("item-1"));
-        assert!(catalog3.items.contains_key("item-2"));
-        assert!(catalog3.items.contains_key("item-3"));
+        assert_eq!(catalog3.len().unwrap(), 3);
+        assert!(catalog3.contains_key("item-1").unwrap());
+        assert!(catalog3.contains_key("item-2").unwrap());
+        assert!(catalog3.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -628,10 +628,10 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_signed_int("sell_trend", Comparison::LesserOrEqual, 10);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(catalog.items.contains_key("item-2"));
-        assert!(!catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(catalog.contains_key("item-2").unwrap());
+        assert!(!catalog.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -676,21 +676,21 @@ mod tests {
         let mut catalog1 = Catalog::new(db_path);
         let filter1 = Filter::new().with_signed_int("sell_trend", Comparison::LesserOrEqual, -5);
         assert!(catalog1.load_by_filter(&filter1).is_ok());
-        assert_eq!(catalog1.items.len(), 1);
-        assert!(catalog1.items.contains_key("item-2"));
+        assert_eq!(catalog1.len().unwrap(), 1);
+        assert!(catalog1.contains_key("item-2").unwrap());
         // Edge Case 2: No values lesser than or equal to filter value.
         let mut catalog2 = Catalog::new(db_path);
         let filter2 = Filter::new().with_signed_int("sell_trend", Comparison::LesserOrEqual, -6);
         assert!(catalog2.load_by_filter(&filter2).is_ok());
-        assert!(catalog2.items.is_empty());
+        assert!(catalog2.is_empty().unwrap());
         // Edge Case 3: All values lesser than or equal to filter value.
         let mut catalog3 = Catalog::new(db_path);
         let filter3 = Filter::new().with_signed_int("sell_trend", Comparison::LesserOrEqual, 20);
         assert!(catalog3.load_by_filter(&filter3).is_ok());
-        assert_eq!(catalog3.items.len(), 3);
-        assert!(catalog3.items.contains_key("item-1"));
-        assert!(catalog3.items.contains_key("item-2"));
-        assert!(catalog3.items.contains_key("item-3"));
+        assert_eq!(catalog3.len().unwrap(), 3);
+        assert!(catalog3.contains_key("item-1").unwrap());
+        assert!(catalog3.contains_key("item-2").unwrap());
+        assert!(catalog3.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -735,44 +735,44 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_unsigned_int("price", Comparison::Equal, 200);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-2"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-2").unwrap());
         // Greater
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_unsigned_int("price", Comparison::Greater, 200);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-3").unwrap());
         // Lesser
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_unsigned_int("price", Comparison::Lesser, 200);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-1"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-1").unwrap());
         // GreaterOrEqual
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_unsigned_int("price", Comparison::GreaterOrEqual, 200);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-2"));
-        assert!(catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-2").unwrap());
+        assert!(catalog.contains_key("item-3").unwrap());
         // LesserOrEqual
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_unsigned_int("price", Comparison::LesserOrEqual, 200);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(catalog.items.contains_key("item-2"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(catalog.contains_key("item-2").unwrap());
         // Edge case: No match
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_unsigned_int("price", Comparison::Equal, 400);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert!(catalog.items.is_empty());
+        assert!(catalog.is_empty().unwrap());
         // Edge case: All match
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_unsigned_int("price", Comparison::GreaterOrEqual, 100);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 3);
+        assert_eq!(catalog.len().unwrap(), 3);
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -817,24 +817,24 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::IsExactly, "Item One");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-1"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-1").unwrap());
         // Partial match should not work
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::IsExactly, "Item");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert!(catalog.items.is_empty());
+        assert!(catalog.is_empty().unwrap());
         // Case insensitive match
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::IsExactly, "item one");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-1"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-1").unwrap());
         // No match
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::IsExactly, "Item Four");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert!(catalog.items.is_empty());
+        assert!(catalog.is_empty().unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -879,34 +879,34 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::StartsWith, "Item");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(catalog.items.contains_key("item-2"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(catalog.contains_key("item-2").unwrap());
         // Starts with "I"
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::StartsWith, "I");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(catalog.items.contains_key("item-2"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(catalog.contains_key("item-2").unwrap());
         // No match
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::StartsWith, "Z");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert!(catalog.items.is_empty());
+        assert!(catalog.is_empty().unwrap());
         // Case insensitive
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::StartsWith, "item");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(catalog.items.contains_key("item-2"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(catalog.contains_key("item-2").unwrap());
         // Full string match
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::StartsWith, "Item One");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-1"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-1").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -951,25 +951,25 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::EndsWith, "one");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-1"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-1").unwrap());
         // Ends with "item" - case insensitive
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::EndsWith, "item");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-3").unwrap());
         // No match
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::EndsWith, "Z");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert!(catalog.items.is_empty());
+        assert!(catalog.is_empty().unwrap());
         // Full string match - case insensitive
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::EndsWith, "item one");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-1"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-1").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1014,24 +1014,24 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::Contains, "item");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 3);
+        assert_eq!(catalog.len().unwrap(), 3);
         // Contains "THE" - case insensitive
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::Contains, "THE");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-3").unwrap());
         // No match
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::Contains, "Z");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert!(catalog.items.is_empty());
+        assert!(catalog.is_empty().unwrap());
         // Full string match - case insensitive
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::Contains, "item one");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-1"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-1").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1066,10 +1066,10 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_real("discount", Comparison::Equal, 0.10);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(catalog.items.contains_key("item-3"));
-        assert!(!catalog.items.contains_key("item-2"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(catalog.contains_key("item-3").unwrap());
+        assert!(!catalog.contains_key("item-2").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1104,9 +1104,9 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_real("discount", Comparison::Greater, 0.15);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-2"));
-        assert!(catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-2").unwrap());
+        assert!(catalog.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1136,12 +1136,12 @@ mod tests {
         let mut catalog1 = Catalog::new(db_path);
         let filter1 = Filter::new().with_real("discount", Comparison::Greater, 0.10);
         assert!(catalog1.load_by_filter(&filter1).is_ok());
-        assert_eq!(catalog1.items.len(), 1);
-        assert!(catalog1.items.contains_key("item-2"));
+        assert_eq!(catalog1.len().unwrap(), 1);
+        assert!(catalog1.contains_key("item-2").unwrap());
         let mut catalog2 = Catalog::new(db_path);
         let filter2 = Filter::new().with_real("discount", Comparison::Greater, 0.20);
         assert!(catalog2.load_by_filter(&filter2).is_ok());
-        assert!(catalog2.items.is_empty());
+        assert!(catalog2.is_empty().unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1176,9 +1176,9 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_real("discount", Comparison::Lesser, 0.15);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(catalog.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1208,12 +1208,12 @@ mod tests {
         let mut catalog1 = Catalog::new(db_path);
         let filter1 = Filter::new().with_real("discount", Comparison::Lesser, 0.20);
         assert!(catalog1.load_by_filter(&filter1).is_ok());
-        assert_eq!(catalog1.items.len(), 1);
-        assert!(catalog1.items.contains_key("item-1"));
+        assert_eq!(catalog1.len().unwrap(), 1);
+        assert!(catalog1.contains_key("item-1").unwrap());
         let mut catalog2 = Catalog::new(db_path);
         let filter2 = Filter::new().with_real("discount", Comparison::Lesser, 0.10);
         assert!(catalog2.load_by_filter(&filter2).is_ok());
-        assert!(catalog2.items.is_empty());
+        assert!(catalog2.is_empty().unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1248,9 +1248,9 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_real("discount", Comparison::GreaterOrEqual, 0.15);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-2"));
-        assert!(catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-2").unwrap());
+        assert!(catalog.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1280,12 +1280,12 @@ mod tests {
         let mut catalog1 = Catalog::new(db_path);
         let filter1 = Filter::new().with_real("discount", Comparison::GreaterOrEqual, 0.20);
         assert!(catalog1.load_by_filter(&filter1).is_ok());
-        assert_eq!(catalog1.items.len(), 1);
-        assert!(catalog1.items.contains_key("item-2"));
+        assert_eq!(catalog1.len().unwrap(), 1);
+        assert!(catalog1.contains_key("item-2").unwrap());
         let mut catalog2 = Catalog::new(db_path);
         let filter2 = Filter::new().with_real("discount", Comparison::GreaterOrEqual, 0.21);
         assert!(catalog2.load_by_filter(&filter2).is_ok());
-        assert!(catalog2.items.is_empty());
+        assert!(catalog2.is_empty().unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1320,9 +1320,9 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         let filter = Filter::new().with_real("discount", Comparison::LesserOrEqual, 0.15);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 2);
-        assert!(catalog.items.contains_key("item-1"));
-        assert!(catalog.items.contains_key("item-3"));
+        assert_eq!(catalog.len().unwrap(), 2);
+        assert!(catalog.contains_key("item-1").unwrap());
+        assert!(catalog.contains_key("item-3").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1352,12 +1352,12 @@ mod tests {
         let mut catalog1 = Catalog::new(db_path);
         let filter1 = Filter::new().with_real("discount", Comparison::LesserOrEqual, 0.10);
         assert!(catalog1.load_by_filter(&filter1).is_ok());
-        assert_eq!(catalog1.items.len(), 1);
-        assert!(catalog1.items.contains_key("item-1"));
+        assert_eq!(catalog1.len().unwrap(), 1);
+        assert!(catalog1.contains_key("item-1").unwrap());
         let mut catalog2 = Catalog::new(db_path);
         let filter2 = Filter::new().with_real("discount", Comparison::LesserOrEqual, 0.09);
         assert!(catalog2.load_by_filter(&filter2).is_ok());
-        assert!(catalog2.items.is_empty());
+        assert!(catalog2.is_empty().unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1408,8 +1408,8 @@ mod tests {
             .with_real("discount", Comparison::Equal, 0.10)
             .with_bool("in_stock", true);
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.items.len(), 1);
-        assert!(catalog.items.contains_key("item-1"));
+        assert_eq!(catalog.len().unwrap(), 1);
+        assert!(catalog.contains_key("item-1").unwrap());
         std::fs::remove_file(path).unwrap();
     }
     #[test]
@@ -1478,30 +1478,30 @@ mod tests {
         let mut catalog1 = Catalog::new(db_path);
         let filter1 = Filter::new().with_class("item");
         assert!(catalog1.load_by_filter(&filter1).is_ok());
-        assert_eq!(catalog1.items.len(), 4);
-        assert!(catalog1.items.contains_key("item-1"));
-        assert!(catalog1.items.contains_key("item-2"));
-        assert!(catalog1.items.contains_key("item-3"));
-        assert!(catalog1.items.contains_key("item-4"));
+        assert_eq!(catalog1.len().unwrap(), 4);
+        assert!(catalog1.contains_key("item-1").unwrap());
+        assert!(catalog1.contains_key("item-2").unwrap());
+        assert!(catalog1.contains_key("item-3").unwrap());
+        assert!(catalog1.contains_key("item-4").unwrap());
         // Test 2: Filter by class "another_item"
         let mut catalog2 = Catalog::new(db_path);
         let filter2 = Filter::new().with_class("another_item");
         assert!(catalog2.load_by_filter(&filter2).is_ok());
-        assert_eq!(catalog2.items.len(), 1);
-        assert!(catalog2.items.contains_key("another-1"));
+        assert_eq!(catalog2.len().unwrap(), 1);
+        assert!(catalog2.contains_key("another-1").unwrap());
         // Test 3: Filter by class "item" and subclass "sub-a"
         let mut catalog3 = Catalog::new(db_path);
         let filter3 = Filter::new().with_class("item").with_subclass("sub-a");
         assert!(catalog3.load_by_filter(&filter3).is_ok());
-        assert_eq!(catalog3.items.len(), 2);
-        assert!(catalog3.items.contains_key("item-1"));
-        assert!(catalog3.items.contains_key("item-3"));
+        assert_eq!(catalog3.len().unwrap(), 2);
+        assert!(catalog3.contains_key("item-1").unwrap());
+        assert!(catalog3.contains_key("item-3").unwrap());
         // Test 4: Filter by class "item" and subclass "subitem" (the default)
         let mut catalog4 = Catalog::new(db_path);
         let filter4 = Filter::new().with_class("item").with_subclass("subitem");
         assert!(catalog4.load_by_filter(&filter4).is_ok());
-        assert_eq!(catalog4.items.len(), 1);
-        assert!(catalog4.items.contains_key("item-4"));
+        assert_eq!(catalog4.len().unwrap(), 1);
+        assert!(catalog4.contains_key("item-4").unwrap());
         std::fs::remove_file(path).unwrap();
     }
 }

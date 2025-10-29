@@ -20,24 +20,16 @@ impl Catalog {
     ///     their state changed to `EntityState::Loaded`.
     pub fn persist(&mut self) -> result::Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
-        sqlite::persist::catalog(path, self).map_err(|_| FailedTo::PersistCatalog)?;
-        // cleaning catalog state after db write
-        self.items = self
-            .items
-            .extract_if(|_, item| item.state != EntityState::ToDelete)
-            .map(|(k, item)| {
-                (
-                    k,
-                    Entity {
-                        state: EntityState::Loaded,
-                        ..item
-                    },
-                )
-            })
-            .collect();
-        Ok(())
+        self.on_items(|items| {
+            sqlite::persist::catalog(path, items).map_err(|_| FailedTo::PersistCatalog)?;
+            // cleaning catalog state after db write
+            let _: Vec<_> = items
+                .extract_if(|_, item| item.state == EntityState::ToDelete)
+                .collect();
+            items
+                .values_mut()
+                .for_each(|item| item.state = EntityState::Loaded);
+            Ok(())
+        })
     }
 }
-
-// #[cfg(test)]
-// mod unit_tests { use super::*; }

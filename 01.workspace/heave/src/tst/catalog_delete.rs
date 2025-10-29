@@ -16,8 +16,13 @@ mod tests {
         let item_id = item.id.clone();
         let _ = catalog.upsert(item);
         catalog.delete(&item_id);
-        let entity = catalog.items.get(&item_id).unwrap();
-        assert_eq!(entity.state, EntityState::ToDelete);
+        let is_deleted = catalog
+            .with_items(|items| {
+                let entity = items.get(&item_id).unwrap();
+                Ok(entity.state == EntityState::ToDelete)
+            })
+            .unwrap();
+        assert!(is_deleted);
     }
     #[test]
     fn delete_should_have_no_effect_for_nonexistent_id() {
@@ -32,9 +37,14 @@ mod tests {
             ..Item::default()
         };
         let _ = catalog.upsert(item);
-        let original_items = catalog.items.clone();
         // Attempt to delete a non-existent entity, which should not panic or change anything.
         catalog.delete("nonexistent-id");
-        assert_eq!(catalog.items, original_items);
+        let not_deleted = catalog
+            .with_items(|items| {
+                let entity = items.get("item-123").unwrap();
+                Ok(entity.state != EntityState::ToDelete)
+            })
+            .unwrap();
+        assert!(not_deleted);
     }
 }

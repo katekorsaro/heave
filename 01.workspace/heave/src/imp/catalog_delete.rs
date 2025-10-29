@@ -17,12 +17,12 @@ impl Catalog {
     ///
     /// * `id` - The ID of the entity to mark for deletion.
     pub fn delete(&mut self, id: &str) {
-        let entity = self.items.get_mut(id);
-        if let Some(entity) = entity {
-            entity.state = EntityState::ToDelete;
-        }
+        let _ = self.on_items(|items| {
+            let entity = items.get_mut(id);
+            if let Some(entity) = entity {
+                entity.state = EntityState::ToDelete;
+            }
+            Ok(())
+        });
     }
 }
-
-// #[cfg(test)]
-// mod unit_tests { use super::*; }

@@ -12,17 +12,17 @@ impl Catalog {
     pub fn list_by_class_and_subclass<T>(
         &self,
         subclass: &str,
-    ) -> impl Iterator<Item = Result<T, FailedTo>>
+    ) -> Result<Vec<Result<T, FailedTo>>, FailedTo>
     where
         T: EAV,
     {
-        self.items
-            .values()
-            .filter(move |item| item.class == T::class())
-            .filter(move |item| item.subclass == Some(subclass.to_string()))
-            .map(|item| T::try_from(item.clone()).map_err(|_| FailedTo::ConvertEntity))
+        self.with_items(|items| {
+            Ok(items
+                .values()
+                .filter(move |item| item.class == T::class())
+                .filter(move |item| item.subclass == Some(subclass.to_string()))
+                .map(|item| T::try_from(item.clone()).map_err(|_| FailedTo::ConvertEntity))
+                .collect())
+        })
     }
 }
-
-// #[cfg(test)]
-// mod unit_tests { use super::*; }

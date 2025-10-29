@@ -1,4 +1,5 @@
 use crate::*;
+use collections::*;
 use rusqlite::*;
 
 fn column(value: &Value) -> &'static str {
@@ -64,12 +65,12 @@ fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result<
     Ok(())
 }
 
-pub fn run(path: &path::Path, catalog: &Catalog) -> result::Result<(), FailedTo> {
+pub fn run(path: &path::Path, items: &HashMap<String, Entity>) -> result::Result<(), FailedTo> {
     let mut connection = Connection::open(path).map_err(|_| sqlite::FailedTo::OpenConnection)?;
     let transaction = connection
         .transaction()
         .map_err(|_| sqlite::FailedTo::BeginTransaction)?;
-    for entity in catalog.items.values().filter(|item| {
+    for entity in items.values().filter(|item| {
         item.state == EntityState::New
             || item.state == EntityState::Updated
             || item.state == EntityState::ToDelete

@@ -20,13 +20,12 @@ impl Catalog {
     {
         let class = T::class();
         let path = path::Path::new(&self.path);
-        let entities = sqlite::load::by_class(path, class).map_err(|_| FailedTo::LoadFromDB)?;
-        for entity in entities {
-            self.items.insert(entity.id.clone(), entity);
-        }
-        Ok(())
+        self.on_items(|items| {
+            let entities = sqlite::load::by_class(path, class).map_err(|_| FailedTo::LoadFromDB)?;
+            for entity in entities {
+                items.insert(entity.id.clone(), entity);
+            }
+            Ok(())
+        })
     }
 }
-
-// #[cfg(test)]
-// mod unit_tests { use super::*; }

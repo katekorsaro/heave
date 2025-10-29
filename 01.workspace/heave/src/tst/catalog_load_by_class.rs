@@ -39,17 +39,22 @@ mod tests {
         let result = catalog2.load_by_class::<Item>();
         assert!(result.is_ok());
         // 3. Verify that all items of that class were loaded
-        assert_eq!(catalog2.items.len(), 2);
+        let len = catalog2.len().unwrap();
+        assert_eq!(len, 2);
         let loaded_item1: Item = catalog2.get("item-1").unwrap().unwrap();
         let loaded_item2: Item = catalog2.get("item-2").unwrap().unwrap();
         assert_eq!(loaded_item1, item1);
         assert_eq!(loaded_item2, item2);
         assert_eq!(
-            catalog2.items.get("item-1").unwrap().state,
+            catalog2
+                .with_items(|items| { Ok(items.get("item-1").unwrap().state) })
+                .unwrap(),
             EntityState::Loaded
         );
         assert_eq!(
-            catalog2.items.get("item-2").unwrap().state,
+            catalog2
+                .with_items(|items| { Ok(items.get("item-2").unwrap().state) })
+                .unwrap(),
             EntityState::Loaded
         );
         // Clean up
@@ -90,7 +95,8 @@ mod tests {
             ..Item::default()
         };
         let _ = catalog2.upsert(item_in_memory);
-        assert_eq!(catalog2.items.len(), 1);
+        let len = catalog2.len().unwrap();
+        assert_eq!(len, 1);
         assert_eq!(
             catalog2.get::<Item>("item-1").unwrap().unwrap().name,
             "Memory Version"
@@ -99,11 +105,14 @@ mod tests {
         let result = catalog2.load_by_class::<Item>();
         assert!(result.is_ok());
         // 4. Verify that the in-memory entity has been replaced with the one from the DB.
-        assert_eq!(catalog2.items.len(), 1);
+        let len = catalog2.len().unwrap();
+        assert_eq!(len, 1);
         let loaded_item: Item = catalog2.get("item-1").unwrap().unwrap();
         assert_eq!(loaded_item, item_in_db);
         assert_eq!(
-            catalog2.items.get("item-1").unwrap().state,
+            catalog2
+                .with_items(|items| { Ok(items.get("item-1").unwrap().state) })
+                .unwrap(),
             EntityState::Loaded
         );
         // Clean up
@@ -124,7 +133,8 @@ mod tests {
         // 2. Attempt to load from the empty DB.
         let result = catalog.load_by_class::<Item>();
         assert!(result.is_ok());
-        assert!(catalog.items.is_empty());
+        let is_empty = catalog.is_empty().unwrap();
+        assert!(is_empty);
         // 3. Add an item to memory and try loading again from the empty DB.
         let item_in_memory = Item {
             id: "item-1".to_string(),
@@ -136,11 +146,13 @@ mod tests {
             ..Item::default()
         };
         let _ = catalog.upsert(item_in_memory.clone());
-        assert_eq!(catalog.items.len(), 1);
+        let len = catalog.len().unwrap();
+        assert_eq!(len, 1);
         let result2 = catalog.load_by_class::<Item>();
         assert!(result2.is_ok());
         // 4. Verify the in-memory item is untouched because nothing was loaded from DB.
-        assert_eq!(catalog.items.len(), 1);
+        let len = catalog.len().unwrap();
+        assert_eq!(len, 1);
         let retrieved_item: Item = catalog.get("item-1").unwrap().unwrap();
         assert_eq!(retrieved_item, item_in_memory);
         // Clean up

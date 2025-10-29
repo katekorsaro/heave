@@ -7,6 +7,6 @@ mod tests {
         let path = "test.db";
         let catalog = Catalog::new(path);
         assert_eq!(catalog.path, path);
-        assert!(catalog.items.is_empty());
+        assert!(catalog.is_empty().unwrap());
     }
 }

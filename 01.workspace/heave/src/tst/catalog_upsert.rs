@@ -15,7 +15,9 @@ mod tests {
         };
         let item_id = item.id.clone();
         let _ = catalog.upsert(item);
-        let entity = catalog.items.get(&item_id).unwrap();
+        let entity = catalog
+            .with_items(|items| Ok(items.get(&item_id).unwrap().clone()))
+            .unwrap();
         assert_eq!(entity.id, item_id);
         assert_eq!(entity.state, EntityState::New);
         assert_eq!(entity.class, "item");
@@ -47,8 +49,10 @@ mod tests {
             ..Item::default()
         };
         let _ = catalog.upsert(item2);
-        assert_eq!(catalog.items.len(), 1);
-        let entity = catalog.items.get(&item_id).unwrap();
+        assert_eq!(catalog.len().unwrap(), 1);
+        let entity = catalog
+            .with_items(|items| Ok(items.get(&item_id).unwrap().clone()))
+            .unwrap();
         assert_eq!(entity.value_of("name"), Some(&Value::from("Second Item")));
         assert_eq!(entity.value_of("price"), Some(&Value::from(200u64)));
         assert_eq!(entity.value_of("sell_trend"), Some(&Value::from(10i64)));

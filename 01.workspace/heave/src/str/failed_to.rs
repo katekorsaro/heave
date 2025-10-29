@@ -15,6 +15,8 @@ pub enum FailedTo {
     InitDatabase,
     /// Failed to load data from the database.
     LoadFromDB,
+    /// Failed to lock catalog in a multithread environment.
+    LockCatalog,
     /// Failed to map a database row to an attribute.
     MapAttribute,
     /// Failed to map a database row to an entity.

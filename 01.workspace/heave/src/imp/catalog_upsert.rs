@@ -20,15 +20,14 @@ impl Catalog {
     /// * `object` - The object to insert or update, which must implement the `EAV` trait.
     pub fn upsert(&mut self, object: impl EAV) -> Result<(), FailedTo> {
         let mut entity = object.try_into().map_err(|_| FailedTo::ConvertObject)?;
-        if self.items.contains_key(&entity.id) {
-            entity.state = EntityState::Updated;
-        } else {
-            entity.state = EntityState::New;
-        }
-        self.items.insert(entity.id.clone(), entity);
-        Ok(())
+        self.on_items(|items| {
+            if items.contains_key(&entity.id) {
+                entity.state = EntityState::Updated;
+            } else {
+                entity.state = EntityState::New;
+            }
+            items.insert(entity.id.clone(), entity);
+            Ok(())
+        })
     }
 }
-
-// #[cfg(test)]
-// mod unit_tests { use super::*; }

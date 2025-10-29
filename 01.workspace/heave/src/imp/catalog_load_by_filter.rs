@@ -21,11 +21,14 @@ impl Catalog {
     /// - **Database State:** Unchanged.
     pub fn load_by_filter(&mut self, filter: &Filter) -> Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
-        let entities = sqlite::load::by_filter(path, filter).map_err(|_| FailedTo::LoadFromDB)?;
-        for entity in entities {
-            self.items.insert(entity.id.clone(), entity);
-        }
-        Ok(())
+        self.on_items(|items| {
+            let entities =
+                sqlite::load::by_filter(path, filter).map_err(|_| FailedTo::LoadFromDB)?;
+            for entity in entities {
+                items.insert(entity.id.clone(), entity);
+            }
+            Ok(())
+        })
     }
 }
 

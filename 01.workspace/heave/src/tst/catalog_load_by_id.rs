@@ -26,13 +26,16 @@ mod tests {
         catalog1.persist().unwrap();
         // 2. Create a new, empty catalog instance for the same DB.
         let mut catalog2 = Catalog::new(db_path);
-        assert!(catalog2.items.is_empty());
+        assert!(catalog2.is_empty().unwrap());
         // 3. Load the item by its ID.
         let result = catalog2.load_by_id("item-1");
         assert!(result.is_ok());
         // 4. Verify the item is now in the in-memory 'items' map.
-        assert_eq!(catalog2.items.len(), 1);
-        let loaded_entity = catalog2.items.get("item-1").unwrap();
+        let len = catalog2.len().unwrap();
+        assert_eq!(len, 1);
+        let loaded_entity = catalog2
+            .with_items(|items| Ok(items.get("item-1").unwrap().clone()))
+            .unwrap();
         // 5. Verify the loaded entity's data and state.
         assert_eq!(loaded_entity.id, "item-1");
         assert_eq!(loaded_entity.class, "item");
@@ -88,7 +91,9 @@ mod tests {
             ..Item::default()
         };
         let _ = catalog2.upsert(item_in_memory);
-        let entity_before_load = catalog2.items.get("item-1").unwrap();
+        let entity_before_load = catalog2
+            .with_items(|items| Ok(items.get("item-1").unwrap().clone()))
+            .unwrap();
         assert_eq!(entity_before_load.state, EntityState::New);
         assert_eq!(
             entity_before_load.value_of("name"),
@@ -98,7 +103,9 @@ mod tests {
         let result = catalog2.load_by_id("item-1");
         assert!(result.is_ok());
         // 4. Verify that the in-memory entity has been replaced with the one from the DB.
-        let entity_after_load = catalog2.items.get("item-1").unwrap();
+        let entity_after_load = catalog2
+            .with_items(|items| Ok(items.get("item-1").unwrap().clone()))
+            .unwrap();
         assert_eq!(entity_after_load.state, EntityState::Loaded);
         assert_eq!(
             entity_after_load.value_of("name"),
@@ -134,7 +141,7 @@ mod tests {
         let result = catalog.load_by_id("nonexistent-id");
         // 3. Verify that the operation succeeded and the catalog remains empty.
         assert!(result.is_ok());
-        assert!(catalog.items.is_empty());
+        assert!(catalog.is_empty().unwrap());
         // Clean up
         std::fs::remove_file(path).unwrap();
     }

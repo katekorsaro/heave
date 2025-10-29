@@ -72,6 +72,8 @@ mod tests {
         catalog2.load_by_class::<Item>().unwrap();
         let mut loaded_items: Vec<Item> = catalog2
             .list_by_class::<Item>()
+            .unwrap()
+            .into_iter()
             .map(|item| item.unwrap())
             .collect();
         // Sort by ID to ensure consistent order for comparison

@@ -18,12 +18,11 @@ impl Catalog {
     where
         T: EAV,
     {
-        let entity = self.items.get(id);
-        entity
-            .map(|e| T::try_from(e.clone()).map_err(|_| FailedTo::ConvertEntity))
-            .transpose()
+        self.with_items(|items| {
+            let entity = items.get(id);
+            entity
+                .map(|e| T::try_from(e.clone()).map_err(|_| FailedTo::ConvertEntity))
+                .transpose()
+        })
     }
 }
-
-// #[cfg(test)]
-// mod unit_tests { use super::*; }
