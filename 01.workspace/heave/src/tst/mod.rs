@@ -10,6 +10,7 @@ pub mod catalog_load_by_filter;
 pub mod catalog_load_by_id;
 pub mod catalog_new;
 pub mod catalog_persist;
+pub mod catalog_thread_safety;
 pub mod catalog_upsert;
 pub mod sqlite_init_db;
 pub mod sqlite_load_attributes;

@@ -1,5 +1,6 @@
 use crate::*;
 use std::collections::HashMap;
+use std::ops::*;
 use std::sync::*;
 
 /// Represents a catalog of entities that can be persisted to a SQLite database.
