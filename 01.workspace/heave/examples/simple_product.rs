@@ -44,7 +44,7 @@ impl From<Entity> for Product {
         // Create a new `Product` from the entity's attributes.
         Self {
             // Set the product's ID from the entity's ID.
-            id: value.id.clone(),
+            id: value.id(),
             // Unwrap the "name" attribute to get the product's name.
             name: value.unwrap("name").expect("name is always present"),
             // Unwrap the optional "model" attribute to get the product's model.

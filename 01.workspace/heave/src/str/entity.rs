@@ -4,23 +4,23 @@ use crate::*;
 #[derive(Debug, PartialEq, Clone)]
 pub struct O {
     /// The unique identifier for this entity.
-    pub id: String,
+    pub(crate) id: String,
     /// The current state of the entity within the `Catalog`'s in-memory cache.
     /// This tracks whether the entity is new, modified, or marked for deletion.
-    pub state: EntityState,
+    pub(crate) state: EntityState,
     /// An optional timestamp or version number, typically used for optimistic
     /// locking or tracking when the entity was last referenced or modified.
-    pub ref_date: Option<u64>,
+    pub(crate) ref_date: Option<u64>,
     /// A string identifying the "type" or "class" of the entity (e.g., "product", "user").
     /// This is used to group and query entities of the same kind.
-    pub class: String,
+    pub(crate) class: String,
     /// A string identifying the "subtype" or "subclass" of the entity (e.g.,
     /// "computer", "phone", "customer"). This is used to group and query entities
     /// of different subtype but of the same kind or inside the same domain (class)
-    pub subclass: Option<String>,
+    pub(crate) subclass: Option<String>,
     /// A map of attribute names to `Attribute` values, holding the actual data
     /// of the entity.
-    pub attributes: std::collections::HashMap<String, Attribute>,
+    pub(crate) attributes: std::collections::HashMap<String, Attribute>,
 }
 
 impl Entity {
@@ -42,7 +42,6 @@ impl Entity {
             attributes: std::collections::HashMap::<String, Attribute>::new(),
         }
     }
-
     /// Sets the ID of the entity.
     ///
     /// # Arguments
@@ -56,12 +55,19 @@ impl Entity {
         self.id = id.to_string();
         self
     }
-
+    /// Sets the subclass of the entity.
+    ///
+    /// # Arguments
+    ///
+    /// * `subclass` - The subclass to set for the entity.
+    ///
+    /// # Returns
+    ///
+    /// The entity with the updated subclass.
     pub fn with_subclass(mut self, subclass: &str) -> Self {
         self.subclass = Some(subclass.to_string());
         self
     }
-
     /// Sets the reference date of the entity.
     ///
     /// # Arguments
@@ -75,7 +81,6 @@ impl Entity {
         self.ref_date = Some(ref_date);
         self
     }
-
     /// Adds or updates an attribute for the entity.
     ///
     /// # Arguments
@@ -91,7 +96,6 @@ impl Entity {
         self.attributes.insert(attribute.id.clone(), attribute);
         self
     }
-
     /// Adds or updates an attribute if the value is `Some`.
     ///
     /// # Arguments
@@ -109,7 +113,16 @@ impl Entity {
         }
         self
     }
-
+    /// Returns a reference to the `Value` of an attribute.
+    ///
+    /// # Arguments
+    ///
+    /// * `id` - The ID of the attribute to get the value of.
+    ///
+    /// # Returns
+    ///
+    /// An `Option<&Value>` which is `Some(&Value)` if the attribute exists,
+    /// or `None` if it does not.
     pub(crate) fn value_of(&self, id: &str) -> Option<&Value> {
         let attribute = self.attributes.get(id);
         match attribute {
@@ -117,7 +130,6 @@ impl Entity {
             Some(attribute) => Some(&attribute.value),
         }
     }
-
     /// Unwraps an attribute's value into a specified type `T`.
     ///
     /// This function requires `T` to implement `TryFrom<Value>`.
@@ -138,7 +150,6 @@ impl Entity {
             .map(|value| T::try_from(value.clone()).map_err(|_| FailedTo::ConvertValue))
             .unwrap()
     }
-
     /// Unwraps an attribute's value into an `Option<T>`.
     ///
     /// This function requires `T` to implement `TryFrom<Value>`.
@@ -161,7 +172,6 @@ impl Entity {
             .map(|value| T::try_from(value.clone()).map_err(|_| FailedTo::ConvertValue))
             .transpose()
     }
-
     /// Unwraps an attribute's value, returning a default value if it doesn't exist or fails to convert.
     ///
     /// This function requires `T` to implement `TryFrom<Value>`.
@@ -182,5 +192,13 @@ impl Entity {
             .map(|value| T::try_from(value.clone()).map_err(|_| FailedTo::ConvertValue))
             .transpose()
             .map(|value| value.unwrap_or(default))
+    }
+    /// Returns the ID of the entity.
+    pub fn id(&self) -> String {
+        self.id.clone()
+    }
+    /// Returns the subclass of the entity, if it has one.
+    pub fn subclass(&self) -> Option<String> {
+        self.subclass.clone()
     }
 }

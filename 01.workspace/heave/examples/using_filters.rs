@@ -35,7 +35,7 @@ impl From<Entity> for Component {
     // `from` is a function that converts an `Entity` into a `Component`.
     fn from(value: Entity) -> Self {
         Self {
-            id: value.id.clone(),
+            id: value.id(),
             part_number: value
                 .unwrap("part_number")
                 .expect("part_number is always present"),

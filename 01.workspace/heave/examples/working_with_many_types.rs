@@ -31,21 +31,21 @@ impl EAV for Product {
 }
 impl From<Entity> for Product {
     fn from(value: Entity) -> Self {
-        if let Some(ref subclass) = value.subclass {
+        if let Some(ref subclass) = value.subclass() {
             match subclass.as_ref() {
                 "laptop" => Product::Laptop(Laptop {
-                    id: value.id.clone(),
+                    id: value.id(),
                     model: value.unwrap("model").expect("model is mandatory"),
                     price: value.unwrap("price").expect("price is mandatory"),
                 }),
                 "display" => Product::Display(Display {
-                    id: value.id.clone(),
+                    id: value.id(),
                     model: value.unwrap("model").expect("model is mandatory"),
                     price: value.unwrap("price").expect("price is mandatory"),
                     resolution: value.unwrap("resolution").expect("resolution is mandatory"),
                 }),
                 "mouse" => Product::Mouse(Mouse {
-                    id: value.id.clone(),
+                    id: value.id(),
                     model: value.unwrap("model").expect("model is mandatory"),
                     price: value.unwrap("price").expect("price is mandatory"),
                     wireless: value.unwrap("wireless").expect("wireless is mandatory"),
