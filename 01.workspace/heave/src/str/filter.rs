@@ -21,12 +21,22 @@ impl<'a> Filter<'a> {
             conditions: Vec::new(),
         }
     }
-    /// Adds a class condition to the filter.
+    /// Sets the entity class to filter by.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The class name to filter for. Only entities with this class
+    ///   name will be considered.
     pub fn with_class(mut self, value: &str) -> Self {
         self.class = Some(value.to_string());
         self
     }
-    /// Adds a subclass condition to the filter.
+    /// Sets the entity subclass to filter by.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The subclass name to filter for. Only entities with this
+    ///   subclass name will be considered.
     pub fn with_subclass(mut self, value: &str) -> Self {
         self.subclass = Some(value.to_string());
         self

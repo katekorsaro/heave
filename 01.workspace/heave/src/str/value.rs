@@ -1,11 +1,20 @@
 use crate::*;
 
+/// Represents the value of an entity's attribute.
+///
+/// This enum can hold different data types, allowing for flexible and
+/// semi-structured data storage.
 #[derive(Debug, PartialEq, PartialOrd, Clone)]
 pub enum Value {
+    /// A boolean value (`true` or `false`).
     Bool(bool),
+    /// A floating-point number (`f64`).
     Real(f64),
+    /// A signed 64-bit integer.
     SignedInt(i64),
+    /// A UTF-8 encoded string.
     Text(String),
+    /// An unsigned 64-bit integer.
     UnsignedInt(u64),
 }
 

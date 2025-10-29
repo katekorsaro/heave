@@ -1,14 +1,29 @@
 use crate::*;
 
 impl Catalog {
-    /// Returns an iterator over all entities of a specific class and subclass
-    /// in the in-memory catalog.
+    /// Returns a list of all entities of a specific class and subclass from the in-memory catalog.
     ///
-    /// This is a purely in-memory operation and does not interact with the database.
+    /// This method filters the in-memory entities by the class of type `T` and the
+    /// provided `subclass`, then attempts to convert them into `T`. This is a purely
+    /// in-memory operation and does not interact with the database.
+    ///
+    /// # Arguments
+    ///
+    /// * `subclass` - The subclass to filter by.
     ///
     /// # Returns
     ///
-    /// An iterator that yields items of type `T` from the in-memory cache.
+    /// A `Result` containing a `Vec` of `Result<T, FailedTo>>`. Each inner `Result`
+    /// represents the outcome of converting an entity to type `T`.
+    ///
+    /// - `Ok(Vec<Ok(T)>)`: A vector of successfully converted entities.
+    /// - `Ok(Vec<Err(FailedTo::ConvertEntity)>)`: If an entity of the correct class
+    ///   and subclass could not be converted to type `T`.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(FailedTo::LockCatalog)` if the catalog's internal mutex
+    /// could not be locked.
     pub fn list_by_class_and_subclass<T>(
         &self,
         subclass: &str,
