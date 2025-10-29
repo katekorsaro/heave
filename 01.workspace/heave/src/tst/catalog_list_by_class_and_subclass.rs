@@ -3,7 +3,7 @@ mod tests {
     use crate::*;
     #[test]
     fn list_by_class_and_subclass_should_return_matching_entities() {
-        let mut catalog = Catalog::new("dummy.db");
+        let catalog = Catalog::new("dummy.db");
         let item1 = Item {
             id: "item-1".to_string(),
             subclass: Some("electronics".to_string()),
@@ -35,7 +35,7 @@ mod tests {
     }
     #[test]
     fn list_by_class_and_subclass_should_return_empty_if_no_match() {
-        let mut catalog = Catalog::new("dummy.db");
+        let catalog = Catalog::new("dummy.db");
         let item1 = Item {
             id: "item-1".to_string(),
             subclass: Some("electronics".to_string()),

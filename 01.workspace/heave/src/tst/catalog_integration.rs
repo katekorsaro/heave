@@ -11,7 +11,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. 'init' -> 'insert' -> 'persist'
-        let mut catalog1 = Catalog::new(db_path);
+        let catalog1 = Catalog::new(db_path);
         catalog1.init().unwrap();
         let item_to_insert = Item {
             id: "item-1".to_string(),
@@ -96,7 +96,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. 'insert' -> 'persist'
-        let mut catalog1 = Catalog::new(db_path);
+        let catalog1 = Catalog::new(db_path);
         catalog1.init().unwrap();
         let item_to_delete = Item {
             id: "item-to-delete".to_string(),
@@ -136,7 +136,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Initial setup
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let initial_item = Item {
             id: "item-1".to_string(),

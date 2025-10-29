@@ -11,7 +11,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Create a catalog, insert an item, and persist it to the DB.
-        let mut catalog1 = Catalog::new(db_path);
+        let catalog1 = Catalog::new(db_path);
         catalog1.init().unwrap();
         let item_to_persist = Item {
             id: "item-1".to_string(),
@@ -66,7 +66,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Persist an item to the database.
-        let mut catalog1 = Catalog::new(db_path);
+        let catalog1 = Catalog::new(db_path);
         catalog1.init().unwrap();
         let item_in_db = Item {
             id: "item-1".to_string(),

@@ -133,7 +133,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let item_in_db = Item {
             id: "item-1".to_string(),
@@ -1421,7 +1421,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         // Define a second struct with a different class
         #[derive(Debug, Default, PartialEq, Clone)]

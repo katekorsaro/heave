@@ -4,7 +4,7 @@ mod tests {
     #[test]
     fn list_by_class_should_return_all_entities_of_class() {
         // Should return an iterator with all entities of a specific class.
-        let mut catalog = Catalog::new("dummy.db");
+        let catalog = Catalog::new("dummy.db");
         let item1 = Item {
             id: "item-1".to_string(),
             subclass: Some("subitem".to_string()),

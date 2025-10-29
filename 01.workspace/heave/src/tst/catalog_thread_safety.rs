@@ -3,7 +3,6 @@ mod tests {
     use crate::*;
     use std::sync::*;
     use std::thread;
-
     #[test]
     fn thread_safety_test() {
         let db_path = "target/test_dbs/thread_safety_test.db";
@@ -12,10 +11,8 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         std::fs::create_dir_all(path.parent().unwrap()).unwrap();
-
         let catalog = Arc::new(Catalog::new(db_path));
         catalog.init().unwrap();
-
         let mut handles = vec![];
         for i in 0..10 {
             let catalog = Arc::clone(&catalog);
@@ -36,22 +33,16 @@ mod tests {
             });
             handles.push(handle);
         }
-
         for handle in handles {
             handle.join().unwrap();
         }
-
         let total_items = catalog.with_items(|items| Ok(items.len())).unwrap();
         assert_eq!(total_items, 1000);
-
         catalog.persist().unwrap();
-
         let mut new_catalog = Catalog::new(db_path);
         new_catalog.load_by_class::<Item>().unwrap();
-
         let total_items_after_load = new_catalog.with_items(|items| Ok(items.len())).unwrap();
         assert_eq!(total_items_after_load, 1000);
-
         std::fs::remove_file(path).unwrap();
     }
 }

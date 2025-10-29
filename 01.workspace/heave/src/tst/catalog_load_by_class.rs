@@ -11,7 +11,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Setup DB with a few items of the same class
-        let mut catalog1 = Catalog::new(db_path);
+        let catalog1 = Catalog::new(db_path);
         catalog1.init().unwrap();
         let item1 = Item {
             id: "item-1".to_string(),
@@ -70,7 +70,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Persist an item to the database.
-        let mut catalog1 = Catalog::new(db_path);
+        let catalog1 = Catalog::new(db_path);
         catalog1.init().unwrap();
         let item_in_db = Item {
             id: "item-1".to_string(),

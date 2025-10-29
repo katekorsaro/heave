@@ -18,7 +18,7 @@ impl Catalog {
     ///     removed from the in-memory catalog.
     ///   - All other entities that were successfully persisted (new or updated) have
     ///     their state changed to `EntityState::Loaded`.
-    pub fn persist(&mut self) -> result::Result<(), FailedTo> {
+    pub fn persist(&self) -> result::Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
         self.on_items(|items| {
             sqlite::persist::catalog(path, items).map_err(|_| FailedTo::PersistCatalog)?;

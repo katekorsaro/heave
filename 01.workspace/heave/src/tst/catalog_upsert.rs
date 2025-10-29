@@ -4,7 +4,7 @@ mod tests {
     #[test]
     fn upsert_should_add_single_entity_as_new() {
         // 'upsert()': Should add a single entity to the 'items' map with 'EntityState::New'.
-        let mut catalog = Catalog::new("dummy.db");
+        let catalog = Catalog::new("dummy.db");
         let item = Item {
             id: "item-123".to_string(),
             name: "Test Item".to_string(),
@@ -29,7 +29,7 @@ mod tests {
     #[test]
     fn upsert_should_overwrite_existing_entity() {
         // 'upsert()': Should overwrite an existing entity with the same ID.
-        let mut catalog = Catalog::new("dummy.db");
+        let catalog = Catalog::new("dummy.db");
         let item1 = Item {
             id: "item-123".to_string(),
             name: "First Item".to_string(),

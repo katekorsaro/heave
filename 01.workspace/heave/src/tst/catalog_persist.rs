@@ -11,7 +11,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Create catalog, insert an item, and persist
-        let mut catalog1 = Catalog::new(db_path);
+        let catalog1 = Catalog::new(db_path);
         catalog1.init().unwrap();
         let item1 = Item {
             id: "item-1".to_string(),
@@ -77,7 +77,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Insert an entity and persist it.
-        let mut catalog1 = Catalog::new(db_path);
+        let catalog1 = Catalog::new(db_path);
         catalog1.init().unwrap();
         let original_item = Item {
             id: "item-1".to_string(),
@@ -132,7 +132,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Setup: Pre-populate the database with some items.
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let item_to_update_original = Item {
             id: "update-me".to_string(),
@@ -221,7 +221,7 @@ mod tests {
         // Using a directory as a path should cause a failure.
         let invalid_path = "target/test_dbs/a_directory_for_persist_fail";
         std::fs::create_dir_all(invalid_path).unwrap();
-        let mut catalog = Catalog::new(invalid_path);
+        let catalog = Catalog::new(invalid_path);
         let item = Item {
             id: "item-1".to_string(),
             name: "Test".to_string(),
