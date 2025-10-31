@@ -44,7 +44,7 @@ impl Catalog {
     where
         F: FnOnce(&HashMap<String, Entity>) -> Result<R, FailedTo>,
     {
-        let mut guarded_items = self.items.lock().map_err(|_| FailedTo::LockCatalog)?;
-        exec(&mut guarded_items)
+        let guarded_items = self.items.lock().map_err(|_| FailedTo::LockCatalog)?;
+        exec(&guarded_items)
     }
 }
