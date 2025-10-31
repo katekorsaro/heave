@@ -70,7 +70,7 @@
 //!
 //!     fn try_from(entity: Entity) -> Result<Self, Self::Error> {
 //!         Ok(Self {
-//!             id: entity.id.clone(),
+//!             id: entity.id(),
 //!             name: entity.unwrap("name").map_err(|_| FailedTo::ConvertEntity)?,
 //!             price: entity.unwrap("price").map_err(|_| FailedTo::ConvertEntity)?,
 //!             in_stock: entity.unwrap("in_stock").map_err(|_| FailedTo::ConvertEntity)?,
