@@ -34,7 +34,7 @@ impl From<Item> for Entity {
             .with_attribute("discount", value.discount)
             .with_attribute("sell_trend", value.sell_trend)
             .with_attribute("in_stock", value.in_stock)
-            .with_opt_attribute("vategory", value.category)
+            .with_opt_attribute("category", value.category)
             .with_attribute("tag", value.tag)
             .with_attribute("supplier_code", value.supplier_code)
             .with_attribute("supplier_rank", value.supplier_rank);
