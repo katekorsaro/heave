@@ -12,6 +12,11 @@ impl Catalog {
     /// - **Database State:** Creates the SQLite file and required tables if they are not
     ///   present. If the file already exists, it does nothing.
     /// - **In-Memory State:** This method does not alter the in-memory entity cache.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(FailedTo::InitDatabase)` if there is an issue creating the
+    /// database file or initializing its schema.
     pub fn init(&self) -> result::Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
         sqlite::init::db(path).map_err(|_| FailedTo::InitDatabase)?;
