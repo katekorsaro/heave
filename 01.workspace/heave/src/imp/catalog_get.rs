@@ -14,9 +14,16 @@ impl Catalog {
     ///
     /// An `Option<T>` containing the converted entity if found in the in-memory
     /// cache, otherwise `None`.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(FailedTo::ConvertEntity)` if the retrieved entity cannot be
+    /// converted into the specified type `T`. This typically happens if the
+    /// entity's data structure in the catalog does not match the expected
+    /// structure of `T`.
     pub fn get<T>(&self, id: &str) -> Result<Option<T>, FailedTo>
     where
-        T: EAV,
+        T: EAV, // T must implement the EAV trait to allow conversion from an Entity
     {
         self.with_items(|items| {
             let entity = items.get(id);
