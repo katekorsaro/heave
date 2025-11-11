@@ -14,6 +14,8 @@ pub struct O {
     pub subclass: Option<String>,
     pub category: Option<String>,
     pub tag: String,
+    pub supplier_code: u32,
+    pub supplier_rank: i32,
 }
 #[cfg(test)]
 impl EAV for Item {
@@ -34,7 +36,9 @@ impl From<Item> for Entity {
             .with_attribute("sell_trend", value.sell_trend)
             .with_attribute("in_stock", value.in_stock)
             .with_opt_attribute("vategory", value.category)
-            .with_attribute("tag", value.tag);
+            .with_attribute("tag", value.tag)
+            .with_attribute("supplier_code", value.supplier_code)
+            .with_attribute("supplier_rank", value.supplier_rank);
         if let Some(subclass) = value.subclass {
             entity = entity.with_subclass(&subclass);
         }
@@ -65,6 +69,12 @@ impl From<Entity> for Item {
             tag: entity
                 .unwrap_or("tag", "-".to_string())
                 .expect("tag is always present"),
+            supplier_code: entity
+                .unwrap("supplier_code")
+                .expect("supplier code is always present"),
+            supplier_rank: entity
+                .unwrap("supplier_rank")
+                .expect("supplier rank is always present"),
         }
     }
 }
