@@ -1,5 +1,6 @@
 pub mod catalog_delete;
 pub mod catalog_for_each;
+pub mod catalog_for_each_mut;
 pub mod catalog_get;
 pub mod catalog_get_by;
 pub mod catalog_init;
