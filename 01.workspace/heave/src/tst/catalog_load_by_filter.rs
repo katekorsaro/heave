@@ -1462,7 +1462,7 @@ mod tests {
         };
         let item4 = Item {
             id: "item-4".to_string(),
-            subclass: None, // -> "subitem"
+            subclass: Some("subitem".to_string()),
             ..Default::default()
         };
         let another_item = AnotherItem {

@@ -29,7 +29,6 @@ impl From<Item> for Entity {
         let mut entity = Entity::new::<Item>()
             .with_id(&value.id)
             .with_ref_date(value.first_seen)
-            .with_subclass("subitem")
             .with_attribute("name", value.name)
             .with_attribute("price", value.price)
             .with_attribute("discount", value.discount)

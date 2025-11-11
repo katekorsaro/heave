@@ -1,5 +1,6 @@
 pub mod catalog_delete;
 pub mod catalog_get;
+pub mod catalog_get_by;
 pub mod catalog_init;
 pub mod catalog_insert_many;
 pub mod catalog_integration;
