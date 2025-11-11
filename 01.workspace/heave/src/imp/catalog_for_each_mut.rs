@@ -1,10 +1,10 @@
 use crate::*;
 
 impl Catalog {
-    pub fn for_each_mut<T, F>(&self, predicate: F) -> Result<(), FailedTo>
+    pub fn for_each_mut<T, F>(&self, mut predicate: F) -> Result<(), FailedTo>
     where
         T: EAV,
-        F: Fn(&mut T) -> (),
+        F: FnMut(&mut T),
     {
         self.on_items(|items| {
             for entity in items.values_mut() {

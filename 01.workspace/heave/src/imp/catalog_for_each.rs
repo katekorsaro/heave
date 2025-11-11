@@ -1,16 +1,17 @@
 use crate::*;
 
 impl Catalog {
-    pub fn for_each<T, F>(&self, predicate: F) -> Result<(), FailedTo>
+    pub fn for_each<T, F>(&self, mut predicate: F) -> Result<(), FailedTo>
     where
         T: EAV,
-        F: Fn(&T) -> (),
+        F: FnMut(&T),
     {
         self.with_items(|items| {
-            Ok(items
+            items
                 .values()
                 .flat_map(|entity| T::try_from(entity.clone()).map_err(|_| FailedTo::ConvertEntity))
-                .for_each(|item| predicate(&item)))
+                .for_each(|item| predicate(&item));
+            Ok(())
         })
     }
 }
