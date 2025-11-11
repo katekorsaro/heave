@@ -14,6 +14,15 @@ impl Catalog {
     ///     state `EntityState::Loaded`.
     ///   - Any existing in-memory entities with matching IDs are replaced.
     /// - **Database State:** Unchanged.
+    ///
+    /// # Type Parameters
+    ///
+    /// * `T` - The type of the entity to load, which must implement the `EAV` trait.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(FailedTo::LoadFromDB)` if there is an issue loading entities
+    /// from the database.
     pub fn load_by_class<T>(&mut self) -> Result<(), FailedTo>
     where
         T: EAV,
