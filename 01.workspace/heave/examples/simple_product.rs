@@ -1,6 +1,7 @@
 use heave::*;
 
 // Define a struct named `Product` to represent a product.
+#[derive(PartialEq)]
 struct Product {
     // `id` is a public field of type `String` to uniquely identify the product.
     pub id: String,

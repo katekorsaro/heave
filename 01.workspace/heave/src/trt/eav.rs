@@ -7,6 +7,7 @@ use crate::*;
 pub trait T where
     Self: TryFrom<Entity>,
     Self: TryInto<Entity>,
+    Self: PartialEq,
 {
     /// Returns the class name of the type.
     ///

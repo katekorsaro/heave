@@ -1,23 +1,27 @@
 use heave::*;
 use std::path::Path;
 
+#[derive(PartialEq)]
 struct Laptop {
     pub id: String,
     pub model: String,
     pub price: u64,
 }
+#[derive(PartialEq)]
 struct Display {
     pub id: String,
     pub model: String,
     pub resolution: f64,
     pub price: u64,
 }
+#[derive(PartialEq)]
 struct Mouse {
     pub id: String,
     pub model: String,
     pub wireless: bool,
     pub price: u64,
 }
+#[derive(PartialEq)]
 enum Product {
     None,
     Laptop(Laptop),
