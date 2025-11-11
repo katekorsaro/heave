@@ -19,6 +19,15 @@ impl Catalog {
     ///     state `EntityState::Loaded`.
     ///   - Any existing in-memory entities with matching IDs are replaced.
     /// - **Database State:** Unchanged.
+    ///
+    /// # Arguments
+    ///
+    /// * `filter` - The `Filter` to apply when loading entities.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(FailedTo::LoadFromDB)` if there is an issue loading entities
+    /// from the database based on the provided filter.
     pub fn load_by_filter(&mut self, filter: &Filter) -> Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
         self.on_items(|items| {
