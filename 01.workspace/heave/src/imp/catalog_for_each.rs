@@ -1,6 +1,23 @@
 use crate::*;
 
 impl Catalog {
+    /// Iterates over each item in the catalog that can be converted into type `T` and applies a predicate function.
+    ///
+    /// This method allows read-only iteration over entities. The predicate receives an immutable reference
+    /// to the item.
+    ///
+    /// # Type Parameters
+    ///
+    /// * `T`: The target type that entities should be converted into. Must implement `EAV`.
+    /// * `F`: The type of the predicate function.
+    ///
+    /// # Arguments
+    ///
+    /// * `predicate`: A mutable closure that takes an immutable reference to an item of type `T`.
+    ///
+    /// # Returns
+    ///
+    /// A `Result` indicating success (`Ok(())`) or failure (`Err(FailedTo)`).
     pub fn for_each<T, F>(&self, mut predicate: F) -> Result<(), FailedTo>
     where
         T: EAV,
