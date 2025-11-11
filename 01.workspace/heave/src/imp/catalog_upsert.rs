@@ -18,6 +18,12 @@ impl Catalog {
     /// # Arguments
     ///
     /// * `object` - The object to insert or update, which must implement the `EAV` trait.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err(FailedTo::ConvertObject)` if the provided `object` cannot be
+    /// converted into an `Entity`. This typically indicates an issue with the
+    /// object's structure or missing required fields for entity conversion.
     pub fn upsert(&self, object: impl EAV) -> Result<(), FailedTo> {
         let mut entity = object.try_into().map_err(|_| FailedTo::ConvertObject)?;
         self.on_items(|items| {
