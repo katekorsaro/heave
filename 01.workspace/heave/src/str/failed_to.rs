@@ -1,7 +1,7 @@
 use crate::*;
 
 /// Represents the possible failures that can occur in the library.
-#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy, Hash)]
+#[derive(Debug)]
 pub enum FailedTo {
     /// Failed to compose filter statement
     ComposeFilter,
@@ -11,6 +11,8 @@ pub enum FailedTo {
     ConvertObject,
     /// Failed to convert from Value to type.
     ConvertValue,
+    /// Failed to execute predicate to mutate an item.
+    ExecutePredicate(Box<dyn error::Error>),
     /// Failed to initialize the database.
     InitDatabase,
     /// Failed to load data from the database.
@@ -25,6 +27,26 @@ pub enum FailedTo {
     PersistCatalog,
     /// A failure originating from the underlying SQLite implementation.
     SQLite(sqlite::FailedTo),
+}
+
+impl PartialEq for FailedTo {
+    fn eq(&self, other: &FailedTo) -> bool {
+        matches!(
+            (self, other),
+            (FailedTo::ComposeFilter, FailedTo::ComposeFilter)
+                | (FailedTo::ConvertEntity, FailedTo::ConvertEntity)
+                | (FailedTo::ConvertObject, FailedTo::ConvertObject)
+                | (FailedTo::ConvertValue, FailedTo::ConvertValue)
+                | (FailedTo::ExecutePredicate(_), FailedTo::ExecutePredicate(_))
+                | (FailedTo::InitDatabase, FailedTo::InitDatabase)
+                | (FailedTo::LoadFromDB, FailedTo::LoadFromDB)
+                | (FailedTo::LockCatalog, FailedTo::LockCatalog)
+                | (FailedTo::MapAttribute, FailedTo::MapAttribute)
+                | (FailedTo::MapEntity, FailedTo::MapEntity)
+                | (FailedTo::PersistCatalog, FailedTo::PersistCatalog)
+                | (FailedTo::SQLite(_), FailedTo::SQLite(_))
+        )
+    }
 }
 
 impl From<sqlite::FailedTo> for FailedTo {
