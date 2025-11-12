@@ -24,17 +24,25 @@ impl Catalog {
         F: FnMut(&mut T) -> Result<(), Box<dyn error::Error>>,
     {
         self.on_items(|items| {
+            let mut errors: Vec<Box<dyn error::Error>> = Vec::new();
             for entity in items.values_mut() {
                 let original_item =
                     T::try_from(entity.clone()).map_err(|_| FailedTo::ConvertEntity)?;
-                let mut item = T::try_from(entity.clone()).map_err(|_| FailedTo::ConvertEntity)?;
-                predicate(&mut item).map_err(FailedTo::ExecutePredicate)?;
+                let mut item = original_item.clone();
+                let result = predicate(&mut item);
+                if let Err(e) = result {
+                    errors.push(e);
+                }
                 if item != original_item {
                     *entity = T::try_into(item).map_err(|_| FailedTo::ConvertObject)?;
                     entity.state = EntityState::Updated;
                 }
             }
-            Ok(())
+            if errors.is_empty() {
+                Ok(())
+            } else {
+                Err(FailedTo::ExecutePredicate(errors))
+            }
         })
     }
 }

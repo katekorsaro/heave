@@ -12,7 +12,7 @@ pub enum FailedTo {
     /// Failed to convert from Value to type.
     ConvertValue,
     /// Failed to execute predicate to mutate an item.
-    ExecutePredicate(Box<dyn error::Error>),
+    ExecutePredicate(Vec<Box<dyn error::Error>>),
     /// Failed to initialize the database.
     InitDatabase,
     /// Failed to load data from the database.
