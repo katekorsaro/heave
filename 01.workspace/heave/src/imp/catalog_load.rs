@@ -1,7 +1,7 @@
 use crate::*;
 
 impl Catalog {
-    /// Loads all entities of a specific class from the database into the in-memory catalog.
+    /// Loads all entities of a specific type from the database into the in-memory catalog.
     ///
     /// This method fetches all entities matching the given class from the database.
     /// If any of the loaded entities have IDs that match entities already in the
@@ -23,7 +23,7 @@ impl Catalog {
     ///
     /// Returns `Err(FailedTo::LoadFromDB)` if there is an issue loading entities
     /// from the database.
-    pub fn load_by_class<T>(&mut self) -> Result<(), FailedTo>
+    pub fn load<T>(&mut self) -> Result<(), FailedTo>
     where
         T: EAV,
     {

@@ -167,7 +167,7 @@ mod tests {
         catalog_setup.persist().unwrap();
         // 2. Manipulation: Load the data and perform mixed operations.
         let mut catalog_ops = Catalog::new(db_path);
-        catalog_ops.load_by_class::<Item>().unwrap(); // Load all items
+        catalog_ops.load::<Item>().unwrap(); // Load all items
         // A new item to be inserted.
         let item_to_add = Item {
             id: "add-me".to_string(),
@@ -197,7 +197,7 @@ mod tests {
         catalog_ops.persist().unwrap();
         // 4. Verification: Load into a new catalog and check the final state of the DB.
         let mut catalog_verify = Catalog::new(db_path);
-        catalog_verify.load_by_class::<Item>().unwrap();
+        catalog_verify.load::<Item>().unwrap();
         // Check total count
         assert_eq!(catalog_verify.len().unwrap(), 3);
         // Verify added item

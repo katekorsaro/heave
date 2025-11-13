@@ -36,7 +36,7 @@ mod tests {
         catalog1.persist().unwrap();
         // 2. Create a new catalog and load the items by class
         let mut catalog2 = Catalog::new(db_path);
-        let result = catalog2.load_by_class::<Item>();
+        let result = catalog2.load::<Item>();
         assert!(result.is_ok());
         // 3. Verify that all items of that class were loaded
         let len = catalog2.len().unwrap();
@@ -102,7 +102,7 @@ mod tests {
             "Memory Version"
         );
         // 3. Load from the database, which should overwrite the in-memory version.
-        let result = catalog2.load_by_class::<Item>();
+        let result = catalog2.load::<Item>();
         assert!(result.is_ok());
         // 4. Verify that the in-memory entity has been replaced with the one from the DB.
         let len = catalog2.len().unwrap();
@@ -131,7 +131,7 @@ mod tests {
         let mut catalog = Catalog::new(db_path);
         catalog.init().unwrap();
         // 2. Attempt to load from the empty DB.
-        let result = catalog.load_by_class::<Item>();
+        let result = catalog.load::<Item>();
         assert!(result.is_ok());
         let is_empty = catalog.is_empty().unwrap();
         assert!(is_empty);
@@ -148,7 +148,7 @@ mod tests {
         let _ = catalog.upsert(item_in_memory.clone());
         let len = catalog.len().unwrap();
         assert_eq!(len, 1);
-        let result2 = catalog.load_by_class::<Item>();
+        let result2 = catalog.load::<Item>();
         assert!(result2.is_ok());
         // 4. Verify the in-memory item is untouched because nothing was loaded from DB.
         let len = catalog.len().unwrap();
@@ -166,7 +166,7 @@ mod tests {
         std::fs::create_dir_all(invalid_path).unwrap();
         let mut catalog = Catalog::new(invalid_path);
         // Attempt to load from the invalid path.
-        let result = catalog.load_by_class::<Item>();
+        let result = catalog.load::<Item>();
         assert!(result.is_err());
         // Based on `load_by_id`, the error should be `LoadFromDB`.
         // This assumes `From<SqliteFailedTo>` is implemented to produce `FailedTo::LoadFromDB`.

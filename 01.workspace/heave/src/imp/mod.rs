@@ -11,7 +11,7 @@ pub mod catalog_is_empty;
 pub mod catalog_len;
 pub mod catalog_list_by_class;
 pub mod catalog_list_by_class_and_subclass;
-pub mod catalog_load_by_class;
+pub mod catalog_load;
 pub mod catalog_load_by_filter;
 pub mod catalog_load_by_id;
 pub mod catalog_persist;

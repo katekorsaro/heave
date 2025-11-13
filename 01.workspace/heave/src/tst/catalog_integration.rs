@@ -69,7 +69,7 @@ mod tests {
         catalog1.persist().unwrap();
         // 2. new catalog -> 'load_by_class' -> 'list_by_class'
         let mut catalog2 = Catalog::new(db_path);
-        catalog2.load_by_class::<Item>().unwrap();
+        catalog2.load::<Item>().unwrap();
         let mut loaded_items: Vec<Item> = catalog2
             .list_by_class::<Item>()
             .unwrap()

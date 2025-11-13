@@ -40,7 +40,7 @@ mod tests {
         assert_eq!(total_items, 1000);
         catalog.persist().unwrap();
         let mut new_catalog = Catalog::new(db_path);
-        new_catalog.load_by_class::<Item>().unwrap();
+        new_catalog.load::<Item>().unwrap();
         let total_items_after_load = new_catalog.with_items(|items| Ok(items.len())).unwrap();
         assert_eq!(total_items_after_load, 1000);
         std::fs::remove_file(path).unwrap();
