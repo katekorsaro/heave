@@ -1,7 +1,7 @@
 use crate::*;
 
 impl Catalog {
-    /// Returns a list of all entities of a specific class and subclass from the in-memory catalog.
+    /// Returns a list of all entities of a specific subclass from the in-memory catalog.
     ///
     /// This method filters the in-memory entities by the class of type `T` and the
     /// provided `subclass`, then attempts to convert them into `T`. This is a purely
@@ -24,10 +24,7 @@ impl Catalog {
     ///
     /// Returns `Err(FailedTo::LockCatalog)` if the catalog's internal mutex
     /// could not be locked.
-    pub fn list_by_class_and_subclass<T>(
-        &self,
-        subclass: &str,
-    ) -> Result<Vec<Result<T, FailedTo>>, FailedTo>
+    pub fn list_by_subclass<T>(&self, subclass: &str) -> Result<Vec<Result<T, FailedTo>>, FailedTo>
     where
         T: EAV,
     {

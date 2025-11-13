@@ -23,7 +23,7 @@ mod tests {
         let _ = catalog.upsert(item2.clone());
         let _ = catalog.upsert(item3.clone());
         let results: Vec<_> = catalog
-            .list_by_class_and_subclass::<Item>("electronics")
+            .list_by_subclass::<Item>("electronics")
             .unwrap()
             .into_iter()
             .map(|item| item.unwrap())
@@ -43,7 +43,7 @@ mod tests {
         };
         let _ = catalog.upsert(item1.clone());
         let results: Vec<_> = catalog
-            .list_by_class_and_subclass::<Item>("books")
+            .list_by_subclass::<Item>("books")
             .unwrap()
             .into_iter()
             .map(|item| item.unwrap())
