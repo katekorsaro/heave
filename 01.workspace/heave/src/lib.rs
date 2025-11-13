@@ -185,16 +185,20 @@ mod str;
 mod trt;
 mod tst;
 
+pub use crate::str::failed_to::FailedTo;
+
 pub(crate) use crate::str::attribute::O as Attribute;
-pub use crate::str::catalog::O as Catalog;
-pub use crate::str::comparison::E as Comparison;
-pub use crate::str::condition::E as Condition;
+pub(crate) use crate::str::value::Value;
+
 pub use crate::str::entity::O as Entity;
 pub use crate::str::entity_state::EntityState;
-pub use crate::str::failed_to::FailedTo;
-pub use crate::str::filter::O as Filter;
-pub(crate) use crate::str::value::Value;
 pub use crate::trt::eav::T as EAV;
+
+pub use crate::str::comparison::E as Comparison;
+pub use crate::str::condition::E as Condition;
+pub use crate::str::filter::O as Filter;
+
+pub use crate::str::catalog::O as Catalog;
 
 #[cfg(test)]
 pub(crate) use crate::str::item::O as Item;
