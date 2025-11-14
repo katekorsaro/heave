@@ -1,4 +1,5 @@
-use heave::*;
+use heave::catalog::*;
+use heave::eav::*;
 
 // Define a struct named `Product` to represent a product.
 #[derive(PartialEq, Clone)]

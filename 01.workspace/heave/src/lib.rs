@@ -187,21 +187,41 @@ mod tst;
 
 pub use crate::str::failed_to::FailedTo;
 
-pub(crate) use crate::str::attribute::O as Attribute;
-pub(crate) use crate::str::value::Value;
+/// The `catalog` module provides the `Catalog` struct, which serves as the main entry point
+/// for interacting with the EAV database. It manages the connection to the SQLite file
+/// and maintains an in-memory cache of entities.
+pub mod catalog {
+    pub use crate::str::catalog::O as Catalog;
+}
 
-pub use crate::str::entity::O as Entity;
-pub use crate::str::entity_state::EntityState;
-pub use crate::trt::eav::T as EAV;
+/// The `eav` module defines the core components of the Entity-Attribute-Value (EAV) model.
+/// It includes the `EAV` trait, which custom structs must implement to be stored as entities,
+/// as well as the `Entity` struct for generic entity representation, `Attribute` for entity properties,
+/// `Value` for attribute values, and `EntityState` for tracking entity changes.
+pub mod eav {
+    pub(crate) use crate::str::attribute::O as Attribute;
+    pub use crate::str::entity::O as Entity;
+    pub use crate::str::entity_state::EntityState;
+    pub(crate) use crate::str::value::Value;
+    pub use crate::trt::eav::T as EAV;
+}
 
-pub use crate::str::comparison::E as Comparison;
-pub use crate::str::condition::E as Condition;
-pub use crate::str::filter::O as Filter;
-
-pub use crate::str::catalog::O as Catalog;
+/// The `filter` module provides tools for constructing complex queries to retrieve entities
+/// from the database. It includes the `Filter` struct for building query conditions,
+/// `Condition` for defining individual filtering criteria, and `Comparison` for specifying
+/// how values should be compared.
+pub mod filter {
+    pub use crate::str::comparison::E as Comparison;
+    pub use crate::str::condition::E as Condition;
+    pub use crate::str::filter::O as Filter;
+}
 
 #[cfg(test)]
 pub(crate) use crate::str::item::O as Item;
+
+use catalog::*;
+use eav::*;
+use filter::*;
 
 mod sqlite {
     pub use crate::str::sqlite_failed_to::FailedTo;

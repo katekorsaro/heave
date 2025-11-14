@@ -1,3 +1,6 @@
+use heave::catalog::*;
+use heave::eav::*;
+use heave::filter::*;
 use heave::*;
 use std::path::Path;
 

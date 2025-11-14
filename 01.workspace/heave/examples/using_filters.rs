@@ -1,4 +1,6 @@
-use heave::*;
+use heave::catalog::*;
+use heave::eav::*;
+use heave::filter::*;
 
 // Define a struct named `Component` to represent an electronic component.
 #[derive(Debug, Clone, PartialEq)]
