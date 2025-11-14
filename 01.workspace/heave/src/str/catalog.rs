@@ -10,6 +10,7 @@ use std::sync::*;
 #[derive(Debug, Default)]
 pub struct O {
     pub(crate) path: String,
+    pub(crate) already_init: bool,
     items: Mutex<HashMap<String, Entity>>,
 }
 
