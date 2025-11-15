@@ -20,7 +20,7 @@ impl Catalog {
     ///
     /// Returns `Err(FailedTo::LockCatalog)` if the catalog's internal mutex
     /// could not be locked.
-    pub fn list_by_class<T>(&self) -> Result<Vec<Result<T, FailedTo>>, FailedTo>
+    pub fn list<T>(&self) -> Result<Vec<Result<T, FailedTo>>, FailedTo>
     where
         T: EAV,
     {

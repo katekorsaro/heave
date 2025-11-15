@@ -71,7 +71,7 @@ mod tests {
         let mut catalog2 = Catalog::new(db_path);
         catalog2.load::<Item>().unwrap();
         let mut loaded_items: Vec<Item> = catalog2
-            .list_by_class::<Item>()
+            .list::<Item>()
             .unwrap()
             .into_iter()
             .map(|item| item.unwrap())

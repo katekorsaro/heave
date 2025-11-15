@@ -142,7 +142,7 @@ fn main() -> Result<(), FailedTo> {
     laptop_catalog.load_by_filter(&laptop_filter)?;
 
     let laptops: Vec<Product> = laptop_catalog
-        .list_by_class()
+        .list()
         .unwrap()
         .into_iter()
         .map(|p| p.unwrap())
@@ -170,7 +170,7 @@ fn main() -> Result<(), FailedTo> {
     expensive_catalog.load_by_filter(&expensive_filter)?;
 
     let expensive_products: Vec<Product> = expensive_catalog
-        .list_by_class()
+        .list()
         .unwrap()
         .into_iter()
         .map(|p| p.unwrap())
@@ -202,7 +202,7 @@ fn main() -> Result<(), FailedTo> {
     all_products_catalog.load_by_filter(&all_products_filter)?;
 
     let all_products: Vec<Product> = all_products_catalog
-        .list_by_class()
+        .list()
         .unwrap()
         .into_iter()
         .map(|p| p.unwrap())

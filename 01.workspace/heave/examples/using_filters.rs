@@ -131,7 +131,7 @@ fn main() {
     new_catalog.load_by_filter(&filter).unwrap();
     // Get the list of loaded components.
     let loaded_components: Vec<Component> = new_catalog
-        .list_by_class::<Component>()
+        .list::<Component>()
         .unwrap()
         .into_iter()
         .map(|c| c.unwrap())
