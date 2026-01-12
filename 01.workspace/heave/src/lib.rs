@@ -134,7 +134,7 @@
 //!
 //!     let mut filtered_catalog = Catalog::new(db_path);
 //!     filtered_catalog.load_by_filter(&filter)?;
-//!     let cheap_products: Vec<Product> = filtered_catalog.list_by_class()
+//!     let cheap_products: Vec<Product> = filtered_catalog.list()
 //!         .unwrap().into_iter().map(|p| p.unwrap()).collect();
 //!     println!("✅ Found {} cheap, in-stock product(s).", cheap_products.len());
 //!     assert_eq!(cheap_products.len(), 1);
@@ -142,7 +142,7 @@
 //!
 //!     // == 3. Update and Delete Data ==
 //!     let mut update_catalog = Catalog::new(db_path);
-//!     update_catalog.load_by_class::<Product>()?;
+//!     update_catalog.load::<Product>()?;
 //!
 //!     // Update the price of the laptop
 //!     let mut laptop_to_update: Product = update_catalog.get("p1")?.unwrap();
@@ -158,9 +158,9 @@
 //!
 //!     // == 4. Verify Final State ==
 //!     let mut final_catalog = Catalog::new(db_path);
-//!     final_catalog.load_by_class::<Product>()?;
+//!     final_catalog.load::<Product>()?;
 //!
-//!     let final_count = final_catalog.list_by_class::<Product>().into_iter().count();
+//!     let final_count = final_catalog.list::<Product>().into_iter().count();
 //!     println!("✅ Final product count: {}", final_count);
 //!     assert_eq!(final_count, 2);
 //!
