@@ -34,8 +34,8 @@
 //!
 //! ```rust,no_run
 //! use heave::*;
-//! use heave::eav::*;
 //! use heave::catalog::*;
+//! use heave::eav::*;
 //! use heave::filter::*;
 //! use std::convert::{From, TryFrom};
 //! use std::result::Result;
