@@ -43,7 +43,7 @@ mod tests {
             loaded_entity.value_of("name"),
             Some(&Value::from("Test Item"))
         );
-        assert_eq!(loaded_entity.value_of("price"), Some(&Value::from(123u64)));
+        assert_eq!(loaded_entity.value_of("price"), Some(&Value::from(123u32)));
         assert_eq!(
             loaded_entity.value_of("sell_trend"),
             Some(&Value::from(0i64))
@@ -113,7 +113,7 @@ mod tests {
         );
         assert_eq!(
             entity_after_load.value_of("price"),
-            Some(&Value::from(100u64))
+            Some(&Value::from(100u32))
         );
         assert_eq!(
             entity_after_load.value_of("sell_trend"),

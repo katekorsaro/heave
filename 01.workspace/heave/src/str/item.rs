@@ -5,9 +5,9 @@ use crate::*;
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct O {
     pub id: String,
-    pub first_seen: u64,
+    pub first_seen: u32,
     pub name: String,
-    pub price: u64,
+    pub price: u32,
     pub discount: f64,
     pub sell_trend: i64,
     pub in_stock: bool,

@@ -8,7 +8,7 @@ struct Component {
     pub id: String,
     pub part_number: String,
     pub kind: String,
-    pub value: u64,
+    pub value: u32,
     pub package: String,
     pub in_stock: bool,
 }

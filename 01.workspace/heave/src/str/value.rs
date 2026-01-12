@@ -15,7 +15,7 @@ pub enum Value {
     /// A UTF-8 encoded string.
     Text(String),
     /// An unsigned 64-bit integer.
-    UnsignedInt(u64),
+    UnsignedInt(u32),
 }
 
 impl std::fmt::Display for Value {

@@ -34,7 +34,7 @@ mod tests {
             .unwrap();
         assert_eq!(entity1.state, EntityState::New);
         assert_eq!(entity1.value_of("name"), Some(&Value::from("Item 1")));
-        assert_eq!(entity1.value_of("price"), Some(&Value::from(10u64)));
+        assert_eq!(entity1.value_of("price"), Some(&Value::from(10u32)));
         assert_eq!(entity1.value_of("sell_trend"), Some(&Value::from(0i64)));
         let entity2 = catalog
             .with_items(|items| {
@@ -44,7 +44,7 @@ mod tests {
             .unwrap();
         assert_eq!(entity2.state, EntityState::New);
         assert_eq!(entity2.value_of("name"), Some(&Value::from("Item 2")));
-        assert_eq!(entity2.value_of("price"), Some(&Value::from(20u64)));
+        assert_eq!(entity2.value_of("price"), Some(&Value::from(20u32)));
         assert_eq!(entity2.value_of("sell_trend"), Some(&Value::from(0i64)));
     }
 }

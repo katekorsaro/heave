@@ -10,7 +10,7 @@ pub struct O {
     pub(crate) state: EntityState,
     /// An optional timestamp or version number, typically used for optimistic
     /// locking or tracking when the entity was last referenced or modified.
-    pub(crate) ref_date: Option<u64>,
+    pub(crate) ref_date: Option<u32>,
     /// A string identifying the "type" or "class" of the entity (e.g., "product", "user").
     /// This is used to group and query entities of the same kind.
     pub(crate) class: String,
@@ -77,7 +77,7 @@ impl Entity {
     /// # Returns
     ///
     /// The entity with the updated reference date.
-    pub fn with_ref_date(mut self, ref_date: u64) -> Self {
+    pub fn with_ref_date(mut self, ref_date: u32) -> Self {
         self.ref_date = Some(ref_date);
         self
     }

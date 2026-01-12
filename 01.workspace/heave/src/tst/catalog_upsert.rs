@@ -22,7 +22,7 @@ mod tests {
         assert_eq!(entity.state, EntityState::New);
         assert_eq!(entity.class, "item");
         assert_eq!(entity.value_of("name"), Some(&Value::from("Test Item")));
-        assert_eq!(entity.value_of("price"), Some(&Value::from(100u64)));
+        assert_eq!(entity.value_of("price"), Some(&Value::from(100u32)));
         assert_eq!(entity.value_of("sell_trend"), Some(&Value::from(0i64)));
         assert_eq!(entity.value_of("in_stock"), Some(&Value::from(true)));
     }
@@ -54,7 +54,7 @@ mod tests {
             .with_items(|items| Ok(items.get(&item_id).unwrap().clone()))
             .unwrap();
         assert_eq!(entity.value_of("name"), Some(&Value::from("Second Item")));
-        assert_eq!(entity.value_of("price"), Some(&Value::from(200u64)));
+        assert_eq!(entity.value_of("price"), Some(&Value::from(200u32)));
         assert_eq!(entity.value_of("sell_trend"), Some(&Value::from(10i64)));
         assert_eq!(entity.value_of("in_stock"), Some(&Value::from(false)));
         assert_eq!(entity.state, EntityState::Updated);

@@ -34,6 +34,9 @@
 //!
 //! ```rust,no_run
 //! use heave::*;
+//! use heave::eav::*;
+//! use heave::catalog::*;
+//! use heave::filter::*;
 //! use std::convert::{From, TryFrom};
 //! use std::result::Result;
 //!
@@ -42,7 +45,7 @@
 //! struct Product {
 //!     pub id: String,
 //!     pub name: String,
-//!     pub price: u64,
+//!     pub price: u32,
 //!     pub in_stock: bool,
 //! }
 //!

@@ -8,21 +8,21 @@ use std::path::Path;
 struct Laptop {
     pub id: String,
     pub model: String,
-    pub price: u64,
+    pub price: u32,
 }
 #[derive(PartialEq, Clone)]
 struct Display {
     pub id: String,
     pub model: String,
     pub resolution: f64,
-    pub price: u64,
+    pub price: u32,
 }
 #[derive(PartialEq, Clone)]
 struct Mouse {
     pub id: String,
     pub model: String,
     pub wireless: bool,
-    pub price: u64,
+    pub price: u32,
 }
 #[derive(PartialEq, Clone)]
 enum Product {
