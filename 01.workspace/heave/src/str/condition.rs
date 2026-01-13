@@ -12,6 +12,6 @@ pub enum E<'a> {
     SignedInt(i64),
     /// A text value (`&str`).
     Text(&'a str),
-    /// An unsigned integer (`u64`), stored as `i64` for SQLite compatibility.
-    UnsignedInt(i64),
+    /// An unsigned integer (`u32`).
+    UnsignedInt(u32),
 }

@@ -66,12 +66,12 @@ impl<'a> Filter<'a> {
         ));
         self
     }
-    /// Adds an unsigned integer (`u64`) condition to the filter.
+    /// Adds an unsigned integer (`u32`) condition to the filter.
     pub fn with_unsigned_int(
         mut self,
         attribute_name: &str,
         comparison: Comparison,
-        value: i64,
+        value: u32,
     ) -> Self {
         self.conditions.push((
             attribute_name.to_string(),
