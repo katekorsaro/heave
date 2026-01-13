@@ -7,9 +7,7 @@ mod tests {
         if fs_path.exists() {
             std::fs::remove_file(fs_path).unwrap();
         }
-        let catalog = Catalog::new(&path);
-        catalog.init().unwrap();
-        catalog
+        Catalog::new(&path)
     }
     #[test]
     fn get_by_finds_item() {
