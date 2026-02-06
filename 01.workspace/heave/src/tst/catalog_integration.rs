@@ -43,7 +43,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. 'init' -> 'insert_many' -> 'persist'
-        let mut catalog1 = Catalog::new(db_path);
+        let catalog1 = Catalog::new(db_path);
         catalog1.init().unwrap();
         let items_to_insert = vec![
             Item {
@@ -68,7 +68,7 @@ mod tests {
         let _ = catalog1.insert_many(items_to_insert.clone());
         catalog1.persist().unwrap();
         // 2. new catalog -> 'load_by_class' -> 'list_by_class'
-        let mut catalog2 = Catalog::new(db_path);
+        let catalog2 = Catalog::new(db_path);
         catalog2.load::<Item>().unwrap();
         let mut loaded_items: Vec<Item> = catalog2
             .list::<Item>()

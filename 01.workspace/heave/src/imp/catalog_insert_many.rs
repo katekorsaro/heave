@@ -19,7 +19,7 @@ impl Catalog {
     ///
     /// Returns `Err(FailedTo)` if any of the underlying `upsert` operations fail.
     /// This could be due to issues like an object not having a valid ID.
-    pub fn insert_many(&mut self, objects: Vec<impl EAV>) -> Result<(), FailedTo> {
+    pub fn insert_many(&self, objects: Vec<impl EAV>) -> Result<(), FailedTo> {
         for object in objects {
             self.upsert(object)?;
         }

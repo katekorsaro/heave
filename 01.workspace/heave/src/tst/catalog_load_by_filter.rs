@@ -10,7 +10,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -57,7 +57,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -96,7 +96,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -183,7 +183,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -230,7 +230,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -277,7 +277,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -324,7 +324,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -383,7 +383,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -430,7 +430,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -489,7 +489,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -536,7 +536,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -595,7 +595,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -642,7 +642,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -701,7 +701,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -783,7 +783,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -845,7 +845,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -917,7 +917,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -980,7 +980,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -1042,7 +1042,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -1080,7 +1080,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -1117,7 +1117,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -1152,7 +1152,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -1189,7 +1189,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -1224,7 +1224,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -1261,7 +1261,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -1296,7 +1296,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -1333,7 +1333,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {
@@ -1368,7 +1368,7 @@ mod tests {
         if path.exists() {
             std::fs::remove_file(path).unwrap();
         }
-        let mut catalog_setup = Catalog::new(db_path);
+        let catalog_setup = Catalog::new(db_path);
         catalog_setup.init().unwrap();
         let items = vec![
             Item {

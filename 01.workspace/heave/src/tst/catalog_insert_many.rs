@@ -4,7 +4,7 @@ mod tests {
     #[test]
     fn insert_many_should_add_all_entities() {
         // 'insert_many()': Should add all provided entities to the 'items' map.
-        let mut catalog = Catalog::new("dummy.db");
+        let catalog = Catalog::new("dummy.db");
         let items = vec![
             Item {
                 id: "item-1".to_string(),

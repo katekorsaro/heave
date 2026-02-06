@@ -55,7 +55,7 @@ fn main() {
     // Define the path for the SQLite database file.
     let db_path = "./using_filters.sqlite3";
     // Create a new `Catalog` instance with the specified database path.
-    let mut catalog = Catalog::new(db_path);
+    let catalog = Catalog::new(db_path);
     // Initialize the catalog, which sets up the database.
     catalog.init().unwrap();
     // Create some component instances.

@@ -35,7 +35,7 @@ mod tests {
         let _ = catalog1.upsert(item2.clone());
         catalog1.persist().unwrap();
         // 2. Create a new catalog and load the items by class
-        let mut catalog2 = Catalog::new(db_path);
+        let catalog2 = Catalog::new(db_path);
         let result = catalog2.load::<Item>();
         assert!(result.is_ok());
         // 3. Verify that all items of that class were loaded
@@ -84,7 +84,7 @@ mod tests {
         let _ = catalog1.upsert(item_in_db.clone());
         catalog1.persist().unwrap();
         // 2. Create a new catalog with a different in-memory version of the same item.
-        let mut catalog2 = Catalog::new(db_path);
+        let catalog2 = Catalog::new(db_path);
         let item_in_memory = Item {
             id: "item-1".to_string(),
             subclass: Some("subitem".to_string()),
@@ -128,7 +128,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Create an empty, initialized database.
-        let mut catalog = Catalog::new(db_path);
+        let catalog = Catalog::new(db_path);
         catalog.init().unwrap();
         // 2. Attempt to load from the empty DB.
         let result = catalog.load::<Item>();
@@ -164,7 +164,7 @@ mod tests {
         // Using a directory as a path should cause a failure.
         let invalid_path = "target/test_dbs/a_directory_for_load_class_fail";
         std::fs::create_dir_all(invalid_path).unwrap();
-        let mut catalog = Catalog::new(invalid_path);
+        let catalog = Catalog::new(invalid_path);
         // Attempt to load from the invalid path.
         let result = catalog.load::<Item>();
         assert!(result.is_err());

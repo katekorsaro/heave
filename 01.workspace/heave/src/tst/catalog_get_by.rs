@@ -11,7 +11,7 @@ mod tests {
     }
     #[test]
     fn get_by_finds_item() {
-        let mut catalog = catalog("get_by_finds_item");
+        let catalog = catalog("get_by_finds_item");
         let item1 = Item {
             id: "1".to_string(),
             name: "one".to_string(),
@@ -33,7 +33,7 @@ mod tests {
     }
     #[test]
     fn get_by_returns_none_when_no_match() {
-        let mut catalog = catalog("get_by_returns_none_when_no_match");
+        let catalog = catalog("get_by_returns_none_when_no_match");
         let item1 = Item {
             id: "1".to_string(),
             name: "one".to_string(),
@@ -51,7 +51,7 @@ mod tests {
     }
     #[test]
     fn get_by_multiple_matches() {
-        let mut catalog = catalog("get_by_multiple_matches");
+        let catalog = catalog("get_by_multiple_matches");
         let item1 = Item {
             id: "1".to_string(),
             name: "match".to_string(),

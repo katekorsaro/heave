@@ -23,7 +23,7 @@ impl Catalog {
     ///
     /// Returns `Err(FailedTo::LoadFromDB)` if there is an issue loading entities
     /// from the database.
-    pub fn load<T>(&mut self) -> Result<(), FailedTo>
+    pub fn load<T>(&self) -> Result<(), FailedTo>
     where
         T: EAV,
     {

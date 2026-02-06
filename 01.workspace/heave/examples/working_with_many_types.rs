@@ -98,7 +98,7 @@ fn main() -> Result<(), FailedTo> {
 
     // 1. Initialize and Persist Data
     println!("== 1. Storing different product types ==");
-    let mut catalog = Catalog::new(db_path);
+    let catalog = Catalog::new(db_path);
     catalog.init()?;
 
     let products_to_add = vec![
