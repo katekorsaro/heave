@@ -43,7 +43,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Create catalog, insert an item, and persist it.
-        let mut catalog1 = Catalog::new(db_path);
+        let catalog1 = Catalog::new(db_path);
         catalog1.init().unwrap();
         let item1 = Item {
             id: "item-to-delete".to_string(),
@@ -248,7 +248,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Setup: Create a catalog and pre-populate it with some data.
-        let mut catalog = Catalog::new(db_path);
+        let catalog = Catalog::new(db_path);
         catalog.init().unwrap();
         let item_to_update = Item {
             id: "update-me".to_string(),

@@ -16,7 +16,7 @@ impl Catalog {
     /// # Arguments
     ///
     /// * `id` - The ID of the entity to mark for deletion.
-    pub fn delete(&mut self, id: &str) {
+    pub fn delete(&self, id: &str) {
         let _ = self.on_items(|items| {
             let entity = items.get_mut(id);
             if let Some(entity) = entity {
