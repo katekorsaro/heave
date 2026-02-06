@@ -134,7 +134,7 @@ fn main() -> Result<(), FailedTo> {
     println!("== 2. Loading products using class and subclass filters ==");
 
     // Load only laptops
-    let mut laptop_catalog = Catalog::new(db_path);
+    let laptop_catalog = Catalog::new(db_path);
     let laptop_filter = Filter::new()
         .with_class(Product::class())
         .with_subclass("laptop");
@@ -162,7 +162,7 @@ fn main() -> Result<(), FailedTo> {
 
     println!("== 3. Loading products using attribute filters ==");
     // Load expensive products (price > 1000)
-    let mut expensive_catalog = Catalog::new(db_path);
+    let expensive_catalog = Catalog::new(db_path);
     let expensive_filter = Filter::new()
         .with_class(Product::class())
         .with_unsigned_int("price", Comparison::Greater, 1000);
@@ -197,7 +197,7 @@ fn main() -> Result<(), FailedTo> {
     println!();
 
     println!("== 4. Loading all product types ==");
-    let mut all_products_catalog = Catalog::new(db_path);
+    let all_products_catalog = Catalog::new(db_path);
     let all_products_filter = Filter::new().with_class(Product::class());
     all_products_catalog.load_by_filter(&all_products_filter)?;
 

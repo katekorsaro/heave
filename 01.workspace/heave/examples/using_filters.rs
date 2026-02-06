@@ -120,7 +120,7 @@ fn main() {
     // Persist the changes to the database.
     catalog.persist().unwrap();
     // Create a new catalog to ensure we are loading from the database.
-    let mut new_catalog = Catalog::new(db_path);
+    let new_catalog = Catalog::new(db_path);
     // Create a composite filter.
     // We are looking for resistors with a value greater than 1000 that are in stock.
     let filter = Filter::new()
