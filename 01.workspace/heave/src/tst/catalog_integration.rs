@@ -25,7 +25,7 @@ mod tests {
         let _ = catalog1.upsert(item_to_insert.clone());
         catalog1.persist().unwrap();
         // 2. create a new catalog instance -> 'load_by_id' -> 'get'
-        let mut catalog2 = Catalog::new(db_path);
+        let catalog2 = Catalog::new(db_path);
         catalog2.load_by_id("item-1").unwrap();
         let loaded_item: Option<Item> = catalog2.get("item-1").unwrap();
         // 3. verify data integrity
@@ -109,14 +109,14 @@ mod tests {
         let _ = catalog1.upsert(item_to_delete.clone());
         catalog1.persist().unwrap();
         // 2. 'load_by_id' to confirm it's there
-        let mut catalog2 = Catalog::new(db_path);
+        let catalog2 = Catalog::new(db_path);
         catalog2.load_by_id("item-to-delete").unwrap();
         assert!(catalog2.get::<Item>("item-to-delete").unwrap().is_some());
         // 3. 'delete' -> 'persist'
         catalog2.delete("item-to-delete");
         catalog2.persist().unwrap();
         // 4. 'load_by_id' should now return nothing
-        let mut catalog3 = Catalog::new(db_path);
+        let catalog3 = Catalog::new(db_path);
         catalog3.load_by_id("item-to-delete").unwrap();
         let loaded_item: Option<Item> = catalog3.get("item-to-delete").unwrap();
         assert!(loaded_item.is_none());
@@ -152,7 +152,7 @@ mod tests {
         // 2. Thread 1: Loads, updates name, and persists.
         let db_path_arc1 = std::sync::Arc::clone(&db_path_arc);
         let handle1 = std::thread::spawn(move || {
-            let mut catalog1 = Catalog::new(&db_path_arc1);
+            let catalog1 = Catalog::new(&db_path_arc1);
             catalog1.load_by_id("item-1").unwrap();
             let mut item = catalog1.get::<Item>("item-1").unwrap().unwrap();
             item.name = "Updated by Thread 1".to_string();
@@ -162,7 +162,7 @@ mod tests {
         // 3. Thread 2: Loads, updates price, and persists.
         let db_path_arc2 = std::sync::Arc::clone(&db_path_arc);
         let handle2 = std::thread::spawn(move || {
-            let mut catalog2 = Catalog::new(&db_path_arc2);
+            let catalog2 = Catalog::new(&db_path_arc2);
             catalog2.load_by_id("item-1").unwrap();
             let mut item = catalog2.get::<Item>("item-1").unwrap().unwrap();
             item.price = 200;
@@ -172,7 +172,7 @@ mod tests {
         handle1.join().unwrap();
         handle2.join().unwrap();
         // 4. Verification: Load the data and check the final state.
-        let mut catalog_verify = Catalog::new(db_path);
+        let catalog_verify = Catalog::new(db_path);
         catalog_verify.load_by_id("item-1").unwrap();
         let final_item: Item = catalog_verify.get("item-1").unwrap().unwrap();
         // The final state depends on which thread persisted last. One update will have been lost.

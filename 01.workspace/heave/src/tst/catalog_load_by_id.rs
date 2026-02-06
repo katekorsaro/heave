@@ -25,7 +25,7 @@ mod tests {
         let _ = catalog1.upsert(item_to_persist.clone());
         catalog1.persist().unwrap();
         // 2. Create a new, empty catalog instance for the same DB.
-        let mut catalog2 = Catalog::new(db_path);
+        let catalog2 = Catalog::new(db_path);
         assert!(catalog2.is_empty().unwrap());
         // 3. Load the item by its ID.
         let result = catalog2.load_by_id("item-1");
@@ -80,7 +80,7 @@ mod tests {
         let _ = catalog1.upsert(item_in_db.clone());
         catalog1.persist().unwrap();
         // 2. Create a new catalog and add a *different* in-memory version of the same item.
-        let mut catalog2 = Catalog::new(db_path);
+        let catalog2 = Catalog::new(db_path);
         let item_in_memory = Item {
             id: "item-1".to_string(),
             subclass: Some("subitem".to_string()),
@@ -135,7 +135,7 @@ mod tests {
             std::fs::remove_file(path).unwrap();
         }
         // 1. Create an empty, initialized database.
-        let mut catalog = Catalog::new(db_path);
+        let catalog = Catalog::new(db_path);
         catalog.init().unwrap();
         // 2. Attempt to load an ID that does not exist.
         let result = catalog.load_by_id("nonexistent-id");
@@ -151,7 +151,7 @@ mod tests {
         // Using a directory as a path should cause a failure.
         let invalid_path = "target/test_dbs/a_directory_for_load_fail";
         std::fs::create_dir_all(invalid_path).unwrap();
-        let mut catalog = Catalog::new(invalid_path);
+        let catalog = Catalog::new(invalid_path);
         // Attempt to load from the invalid path.
         let result = catalog.load_by_id("any-id");
         assert!(result.is_err());

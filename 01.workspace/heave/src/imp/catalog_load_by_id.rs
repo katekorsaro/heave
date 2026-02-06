@@ -25,7 +25,7 @@ impl Catalog {
     ///
     /// Returns `Err(FailedTo::LoadFromDB)` if there is an issue loading the entity
     /// from the database.
-    pub fn load_by_id(&mut self, id: &str) -> Result<(), FailedTo> {
+    pub fn load_by_id(&self, id: &str) -> Result<(), FailedTo> {
         let path = path::Path::new(&self.path);
         self.on_items(|items| {
             let entity = sqlite::load::by_id(path, id).map_err(|_| FailedTo::LoadFromDB)?;

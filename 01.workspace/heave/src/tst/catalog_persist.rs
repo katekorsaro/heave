@@ -25,7 +25,7 @@ mod tests {
         let _ = catalog1.upsert(item1.clone());
         assert!(catalog1.persist().is_ok());
         // 2. Create a new catalog and load the item to verify it was persisted
-        let mut catalog2 = Catalog::new(db_path);
+        let catalog2 = Catalog::new(db_path);
         assert!(catalog2.load_by_id("item-1").is_ok());
         // 3. Get the item and assert it's the same as the one we inserted
         let loaded_item: Option<Item> = catalog2.get("item-1").unwrap();
@@ -59,7 +59,7 @@ mod tests {
         catalog1.delete(&item1.id);
         assert!(catalog1.persist().is_ok());
         // 3. Create a new catalog and try to load the deleted item.
-        let mut catalog2 = Catalog::new(db_path);
+        let catalog2 = Catalog::new(db_path);
         assert!(catalog2.load_by_id(&item1.id).is_ok());
         // 4. Assert that the item was not found.
         let loaded_item: Option<Item> = catalog2.get(&item1.id).unwrap();
@@ -91,7 +91,7 @@ mod tests {
         let _ = catalog1.upsert(original_item.clone());
         catalog1.persist().unwrap();
         // 2. Load it into a new catalog to simulate a separate session.
-        let mut catalog2 = Catalog::new(db_path);
+        let catalog2 = Catalog::new(db_path);
         catalog2.load_by_id("item-1").unwrap();
         // 3. Upsert updated data for the same item. This should mark it as 'Updated'.
         let updated_item = Item {
@@ -113,7 +113,7 @@ mod tests {
         // 4. Persist the changes.
         catalog2.persist().unwrap();
         // 5. Load the data into a third catalog to verify the update was written to the DB.
-        let mut catalog3 = Catalog::new(db_path);
+        let catalog3 = Catalog::new(db_path);
         catalog3.load_by_id("item-1").unwrap();
         let loaded_item: Item = catalog3.get("item-1").unwrap().unwrap();
         // 6. Assert that the loaded item has the updated values.
