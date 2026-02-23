@@ -2,6 +2,9 @@
 name = "heave"
 version = "0.1.0"
 edition = "2024"
+description = "An Entity-Attribute-Value (EAV) system library for Rust, backed by SQLite."
+license = "MIT"
+keywords = ["eav", "entity-attribute-value", "sqlite", "database", "orm", "data-model", "rust"]
 
 [dependencies]
 rusqlite = { version = "0.38.0", features = ["bundled"] }
