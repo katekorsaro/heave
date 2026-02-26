@@ -14,7 +14,7 @@ pub enum Value {
     SignedInt(i64),
     /// A UTF-8 encoded string.
     Text(String),
-    /// An unsigned 64-bit integer.
+    /// An unsigned 32-bit integer.
     UnsignedInt(u32),
 }
 
