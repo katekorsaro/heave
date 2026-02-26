@@ -21,6 +21,7 @@ pub mod f64_try_from_value;
 pub mod i32_try_from_value;
 pub mod i64_try_from_value;
 pub mod string_try_from_value;
+pub mod to_sql_value;
 pub mod u32_try_from_value;
 pub mod value_from_bool;
 pub mod value_from_f64;

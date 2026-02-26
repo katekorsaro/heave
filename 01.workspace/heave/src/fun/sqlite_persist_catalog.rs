@@ -33,7 +33,7 @@ fn write_attribute(
     transaction: &rusqlite::Transaction,
 ) -> result::Result<(), FailedTo> {
     let column = column(&attribute.value);
-    let attribute_values = (&attribute.id, &entity.id, &attribute.value.to_string());
+    let attribute_values = (&attribute.id, &entity.id, &attribute.value);
     let insert_attribute_statement =
         INSERT_ATTRIBUTE_STATEMENT_TEMPLATE.replace("{column}", column);
     transaction
