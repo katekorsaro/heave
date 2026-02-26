@@ -2,7 +2,15 @@ use crate::*;
 use rusqlite::*;
 
 const SELECT_ATTRIBUTE_BY_FK: &str = r#"
-    SELECT * FROM attribute
+    SELECT
+        id,
+        entity_id,
+        value_int,
+        value_uint,
+        value_real,
+        value_text,
+        value_bool
+    FROM attribute
     WHERE entity_id = ?1;
 "#;
 
