@@ -56,7 +56,7 @@ mod tests {
         let _ = catalog1.upsert(item1.clone());
         assert!(catalog1.persist().is_ok());
         // 2. Mark the item for deletion and persist again.
-        catalog1.delete(&item1.id);
+        catalog1.delete(&item1.id).unwrap();
         assert!(catalog1.persist().is_ok());
         // 3. Create a new catalog and try to load the deleted item.
         let catalog2 = Catalog::new(db_path);
@@ -191,7 +191,7 @@ mod tests {
         };
         let _ = catalog_ops.upsert(item_to_update_new.clone()); // State: Updated
         // An item to be deleted.
-        catalog_ops.delete("delete-me"); // State: ToDelete
+        catalog_ops.delete("delete-me").unwrap(); // State: ToDelete
         // item_to_keep is left untouched (State: Synced after load)
         // 3. Execution: Persist all the changes in one go.
         catalog_ops.persist().unwrap();
@@ -320,7 +320,7 @@ mod tests {
         };
         let _ = catalog.upsert(item_updated.clone()); // State: Updated
         // An item to be deleted.
-        catalog.delete("delete-me"); // State: ToDelete
+        catalog.delete("delete-me").unwrap(); // State: ToDelete
         // 'item_untouched' remains with state `Loaded`.
         // Check states before final persist
         assert_eq!(

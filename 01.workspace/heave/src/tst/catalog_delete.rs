@@ -15,7 +15,7 @@ mod tests {
         };
         let item_id = item.id.clone();
         let _ = catalog.upsert(item);
-        catalog.delete(&item_id);
+        catalog.delete(&item_id).unwrap();
         let is_deleted = catalog
             .with_items(|items| {
                 let entity = items.get(&item_id).unwrap();
@@ -38,7 +38,7 @@ mod tests {
         };
         let _ = catalog.upsert(item);
         // Attempt to delete a non-existent entity, which should not panic or change anything.
-        catalog.delete("nonexistent-id");
+        catalog.delete("nonexistent-id").unwrap();
         let not_deleted = catalog
             .with_items(|items| {
                 let entity = items.get("item-123").unwrap();

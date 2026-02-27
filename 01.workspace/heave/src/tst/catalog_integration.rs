@@ -112,7 +112,7 @@ mod tests {
         catalog2.load_by_id("item-to-delete").unwrap();
         assert!(catalog2.get::<Item>("item-to-delete").unwrap().is_some());
         // 3. 'delete' -> 'persist'
-        catalog2.delete("item-to-delete");
+        catalog2.delete("item-to-delete").unwrap();
         catalog2.persist().unwrap();
         // 4. 'load_by_id' should now return nothing
         let catalog3 = Catalog::new(db_path);
