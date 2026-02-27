@@ -4,7 +4,8 @@ use rusqlite::*;
 pub fn run<'a>(filter: &'a Filter) -> Result<Vec<Box<dyn ToSql + 'a>>, FailedTo> {
     let mut params: Vec<Box<dyn ToSql>> = Vec::new();
     for condition in filter.conditions() {
-        let (_, comparison, condition) = condition;
+        let (name, comparison, condition) = condition;
+        params.push(Box::new(name));
         match (comparison, condition) {
             // BOOL
             (Comparison::Equal, Condition::Bool(value)) => params.push(Box::new(value)),
