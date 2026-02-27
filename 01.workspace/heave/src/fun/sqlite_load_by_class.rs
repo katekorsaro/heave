@@ -2,7 +2,7 @@ use crate::*;
 use rusqlite::*;
 
 const SELECT_ENTITY_BY_CLASS: &str = r#"
-    SELECT * FROM entity
+    SELECT id, class, subclass, ref_date FROM entity
     WHERE class = ?1;
 "#;
 
