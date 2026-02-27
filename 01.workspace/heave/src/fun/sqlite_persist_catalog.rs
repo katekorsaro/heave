@@ -38,7 +38,7 @@ fn write_attribute(
         INSERT_ATTRIBUTE_STATEMENT_TEMPLATE.replace("{column}", column);
     transaction
         .execute(&insert_attribute_statement, attribute_values)
-        .map_err(|_| sqlite::FailedTo::ExecuteStatement)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteStatement(sqlite_error))?;
     Ok(())
 }
 
@@ -46,7 +46,7 @@ fn delete_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result
     let entity_id = [&entity.id];
     transaction
         .execute(DELETE_ENTITY_STATEMENT, entity_id)
-        .map_err(|_| sqlite::FailedTo::ExecuteStatement)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteStatement(sqlite_error))?;
     Ok(())
 }
 
@@ -55,10 +55,10 @@ fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result<
     let entity_values = (&entity.id, &entity.class, &entity.subclass, entity.ref_date);
     transaction
         .execute(DELETE_ENTITY_STATEMENT, entity_id)
-        .map_err(|_| sqlite::FailedTo::ExecuteStatement)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteStatement(sqlite_error))?;
     transaction
         .execute(INSERT_ENTITY_STATEMENT, entity_values)
-        .map_err(|_| sqlite::FailedTo::ExecuteStatement)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteStatement(sqlite_error))?;
     for attribute in entity.attributes.values() {
         write_attribute(attribute, entity, transaction)?;
     }
