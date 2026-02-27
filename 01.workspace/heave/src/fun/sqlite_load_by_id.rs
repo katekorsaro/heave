@@ -15,7 +15,7 @@ pub fn run(path: &path::Path, entity_id: &str) -> Result<Option<Entity>, FailedT
     let mut entity = transaction
         .query_one(SELECT_ENTITY_BY_ID, [entity_id], sqlite::map::row_to_entity)
         .optional()
-        .map_err(|_| sqlite::FailedTo::ExecuteQuery)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteQuery(sqlite_error))?;
     if let Some(ref mut entity) = entity {
         sqlite::load::attributes(&transaction, entity)?;
         entity.state = EntityState::Loaded;

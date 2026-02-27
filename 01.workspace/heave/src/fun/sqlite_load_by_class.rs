@@ -18,7 +18,7 @@ pub fn run(path: &path::Path, entity_class: &str) -> Result<Vec<Entity>, FailedT
         .map_err(|_| sqlite::FailedTo::PrepareStatement)?;
     let result = statement
         .query_map([entity_class], sqlite::map::row_to_entity)
-        .map_err(|_| sqlite::FailedTo::ExecuteQuery)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteQuery(sqlite_error))?;
     for entity in result {
         let mut entity = entity.map_err(|_| FailedTo::MapEntity)?;
         sqlite::load::attributes(&transaction, &mut entity)?;

@@ -10,7 +10,7 @@ pub enum FailedTo {
     /// Failed to execute a batch of SQL statements.
     ExecuteBatch(rusqlite::Error),
     /// Failed to execute a SQL query.
-    ExecuteQuery,
+    ExecuteQuery(rusqlite::Error),
     /// Failed to execute a prepared SQL statement.
     ExecuteStatement,
     /// Failed to open a connection to the SQLite database.
