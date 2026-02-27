@@ -83,6 +83,6 @@ pub fn run(path: &path::Path, items: &HashMap<String, Entity>) -> result::Result
     }
     transaction
         .commit()
-        .map_err(|_| sqlite::FailedTo::CommitTransaction)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::CommitTransaction(sqlite_error))?;
     Ok(())
 }
