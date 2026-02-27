@@ -26,7 +26,6 @@ mod tests {
             .list_by_subclass::<Item>("electronics")
             .unwrap()
             .into_iter()
-            .map(|item| item.unwrap())
             .collect();
         assert_eq!(results.len(), 2);
         assert!(results.contains(&item1));
@@ -46,7 +45,6 @@ mod tests {
             .list_by_subclass::<Item>("books")
             .unwrap()
             .into_iter()
-            .map(|item| item.unwrap())
             .collect();
         assert!(results.is_empty());
     }

@@ -24,7 +24,7 @@ impl Catalog {
     ///
     /// Returns `Err(FailedTo::LockCatalog)` if the catalog's internal mutex
     /// could not be locked.
-    pub fn list_by_subclass<T>(&self, subclass: &str) -> Result<Vec<Result<T, FailedTo>>, FailedTo>
+    pub fn list_by_subclass<T>(&self, subclass: &str) -> Result<Vec<T>, FailedTo>
     where
         T: EAV,
     {
@@ -33,7 +33,7 @@ impl Catalog {
                 .values()
                 .filter(move |item| item.class == T::class())
                 .filter(move |item| item.subclass == Some(subclass.to_string()))
-                .map(|item| T::try_from(item.clone()).map_err(|_| FailedTo::ConvertEntity))
+.filter_map(|item| { T::try_from(item.clone()).ok() })
                 .collect())
         })
     }
