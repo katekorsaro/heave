@@ -14,7 +14,7 @@ pub enum FailedTo {
     /// Failed to execute a prepared SQL statement.
     ExecuteStatement(rusqlite::Error),
     /// Failed to open a connection to the SQLite database.
-    OpenConnection,
+    OpenConnection(rusqlite::Error),
     /// Failed to prepare a SQL statement for execution.
     PrepareStatement,
 }

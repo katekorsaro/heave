@@ -66,7 +66,8 @@ fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result<
 }
 
 pub fn run(path: &path::Path, items: &HashMap<String, Entity>) -> result::Result<(), FailedTo> {
-    let mut connection = Connection::open(path).map_err(|_| sqlite::FailedTo::OpenConnection)?;
+    let mut connection = Connection::open(path)
+        .map_err(|sqlite_error| sqlite::FailedTo::OpenConnection(sqlite_error))?;
     let transaction = connection
         .transaction()
         .map_err(|sqlite_error| sqlite::FailedTo::BeginTransaction(sqlite_error))?;

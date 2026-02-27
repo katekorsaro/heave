@@ -71,9 +71,7 @@ fn from_condition(
         }
         (_, Condition::Real(_)) => return Err(FailedTo::ComposeFilter),
         // TEXT
-        (Comparison::IsExactly, Condition::Text(_)) => {
-            compose_fragment(name, "value_text", "=", i)
-        }
+        (Comparison::IsExactly, Condition::Text(_)) => compose_fragment(name, "value_text", "=", i),
         (
             Comparison::StartsWith | Comparison::EndsWith | Comparison::Contains,
             Condition::Text(_),

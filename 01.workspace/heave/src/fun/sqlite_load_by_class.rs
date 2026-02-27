@@ -8,7 +8,8 @@ const SELECT_ENTITY_BY_CLASS: &str = r#"
 
 pub fn run(path: &path::Path, entity_class: &str) -> Result<Vec<Entity>, FailedTo> {
     let mut entities = Vec::<Entity>::new();
-    let mut connection = Connection::open(path).map_err(|_| sqlite::FailedTo::OpenConnection)?;
+    let mut connection = Connection::open(path)
+        .map_err(|sqlite_error| sqlite::FailedTo::OpenConnection(sqlite_error))?;
     let mut transaction = connection
         .transaction()
         .map_err(|sqlite_error| sqlite::FailedTo::BeginTransaction(sqlite_error))?;
