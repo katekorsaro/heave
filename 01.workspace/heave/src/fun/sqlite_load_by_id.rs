@@ -8,15 +8,15 @@ const SELECT_ENTITY_BY_ID: &str = r#"
 
 pub fn run(path: &path::Path, entity_id: &str) -> Result<Option<Entity>, FailedTo> {
     let mut connection = Connection::open(path)
-        .map_err(|sqlite_error| sqlite::FailedTo::OpenConnection(sqlite_error))?;
+        .map_err(sqlite::FailedTo::OpenConnection)?;
     let mut transaction = connection
         .transaction()
-        .map_err(|sqlite_error| sqlite::FailedTo::BeginTransaction(sqlite_error))?;
+        .map_err(sqlite::FailedTo::BeginTransaction)?;
     transaction.set_drop_behavior(DropBehavior::Commit);
     let mut entity = transaction
         .query_one(SELECT_ENTITY_BY_ID, [entity_id], sqlite::map::row_to_entity)
         .optional()
-        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteQuery(sqlite_error))?;
+        .map_err(sqlite::FailedTo::ExecuteQuery)?;
     if let Some(ref mut entity) = entity {
         sqlite::load::attributes(&transaction, entity)?;
         entity.state = EntityState::Loaded;

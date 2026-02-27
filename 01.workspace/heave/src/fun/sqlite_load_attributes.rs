@@ -17,10 +17,10 @@ const SELECT_ATTRIBUTE_BY_FK: &str = r#"
 pub fn run(transaction: &Transaction, entity: &mut Entity) -> Result<(), FailedTo> {
     let mut select_attributes_statement = transaction
         .prepare(SELECT_ATTRIBUTE_BY_FK)
-        .map_err(|sqlite_error| sqlite::FailedTo::PrepareStatement(sqlite_error))?;
+        .map_err(sqlite::FailedTo::PrepareStatement)?;
     let attributes = select_attributes_statement
         .query_map([&entity.id], sqlite::map::row_to_attribute)
-        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteQuery(sqlite_error))?;
+        .map_err(sqlite::FailedTo::ExecuteQuery)?;
     for attribute in attributes {
         let attribute = attribute.map_err(|_| FailedTo::MapAttribute)?;
         entity.attributes.insert(attribute.id.clone(), attribute);

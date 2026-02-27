@@ -38,7 +38,7 @@ fn write_attribute(
         INSERT_ATTRIBUTE_STATEMENT_TEMPLATE.replace("{column}", column);
     transaction
         .execute(&insert_attribute_statement, attribute_values)
-        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteStatement(sqlite_error))?;
+        .map_err(sqlite::FailedTo::ExecuteStatement)?;
     Ok(())
 }
 
@@ -46,7 +46,7 @@ fn delete_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result
     let entity_id = [&entity.id];
     transaction
         .execute(DELETE_ENTITY_STATEMENT, entity_id)
-        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteStatement(sqlite_error))?;
+        .map_err(sqlite::FailedTo::ExecuteStatement)?;
     Ok(())
 }
 
@@ -55,10 +55,10 @@ fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result<
     let entity_values = (&entity.id, &entity.class, &entity.subclass, entity.ref_date);
     transaction
         .execute(DELETE_ENTITY_STATEMENT, entity_id)
-        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteStatement(sqlite_error))?;
+        .map_err(sqlite::FailedTo::ExecuteStatement)?;
     transaction
         .execute(INSERT_ENTITY_STATEMENT, entity_values)
-        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteStatement(sqlite_error))?;
+        .map_err(sqlite::FailedTo::ExecuteStatement)?;
     for attribute in entity.attributes.values() {
         write_attribute(attribute, entity, transaction)?;
     }
@@ -67,10 +67,10 @@ fn write_entity(entity: &Entity, transaction: &rusqlite::Transaction) -> Result<
 
 pub fn run(path: &path::Path, items: &HashMap<String, Entity>) -> result::Result<(), FailedTo> {
     let mut connection = Connection::open(path)
-        .map_err(|sqlite_error| sqlite::FailedTo::OpenConnection(sqlite_error))?;
+        .map_err(sqlite::FailedTo::OpenConnection)?;
     let transaction = connection
         .transaction()
-        .map_err(|sqlite_error| sqlite::FailedTo::BeginTransaction(sqlite_error))?;
+        .map_err(sqlite::FailedTo::BeginTransaction)?;
     for entity in items.values().filter(|item| {
         item.state == EntityState::New
             || item.state == EntityState::Updated
@@ -84,6 +84,6 @@ pub fn run(path: &path::Path, items: &HashMap<String, Entity>) -> result::Result
     }
     transaction
         .commit()
-        .map_err(|sqlite_error| sqlite::FailedTo::CommitTransaction(sqlite_error))?;
+        .map_err(sqlite::FailedTo::CommitTransaction)?;
     Ok(())
 }
