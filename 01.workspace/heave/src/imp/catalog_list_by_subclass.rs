@@ -29,7 +29,7 @@ impl Catalog {
             Ok(items
                 .values()
                 .filter(move |item| item.class == T::class())
-                .filter(move |item| item.subclass == Some(subclass.to_string()))
+                .filter(move |item| item.subclass.as_deref() == Some(subclass))
 .filter_map(|item| { T::try_from(item.clone()).ok() })
                 .collect())
         })
