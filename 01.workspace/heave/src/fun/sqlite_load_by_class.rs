@@ -16,7 +16,7 @@ pub fn run(path: &path::Path, entity_class: &str) -> Result<Vec<Entity>, FailedT
     transaction.set_drop_behavior(DropBehavior::Commit);
     let mut statement = transaction
         .prepare(SELECT_ENTITY_BY_CLASS)
-        .map_err(|_| sqlite::FailedTo::PrepareStatement)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::PrepareStatement(sqlite_error))?;
     let result = statement
         .query_map([entity_class], sqlite::map::row_to_entity)
         .map_err(|sqlite_error| sqlite::FailedTo::ExecuteQuery(sqlite_error))?;

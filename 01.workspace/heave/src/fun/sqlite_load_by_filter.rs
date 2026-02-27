@@ -14,7 +14,7 @@ pub fn run(path: &path::Path, filter: &Filter) -> Result<Vec<Entity>, FailedTo> 
     let params: Vec<&dyn ToSql> = params.iter().map(|p| p.as_ref() as &dyn ToSql).collect();
     let mut statement = transaction
         .prepare(&select_entity_by_filter)
-        .map_err(|_| sqlite::FailedTo::PrepareStatement)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::PrepareStatement(sqlite_error))?;
     let result = statement
         .query_map(&params[..], sqlite::map::row_to_entity)
         .map_err(|sqlite_error| sqlite::FailedTo::ExecuteQuery(sqlite_error))?;
