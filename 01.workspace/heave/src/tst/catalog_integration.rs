@@ -74,7 +74,6 @@ mod tests {
             .list::<Item>()
             .unwrap()
             .into_iter()
-            .map(|item| item.unwrap())
             .collect();
         // Sort by ID to ensure consistent order for comparison
         let mut expected_items = items_to_insert;

@@ -27,8 +27,8 @@ mod tests {
         let _ = catalog.upsert(item2.clone());
         let results = catalog.list::<Item>().unwrap();
         assert_eq!(results.len(), 2);
-        assert!(results.contains(&Ok(item1)));
-        assert!(results.contains(&Ok(item2)));
+        assert!(results.contains(&item1));
+        assert!(results.contains(&item2));
     }
     #[test]
     fn list_by_class_should_return_empty_iterator_if_no_match() {

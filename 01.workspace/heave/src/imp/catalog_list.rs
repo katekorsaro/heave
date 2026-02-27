@@ -20,7 +20,7 @@ impl Catalog {
     ///
     /// Returns `Err(FailedTo::LockCatalog)` if the catalog's internal mutex
     /// could not be locked.
-    pub fn list<T>(&self) -> Result<Vec<Result<T, FailedTo>>, FailedTo>
+    pub fn list<T>(&self) -> Result<Vec<T>, FailedTo>
     where
         T: EAV,
     {
@@ -28,7 +28,7 @@ impl Catalog {
             Ok(items
                 .values()
                 .filter(move |item| item.class == T::class())
-                .map(|item| T::try_from(item.clone()).map_err(|_| FailedTo::ConvertEntity))
+                .filter_map(|item| T::try_from(item.clone()).ok())
                 .collect())
         })
     }

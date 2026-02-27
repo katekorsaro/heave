@@ -145,7 +145,6 @@ fn main() -> Result<(), FailedTo> {
         .list()
         .unwrap()
         .into_iter()
-        .map(|p| p.unwrap())
         .collect();
 
     println!("✅ Loaded {} laptop(s) using filter.", laptops.len());
@@ -173,7 +172,6 @@ fn main() -> Result<(), FailedTo> {
         .list()
         .unwrap()
         .into_iter()
-        .map(|p| p.unwrap())
         .collect();
 
     println!(
@@ -205,7 +203,6 @@ fn main() -> Result<(), FailedTo> {
         .list()
         .unwrap()
         .into_iter()
-        .map(|p| p.unwrap())
         .collect();
 
     println!("✅ Loaded {} total products.", all_products.len());

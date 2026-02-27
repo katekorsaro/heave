@@ -134,7 +134,6 @@ fn main() {
         .list::<Component>()
         .unwrap()
         .into_iter()
-        .map(|c| c.unwrap())
         .collect();
     // Print the loaded components
     println!(
