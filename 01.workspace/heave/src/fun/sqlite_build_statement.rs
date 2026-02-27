@@ -1,5 +1,7 @@
 use crate::*;
 
+// TODO: possible sql injection for attribute_id!!!
+
 const BASE_SELECT: &str = r#"SELECT * FROM entity"#;
 const INNER_JOIN_FRAGMENT: &str = r#"
     INNER JOIN attribute as attribute_{index}
