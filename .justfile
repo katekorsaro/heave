@@ -10,6 +10,10 @@ check_semver:
 code_coverage:
   cd 01.workspace && cargo llvm-cov clean && cargo llvm-cov --show-missing-lines
 
+force_sync_remotes:
+  git push --force codeberg.org next
+  git push --force github.com next
+
 sync_remotes:
   git push codeberg.org next
   git push github.com next
