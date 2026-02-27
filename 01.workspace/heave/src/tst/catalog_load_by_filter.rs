@@ -828,8 +828,8 @@ mod tests {
         let catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::IsExactly, "item one");
         assert!(catalog.load_by_filter(&filter).is_ok());
-        assert_eq!(catalog.len().unwrap(), 1);
-        assert!(catalog.contains_key("item-1").unwrap());
+        assert_eq!(catalog.len().unwrap(), 0);
+        assert!(catalog.is_empty().unwrap());
         // No match
         let catalog = Catalog::new(db_path);
         let filter = Filter::new().with_text("name", Comparison::IsExactly, "Item Four");
