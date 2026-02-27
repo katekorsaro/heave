@@ -9,12 +9,9 @@ impl Catalog {
     ///
     /// # Returns
     ///
-    /// A `Result` containing a `Vec` of `Result<T, FailedTo>>`. Each inner `Result`
-    /// represents the outcome of converting an entity to type `T`.
-    ///
-    /// - `Ok(Vec<Ok(T)>)`: A vector of successfully converted entities.
-    /// - `Ok(Vec<Err(FailedTo::ConvertEntity)>)`: If an entity of the correct class
-    ///   could not be converted to type `T`.
+    /// A `Result` containing a `Vec<T>` of entities that were successfully
+    /// converted to type `T`. Entities that fail conversion are silently
+    /// skipped and not included in the returned vector.
     ///
     /// # Errors
     ///
