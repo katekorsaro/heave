@@ -3,8 +3,7 @@ use rusqlite::*;
 
 pub fn run(path: &path::Path, filter: &Filter) -> Result<Vec<Entity>, FailedTo> {
     let mut entities = Vec::<Entity>::new();
-    let mut connection = Connection::open(path)
-        .map_err(sqlite::FailedTo::OpenConnection)?;
+    let mut connection = Connection::open(path).map_err(sqlite::FailedTo::OpenConnection)?;
     let mut transaction = connection
         .transaction()
         .map_err(sqlite::FailedTo::BeginTransaction)?;

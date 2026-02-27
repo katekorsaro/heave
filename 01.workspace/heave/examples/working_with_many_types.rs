@@ -141,11 +141,7 @@ fn main() -> Result<(), FailedTo> {
 
     laptop_catalog.load_by_filter(&laptop_filter)?;
 
-    let laptops: Vec<Product> = laptop_catalog
-        .list()
-        .unwrap()
-        .into_iter()
-        .collect();
+    let laptops: Vec<Product> = laptop_catalog.list().unwrap().into_iter().collect();
 
     println!("✅ Loaded {} laptop(s) using filter.", laptops.len());
     assert_eq!(laptops.len(), 2);
@@ -168,11 +164,7 @@ fn main() -> Result<(), FailedTo> {
 
     expensive_catalog.load_by_filter(&expensive_filter)?;
 
-    let expensive_products: Vec<Product> = expensive_catalog
-        .list()
-        .unwrap()
-        .into_iter()
-        .collect();
+    let expensive_products: Vec<Product> = expensive_catalog.list().unwrap().into_iter().collect();
 
     println!(
         "✅ Loaded {} product(s) with price > $1000.",
@@ -199,11 +191,7 @@ fn main() -> Result<(), FailedTo> {
     let all_products_filter = Filter::new().with_class(Product::class());
     all_products_catalog.load_by_filter(&all_products_filter)?;
 
-    let all_products: Vec<Product> = all_products_catalog
-        .list()
-        .unwrap()
-        .into_iter()
-        .collect();
+    let all_products: Vec<Product> = all_products_catalog.list().unwrap().into_iter().collect();
 
     println!("✅ Loaded {} total products.", all_products.len());
     assert_eq!(all_products.len(), 4);

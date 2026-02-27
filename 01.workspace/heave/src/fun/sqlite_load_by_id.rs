@@ -7,8 +7,7 @@ const SELECT_ENTITY_BY_ID: &str = r#"
 "#;
 
 pub fn run(path: &path::Path, entity_id: &str) -> Result<Option<Entity>, FailedTo> {
-    let mut connection = Connection::open(path)
-        .map_err(sqlite::FailedTo::OpenConnection)?;
+    let mut connection = Connection::open(path).map_err(sqlite::FailedTo::OpenConnection)?;
     let mut transaction = connection
         .transaction()
         .map_err(sqlite::FailedTo::BeginTransaction)?;

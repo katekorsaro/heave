@@ -70,11 +70,7 @@ mod tests {
         // 2. new catalog -> 'load_by_class' -> 'list_by_class'
         let catalog2 = Catalog::new(db_path);
         catalog2.load::<Item>().unwrap();
-        let mut loaded_items: Vec<Item> = catalog2
-            .list::<Item>()
-            .unwrap()
-            .into_iter()
-            .collect();
+        let mut loaded_items: Vec<Item> = catalog2.list::<Item>().unwrap().into_iter().collect();
         // Sort by ID to ensure consistent order for comparison
         let mut expected_items = items_to_insert;
         loaded_items.sort_by(|a, b| a.id.cmp(&b.id));
