@@ -11,7 +11,7 @@ pub fn run(path: &path::Path, entity_class: &str) -> Result<Vec<Entity>, FailedT
     let mut connection = Connection::open(path).map_err(|_| sqlite::FailedTo::OpenConnection)?;
     let mut transaction = connection
         .transaction()
-        .map_err(|_| sqlite::FailedTo::BeginTransaction)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::BeginTransaction(sqlite_error))?;
     transaction.set_drop_behavior(DropBehavior::Commit);
     let mut statement = transaction
         .prepare(SELECT_ENTITY_BY_CLASS)

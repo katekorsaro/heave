@@ -10,7 +10,7 @@ pub fn run(path: &path::Path, entity_id: &str) -> Result<Option<Entity>, FailedT
     let mut connection = Connection::open(path).map_err(|_| sqlite::FailedTo::OpenConnection)?;
     let mut transaction = connection
         .transaction()
-        .map_err(|_| sqlite::FailedTo::BeginTransaction)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::BeginTransaction(sqlite_error))?;
     transaction.set_drop_behavior(DropBehavior::Commit);
     let mut entity = transaction
         .query_one(SELECT_ENTITY_BY_ID, [entity_id], sqlite::map::row_to_entity)

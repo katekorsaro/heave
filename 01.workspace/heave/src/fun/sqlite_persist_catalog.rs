@@ -69,7 +69,7 @@ pub fn run(path: &path::Path, items: &HashMap<String, Entity>) -> result::Result
     let mut connection = Connection::open(path).map_err(|_| sqlite::FailedTo::OpenConnection)?;
     let transaction = connection
         .transaction()
-        .map_err(|_| sqlite::FailedTo::BeginTransaction)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::BeginTransaction(sqlite_error))?;
     for entity in items.values().filter(|item| {
         item.state == EntityState::New
             || item.state == EntityState::Updated

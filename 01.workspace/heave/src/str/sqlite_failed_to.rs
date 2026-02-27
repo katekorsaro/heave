@@ -1,8 +1,8 @@
 /// Represents failures that can occur specifically within the SQLite implementation.
-#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy, Hash)]
+#[derive(Debug, PartialEq)]
 pub enum FailedTo {
     /// Failed to begin a database transaction.
-    BeginTransaction,
+    BeginTransaction(rusqlite::Error),
     /// Failed to build a SQL statement.
     BuildStatement,
     /// Failed to commit a database transaction.
