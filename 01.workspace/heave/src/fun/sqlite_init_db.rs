@@ -28,6 +28,6 @@ pub fn run(path: &path::Path) -> result::Result<(), FailedTo> {
     let connection = Connection::open(path).map_err(|_| sqlite::FailedTo::OpenConnection)?;
     connection
         .execute_batch(init_statement)
-        .map_err(|_| sqlite::FailedTo::ExecuteBatch)?;
+        .map_err(|sqlite_error| sqlite::FailedTo::ExecuteBatch(sqlite_error))?;
     Ok(())
 }

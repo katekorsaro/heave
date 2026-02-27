@@ -8,7 +8,7 @@ pub enum FailedTo {
     /// Failed to commit a database transaction.
     CommitTransaction(rusqlite::Error),
     /// Failed to execute a batch of SQL statements.
-    ExecuteBatch,
+    ExecuteBatch(rusqlite::Error),
     /// Failed to execute a SQL query.
     ExecuteQuery,
     /// Failed to execute a prepared SQL statement.
