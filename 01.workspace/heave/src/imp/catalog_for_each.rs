@@ -17,7 +17,9 @@ impl Catalog {
     ///
     /// # Returns
     ///
-    /// A `Result` indicating success (`Ok(())`) or failure (`Err(FailedTo)`).
+    /// A `Result` indicating success (`Ok(())`) or failure (`Err(FailedTo::LockCatalog)`).
+    /// Entities that cannot be converted to type `T` are silently skipped from the iteration
+    /// and do not cause this function to return an error.
     pub fn for_each<T, F>(&self, mut predicate: F) -> Result<(), FailedTo>
     where
         T: EAV,
