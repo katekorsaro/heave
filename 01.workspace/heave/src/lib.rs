@@ -135,7 +135,7 @@
 //!     let mut filtered_catalog = Catalog::new(db_path);
 //!     filtered_catalog.load_by_filter(&filter)?;
 //!     let cheap_products: Vec<Product> = filtered_catalog.list()
-//!         .unwrap().into_iter().map(|p| p.unwrap()).collect();
+//!         .unwrap().into_iter().collect();
 //!     println!("✅ Found {} cheap, in-stock product(s).", cheap_products.len());
 //!     assert_eq!(cheap_products.len(), 1);
 //!     assert_eq!(cheap_products[0].id, "p2");
